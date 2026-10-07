@@ -1672,12 +1672,14 @@ function updateEntityHost(dt) {
       moveTo = E.path[0];
       if (moveTo && Math.hypot(moveTo.x - E.x, moveTo.z - E.z) < .3) { E.path.shift(); moveTo = E.path[0]; }
     }
-    if (F.hidden && fdist < 2.4) {
-      if (!E.near) { E.near = true; E.checks = Math.random() < (.5 + FLN * .1); E.hideT = 0; }
-      speed = 0; E.hideT += dt;
-      if (E.hideT > 3.2) {
-        if (E.checks) { catchTarget(F, 'hide'); E.near = false; }
-        else { E.near = false; E.state = 'investigate'; E.path = []; E.hideT = 0; const c = openCells[(Math.random() * openCells.length) | 0]; E.target = { x: c[0] * CELL, z: c[1] * CELL }; if (F.local) say('… es geht weg …', 3000); }
+    if (F.hidden && fdist < 2.4) {   // Versteckt = sicher: das Wesen sucht, lauert, geht irgendwann weg
+      if (!E.near) { E.near = true; E.checks = Math.random() < .6; E.hideT = 0; E.lingerT = 6 + Math.random() * 6; E.sniffT = 1.5; }
+      speed = 0; E.hideT += dt; E.sniffT -= dt;
+      if (E.sniffT <= 0) { E.sniffT = 1.2 + Math.random() * 2.2; if (E.checks) { glitchKick = Math.max(glitchKick, .35); if (F.local) breath(.1); } }
+      if (E.hideT > E.lingerT) {
+        E.near = false; E.state = 'investigate'; E.path = []; E.hideT = 0; E.lostT = 0;
+        let c = null; for (let k = 0; k < 12 && !c; k++) { const q = openCells[(Math.random() * openCells.length) | 0]; if (Math.hypot(q[0] * CELL - F.x, q[1] * CELL - F.z) > 14) c = q; } c = c || openCells[(Math.random() * openCells.length) | 0];
+        E.target = { x: c[0] * CELL, z: c[1] * CELL }; if (F.local) say('… es geht weg …', 3000);
       }
     } else E.near = false;
   }
