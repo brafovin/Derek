@@ -23,6 +23,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 #tasks{top:8.5vh;left:50%;transform:translateX(-50%);text-align:left;opacity:.8;font-size:.9em;line-height:1.55;white-space:nowrap}
 #tasks .ok{opacity:.55;text-decoration:line-through}
 #prompt{top:58%;left:50%;transform:translateX(-50%);text-align:center;font-size:1.15em;display:none}
+#subl{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.45);color:#c40000;font-size:9vw;font-weight:bold;letter-spacing:.3em;text-align:center;text-shadow:3px 0 #0ff,-3px 0 #f00,0 0 30px #600}
 #sub{bottom:13vh;left:50%;transform:translateX(-50%);width:min(80vw,900px);text-align:center;font-size:1.2em;line-height:1.5;
   background:rgba(0,0,0,.35);padding:.3em .8em;display:none}
 #cross{top:50%;left:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:rgba(255,255,255,.5)}
@@ -106,6 +107,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
   <div id="spec">ZUSCHAUER — LEERTASTE: nächster Spieler</div>
   <div id="cross"></div>
   <div id="prompt"></div>
+  <div id="subl"></div>
   <div id="sub"></div>
   <div id="hideov"></div>
   <div id="floorbn"></div>
@@ -2745,6 +2747,77 @@ function showEnd() {
 $('endagain').addEventListener('click', restartRequest);
 
 /* ====================================================================
+   UNHEIMLICHES: Spieldosen-Melodie, Schritte hinter dir, Augen im Dunkeln,
+   Bild-Störungen, Kratzen am Versteck
+==================================================================== */
+const eyesMat = new THREE.MeshBasicMaterial({ color: 0xf2efe6, fog: false });
+const eyesGrp = new THREE.Group(); eyesGrp.visible = false; scene.add(eyesGrp);
+[-.065, .065].forEach(dx => { const m = new THREE.Mesh(new THREE.SphereGeometry(.06, 8, 6), eyesMat); m.position.x = dx; m.scale.set(1.4, .9, 1); eyesGrp.add(m); });
+const CR = { t: 25, fl: -1, eyes: false, eyeT: 0, eyeSeen: 0, tsT: 0, subT: 0, scratchT: 0, steps: 0, stepT: 0, stepD: 0, stepA: 0 };
+const SUBL_TXT = ['SIE SIEHT DICH', 'NICHT UMDREHEN', 'LENA', 'HINTER DIR', 'ER IST NÄHER', 'SCHLAF', 'DU HAST ES GESEHEN', '7'];
+const SUBL_TXT2 = ['PAPA IST DA', 'SCHLAF EINFACH EIN', 'ES WAR KEIN TRAUM', 'WIR SIND ZU HAUSE'];
+
+function musicBox(px, pz) {   // verstimmte Spieluhr, wird langsamer und bricht mitten im Satz ab
+  if (!AC) return; const p = makeTempPanner(px, pz); let t = AC.currentTime + .05, dur = .42;
+  const notes = [0, 3, 7, 5, 3, 2, 0, -1, -3, 0, 3, 7, 10, 8];
+  const n = 9 + ((Math.random() * 5) | 0);
+  for (let i = 0; i < n; i++) {
+    const f = 440 * Math.pow(2, (notes[i % notes.length] - i * .06) / 12) * (1 + (Math.random() - .5) * .03);
+    [1, 3.01].forEach((m, j) => { const o = AC.createOscillator(); o.type = 'sine'; o.frequency.value = f * m; const g = AC.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime((j ? .05 : .2), t + .008); g.gain.exponentialRampToValueAtTime(.001, t + dur * 1.8); o.connect(g); g.connect(p); o.start(t); o.stop(t + dur * 1.9); });
+    t += dur; dur *= 1.07;
+  }
+}
+function scratchDoor() {   // Fingernägel am Versteck
+  if (!AC) return; const a = rnd(0, 6.28), p = makeTempPanner(P.x + Math.cos(a) * .7, P.z + Math.sin(a) * .7), t0 = AC.currentTime;
+  for (let i = 0; i < 4; i++) { const t = t0 + i * .13, s = AC.createBufferSource(); s.buffer = noiseBuf; const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2400 + Math.random() * 1400; f.Q.value = 2; const g = AC.createGain(); g.gain.setValueAtTime(.0, t); g.gain.linearRampToValueAtTime(.55, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + .12); s.connect(f); f.connect(g); g.connect(p); s.start(t, Math.random()); s.stop(t + .14); }
+}
+function footstepsBehind() { CR.steps = 5 + ((Math.random() * 3) | 0); CR.stepT = 0; CR.stepD = 6.5; CR.stepA = P.yaw; }
+function subliminal() {
+  const el = $('subl'), list = FLN === 4 ? SUBL_TXT2.concat(SUBL_TXT) : SUBL_TXT; el.textContent = list[(Math.random() * list.length) | 0]; el.style.display = 'flex';
+  glitchKick = 1; if (AC) sting(.35); setTimeout(() => { el.style.display = 'none'; }, 85 + Math.random() * 40);
+}
+function spawnEyes() {
+  const fx = -Math.sin(P.yaw), fz = -Math.cos(P.yaw);
+  for (let k = 0; k < 30; k++) {
+    const c = openCells[(Math.random() * openCells.length) | 0], x = c[0] * CELL, z = c[1] * CELL, dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz);
+    if (d < 9 || d > 17 || (dx * fx + dz * fz) / d < .8 || !hasLOS(P.x, P.z, x, z)) continue;
+    eyesGrp.position.set(x, rnd(1.75, 1.95), z); eyesGrp.rotation.y = Math.atan2(P.x - x, P.z - z); eyesGrp.visible = true; CR.eyes = true; CR.eyeT = 0; CR.eyeSeen = 0; return true;
+  }
+  return false;
+}
+function creepClear() { CR.eyes = false; eyesGrp.visible = false; CR.steps = 0; const el = $('subl'); if (el) el.style.display = 'none'; }
+function creepEvent() {
+  const r = Math.random(), house = floorDef.kind === 'house';
+  const a = rnd(0, 6.28), d = rnd(9, 16);
+  if (r < .2) musicBox(P.x + Math.cos(a) * d, P.z + Math.sin(a) * d);
+  else if (r < .42) footstepsBehind();
+  else if (r < .6) subliminal();
+  else if (r < .72) CR.tsT = rnd(.9, 1.7);
+  else if (r < .92 && !house) { if (!spawnEyes()) subliminal(); }
+  else { breath(.16); flickerAll = Math.max(flickerAll, .7); }
+}
+function updateCreep(dt) {
+  if (CR.fl !== FLN) { CR.fl = FLN; creepClear(); CR.t = rnd(20, 32); }
+  const calm = !inputBlocked && !cinS.mode && !fadeBusy && !keypadOpen;
+  // Kratzen am Versteck, solange das Wesen lauert
+  if (P.hidden && E.near && AC) { CR.scratchT -= dt; if (CR.scratchT <= 0) { CR.scratchT = rnd(1.3, 2.6); scratchDoor(); if (Math.random() < .3) whisper(P.x + rnd(-.8, .8), P.z + rnd(-.8, .8)); } }
+  // Schritte
+  if (CR.steps > 0 && AC) { CR.stepT -= dt; if (CR.stepT <= 0) { CR.stepT = .52; CR.steps--; CR.stepD = Math.max(1.6, CR.stepD - .85); const a = CR.stepA + (CR.steps % 2 ? .06 : -.06); thud(.55, 520, makeTempPanner(P.x + Math.sin(a) * CR.stepD, P.z + Math.cos(a) * CR.stepD), .09); if (CR.steps === 0) { glitchKick = Math.max(glitchKick, .25); } } }
+  // Augen im Dunkeln
+  if (CR.eyes) {
+    CR.eyeT += dt; const dx = eyesGrp.position.x - P.x, dz = eyesGrp.position.z - P.z, d = Math.hypot(dx, dz), fx = -Math.sin(P.yaw), fz = -Math.cos(P.yaw), aim = (dx * fx + dz * fz) / d;
+    eyesGrp.visible = Math.sin(CR.eyeT * 1.9 + 1) > -.82 || CR.eyeT < 1;   // blinzelt
+    if (P.flash && aim > .985) CR.eyeSeen += dt; else CR.eyeSeen = Math.max(0, CR.eyeSeen - dt * .5);
+    if (CR.eyeSeen > .4 || d < 4.5 || CR.eyeT > 11 || !calm) { CR.eyes = false; eyesGrp.visible = false; if (CR.eyeSeen > .4 && AC) { hiss2(); glitchKick = Math.max(glitchKick, .5); } }
+  }
+  // Zeitstempel zerfällt
+  if (CR.tsT > 0) { CR.tsT -= dt; $('ts').textContent = Math.random() < .5 ? '1987-11-02 03:13:00' : '0000-00-00 ██:██:██'; if (Math.random() < .5) $('rect').textContent = '--:--:--'; }
+  if (!calm || E.state === 'chase' || P.hidden) return;
+  CR.t -= dt * dcfg().scare;
+  if (CR.t <= 0) { CR.t = rnd(28, 55) / (1 + FLN * .2); creepEvent(); }
+}
+
+/* ====================================================================
    SPRAYEN (Ego & Third-Person)
 ==================================================================== */
 const MAX_DOTS = 6000;
@@ -3067,6 +3140,7 @@ function frame(now) {
     if (state === 'play') updateTVs(dt); else tvFovFX += (0 - tvFovFX) * Math.min(1, dt * 5);
     if (floorDef.kind === 'house') updateHouse(dt);
     if (state === 'play' || state === 'spectate') updateHUD(dt);
+    if (state === 'play') updateCreep(dt); else if (CR.eyes || CR.steps) creepClear();
     updateAudio(dt);
   } else if (state === 'menu' || state === 'lobby' || state === 'boot') { updateLights(dt); }
   else if (state === 'trailer') { updateTrailer(dt); updateLights(dt); updateAudio(dt); }
@@ -3098,7 +3172,7 @@ if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state 
 window.__game = { get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
-  get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; } };
+  get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
 
 }, 40); }); });
 </script>

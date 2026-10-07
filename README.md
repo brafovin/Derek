@@ -22,6 +22,8 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
 
+**Unheimliches:** Zwischendurch passieren Dinge, ohne dass das Wesen dich jagt – eine verstimmte Spieluhr in der Ferne, Schritte hinter dir, die abrupt stoppen, zwei Augen im Dunkeln, die blinzeln und verschwinden, Bildstörungen mit kaputtem Zeitstempel, einzelne Einblendungen für Sekundenbruchteile. Und wer sich versteckt, hört es an der Tür kratzen.
+
 ## Allgemein
 
 **Schwierigkeit** (Leicht / Normal / Albtraum) wird im Menü bzw. in der Lobby (Host) gewählt.
