@@ -28,6 +28,8 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 #cross{top:50%;left:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:rgba(255,255,255,.5)}
 #hideov{inset:0;display:none;background:repeating-linear-gradient(to bottom,#030403 0 3.2vh,transparent 3.2vh 4.4vh);
   box-shadow:inset 0 0 18vh 6vh #000}
+#hideov.hid-cabinet{background:repeating-linear-gradient(to right,#140d07 0 1.3vw,transparent 1.3vw 4.8vw);box-shadow:inset 0 0 20vh 7vh #000}
+#hideov.hid-bed{background:linear-gradient(to bottom,#040303 0 36%,transparent 36%),repeating-linear-gradient(to right,#0b0807 0 1.4vw,transparent 1.4vw 24vw);box-shadow:inset 0 0 24vh 9vh #000}
 #room{top:13vh;right:3vw;text-align:right;opacity:.8;font-size:.9em}
 #roster{top:8vh;left:3vw;line-height:1.5;font-size:.9em}
 #spec{bottom:20vh;left:50%;transform:translateX(-50%);text-align:center;display:none;background:rgba(0,0,0,.4);padding:.4em 1em}
@@ -47,7 +49,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 .joinbox{display:inline-flex;align-items:center}
 #codein{margin-top:1em;width:5em;padding:.75em .6em;background:#000;border:1px solid #ddd;color:#fff;font:inherit;letter-spacing:.35em;text-transform:uppercase;text-align:center}
 #netmsg{min-height:1.4em;color:#f88}
-#menu{display:flex;background:#000}
+#menu{display:none;background:#000}
 #dead h1{color:#d22}
 #pause.light{background:rgba(0,0,0,.45)}
 #lobplayers{margin:.8em 0;line-height:1.9;font-size:clamp(13px,2.1vh,19px)}
@@ -57,6 +59,37 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 #kpgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em}
 #kpgrid div{border:1px solid #666;padding:.7em 0;cursor:pointer;font-size:1.3em;background:#161a16}
 #kpgrid div:hover{background:#fff;color:#000}
+#card{position:fixed;inset:0;z-index:18;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity 1.2s;padding:0 6vw}
+#card h1{font-size:clamp(26px,6vh,64px);letter-spacing:.3em;font-weight:400;margin:0 0 .5em;text-shadow:2px 0 rgba(255,0,0,.7),-2px 0 rgba(0,255,255,.5)}
+#card p{opacity:.8;letter-spacing:.14em;max-width:40em;line-height:1.7;font-size:clamp(13px,2.2vh,20px);margin:0}
+#lids{position:fixed;inset:0;z-index:7;pointer-events:none;display:none}
+#lids div{position:absolute;left:0;right:0;background:#000;box-shadow:0 0 7vh 4vh #000}
+#lidt{top:0;height:50%}#lidb{bottom:0;height:50%}
+#boot{position:fixed;inset:0;background:#000;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+#bootnoise{position:absolute;inset:-10%;opacity:.2;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");animation:nj .2s steps(3) infinite;will-change:transform}
+@keyframes nj{0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-3%)}100%{transform:translate(0,0)}}
+#boot::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.4) 0 1px,transparent 1px 3px);pointer-events:none}
+#boot>*:not(#bootnoise){position:relative;z-index:1}
+#bootrec{position:absolute!important;top:3.4vh;left:3vw;font-size:clamp(13px,2vh,20px);letter-spacing:.1em}
+#bootrec i{display:inline-block;width:.7em;height:.7em;border-radius:50%;background:#e22;margin-right:.5em;animation:bl 1s steps(2) infinite}
+#bootcount{position:absolute!important;top:3.4vh;right:3vw;font-size:clamp(13px,2vh,20px);letter-spacing:.1em;opacity:.8}
+#boottitle{font-size:clamp(28px,8vh,84px);letter-spacing:.3em;text-shadow:2px 0 rgba(255,0,0,.8),-2px 0 rgba(0,255,255,.6);animation:tflick 3.3s steps(1) infinite}
+@keyframes tflick{0%,100%{opacity:1}7%{opacity:.25}8%{opacity:1}41%{opacity:1}42%{opacity:.4;transform:translateX(5px)}43%{opacity:1;transform:none}77%{opacity:.7}78%{opacity:1}}
+#bootmsg{margin-top:3vh;font-size:clamp(12px,2vh,19px);letter-spacing:.18em;opacity:.85;min-height:1.4em}
+#bootbarwrap{margin-top:2.2vh;width:min(54vw,520px);height:6px;border:1px solid #888}
+#bootbar{height:100%;width:0;background:#d8d8d0}
+#bootpct{margin-top:.8vh;font-size:12px;opacity:.6;letter-spacing:.2em}
+#bootgo{margin-top:4vh;padding:.8em 1.8em;border:1px solid #ddd;letter-spacing:.3em;cursor:pointer;display:none;animation:bl 1.3s steps(2) infinite}
+#bootgo:hover{background:#fff;color:#000}
+#bootwarn{position:absolute!important;bottom:3vh;left:0;right:0;font-size:clamp(10px,1.5vh,13px);opacity:.5;letter-spacing:.08em;padding:0 5vw}
+#bootface{position:absolute!important;inset:0;width:100%;height:100%;opacity:0;mix-blend-mode:screen;z-index:2}
+#trailer{position:fixed;inset:0;z-index:25;display:none;cursor:pointer}
+#trailer .bar{position:absolute;left:0;right:0;height:11vh;background:#000}
+#trailer .t{top:0}#trailer .b{bottom:0}
+#trailtext{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:clamp(18px,4.4vh,46px);letter-spacing:.26em;text-shadow:2px 0 rgba(255,0,0,.7),-2px 0 rgba(0,255,255,.5),0 0 20px #000;opacity:0;transition:opacity .3s;padding:0 4vw}
+#trailsub{position:absolute;left:0;right:0;top:58%;text-align:center;font-size:clamp(11px,2vh,19px);letter-spacing:.3em;opacity:0;transition:opacity .4s}
+#trailskip{position:absolute;right:3vw;bottom:2.2vh;font-size:12px;opacity:.5;letter-spacing:.15em}
+#end h1{letter-spacing:.5em}
 </style>
 </head>
 <body>
@@ -65,7 +98,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 <div id="hud">
   <div id="rec"><span id="dot"></span>REC <span id="rect">00:00:00</span></div>
   <div id="ts">2024-10-31 23:47:12</div>
-  <div id="cam">CAM-07 // K. MARLOW<br><span id="camfloor">KLINIK ST. AURELIA</span></div>
+  <div id="cam"><span id="camname">CAM-07 // K. MARLOW</span><br><span id="camfloor">KLINIK ST. AURELIA</span></div>
   <div id="stats"><div>ETAGE <b id="fl">3</b></div><div>LAMPE <b id="bt">100%</b></div><div>SPRAY <b id="pt">—</b></div><div id="stam"><i></i></div></div>
   <div id="tasks"></div>
   <div id="room"></div>
@@ -78,12 +111,26 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
   <div id="floorbn"></div>
 </div>
 
+<div id="boot">
+  <div id="bootnoise"></div>
+  <div id="bootrec"><i></i>REC</div><div id="bootcount">00:00:00:00</div>
+  <div id="boottitle">LETZTE AUFNAHME</div>
+  <div id="bootmsg">BAND WIRD GELADEN …</div>
+  <div id="bootbarwrap"><div id="bootbar"></div></div><div id="bootpct">0%</div>
+  <div id="bootgo">[ KLICKEN — MIT TON ABSPIELEN ]</div>
+  <div id="bootwarn">ACHTUNG: Enthält flackernde Lichter, Schockeffekte, Blut und verstörende Szenen. Kopfhörer empfohlen.</div>
+  <canvas id="bootface" width="320" height="180"></canvas>
+</div>
+<div id="trailer"><div class="bar t"></div><div class="bar b"></div><div id="trailtext"></div><div id="trailsub"></div><div id="trailskip">[ KLICK — ÜBERSPRINGEN ]</div></div>
+<div id="card"><h1></h1><p></p></div>
+<div id="lids"><div id="lidt"></div><div id="lidb"></div></div>
 <div id="menu" class="screen">
   <h1>LETZTE AUFNAHME</h1>
   <p>Klinik St. Aurelia, 23:47 Uhr. Seit drei Nächten ist das Wachteam verschwunden. Du bist K. Marlow, Nachtwächter – gefangen im obersten Stock.
-     Das Haus hat <b>3 Etagen</b>. Auf jeder Etage musst du Rätsel lösen (Sicherungen, Schlüssel, Codes), um die Treppe nach unten zu öffnen –
-     und im Erdgeschoss den Ausgang. Etwas jagt dich. Es hört dich, und es sieht dein Licht. Mit jeder Etage wird es schlimmer.</p>
-  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; SHIFT – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; F – Lampe &nbsp;·&nbsp; E – benutzen / aufnehmen / Spind<br>
+     <b>Kapitel 1:</b> Das Haus hat 3 Etagen. Auf jeder musst du Rätsel lösen (Sicherungen, Schlüssel, Codes), um nach unten zu kommen – und am Ende zu fliehen.
+     Etwas jagt dich. Es hört dich, und es sieht dein Licht. Such dir Verstecke: Spinde, Schränke, unter Betten. Und schau nicht zu lange in die Fernseher …
+     <b>Kapitel 2:</b> Der Albtraum ist vorbei. Oder?</p>
+  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; SHIFT – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; F – Lampe &nbsp;·&nbsp; E – benutzen / aufnehmen / verstecken<br>
      LINKE MAUSTASTE – sprühen (Dosen liegen auf dem Boden) &nbsp;·&nbsp; Q – Farbe &nbsp;·&nbsp; T – Ego / Third-Person &nbsp;·&nbsp; V – Mikrofon &nbsp;·&nbsp; ESC – Pause</p>
   <div class="k" style="margin-top:.8em">SCHWIERIGKEIT</div>
   <div class="diffrow">
@@ -112,6 +159,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 <div id="pause" class="screen"><h1>PAUSE</h1><p class="k" id="pauseinfo"></p><div class="go" id="resumebtn">[ KLICKEN ZUM FORTFAHREN ]</div></div>
 <div id="dead" class="screen"><h1>SIGNAL VERLOREN</h1><p id="deadtxt">Die Aufnahme bricht ab.</p><div><div class="go" id="retrybtn">[ R – ETAGE NEU STARTEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="win" class="screen"><h1>AUFNAHME GESICHERT</h1><p id="wintxt"></p><div><div class="go" id="againbtn">[ R – NOCHMAL SPIELEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
+<div id="end" class="screen"><h1>ENDE</h1><p id="endtxt"></p><div><div class="go" id="endagain">[ R – VON VORNE ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="keypad" class="screen">
   <div id="kpbox"><div id="kpdisp">----</div>
     <div id="kpgrid"></div>
@@ -134,7 +182,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 //# sourceMappingURL=peerjs.min.js.map
 </script>
 <script>
-(function(){
+window.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(function () { setTimeout(function () {
 'use strict';
 
 /* ====================================================================
@@ -170,11 +218,11 @@ const postMat = new THREE.ShaderMaterial({
   uniforms: {
     tDiffuse: { value: rt.texture }, time: { value: 0 }, glitch: { value: 0 }, fade: { value: 1 },
     flash: { value: 0 }, flashCol: { value: new THREE.Vector3(1, 1, 1) }, res: { value: new THREE.Vector2(800, RT_H) },
-    expo: { value: 1.0 }, bleed: { value: 0 }
+    expo: { value: 1.0 }, bleed: { value: 0 }, warm: { value: 0 }
   },
   vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }',
   fragmentShader: `
-    uniform sampler2D tDiffuse; uniform float time, glitch, fade, flash, expo, bleed; uniform vec3 flashCol; uniform vec2 res; varying vec2 vUv;
+    uniform sampler2D tDiffuse; uniform float time, glitch, fade, flash, expo, bleed, warm; uniform vec3 flashCol; uniform vec2 res; varying vec2 vUv;
     float hash(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
     vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0); }
     void main(){
@@ -207,10 +255,10 @@ const postMat = new THREE.ShaderMaterial({
       col=aces(col*1.15);
       float luma=dot(col,vec3(0.299,0.587,0.114));
       col=mix(vec3(luma),col,0.78);
-      col*=vec3(0.97,1.03,1.0);                      // leicht kühler Grünstich
+      col*=mix(vec3(0.97,1.03,1.0),vec3(1.1,1.02,0.9),warm);   // kühler Grünstich – im Haus warm
       col=pow(max(col,0.0),vec3(0.86));
       float n=hash(uv*res+vec2(fract(time)*37.0,fract(time*1.7)*91.0));
-      col+=(n-0.5)*(0.055+(1.0-clamp(luma*2.0,0.0,1.0))*0.17+glitch*0.30);
+      col+=(n-0.5)*(0.055+(1.0-clamp(luma*2.0,0.0,1.0))*0.17*(1.0-warm*0.5)+glitch*0.30);
       col*=0.95+0.05*sin(uv.y*res.y*3.14159);
       col*=smoothstep(1.0,0.2,length(c)*1.3);
       col=mix(col,col*vec3(1.0,0.35,0.3)+vec3(0.12,0.0,0.0),bleed);   // blutiger Rand
@@ -279,6 +327,10 @@ function peel(g, s, n, col, ymax) {
 const THEME_CACHE = [];
 function getTheme(i) {
   if (THEME_CACHE[i]) return THEME_CACHE[i];
+  if (i === 4) {   // Kapitel 2: dasselbe Haus, nur dunkler, nasser, roter
+    const t2 = getTheme(2); const t = { wall: t2.wall.clone(), floor: t2.floor.clone(), ceil: t2.ceil.clone() };
+    t.wall.color.setHex(0x9a6c66); t.floor.color.setHex(0x80605c); t.ceil.color.setHex(0x6a5452); THEME_CACHE[4] = t; return t;
+  }
   let wallT, floorT, ceilT;
   if (i === 0) {          // PATIENTENSTATION: schmutziges Grün, Linoleum
     wallT = canvasTex(512, (g, s) => {
@@ -316,7 +368,7 @@ function getTheme(i) {
       stains(g, s, 14, 'rgba(10,10,8,.6)', 1, 20, 80); stains(g, s, 6, 'rgba(80,0,0,.5)', 1, 20, 60); grain(g, s, 12);
     });
     ceilT = canvasTex(256, (g, s) => { g.fillStyle = '#6d7774'; g.fillRect(0, 0, s, s); g.fillStyle = '#242b29'; for (let k = 0; k <= s; k += 128) { g.fillRect(k, 0, 4, s); g.fillRect(0, k, s, 4); } stains(g, s, 10, 'rgba(25,25,15,.5)', 1); grain(g, s, 12); });
-  } else {                // EINGANGSHALLE: Holzpaneele, Marmor, Risse
+  } else if (i === 2) {   // EINGANGSHALLE: Holzpaneele, Marmor, Risse
     wallT = canvasTex(512, (g, s) => {
       g.fillStyle = '#b4a98a'; g.fillRect(0, 0, s, s);
       peel(g, s, 20, 'rgba(210,200,170,.4)', .6); peel(g, s, 14, 'rgba(70,55,35,.4)', .6);
@@ -336,8 +388,23 @@ function getTheme(i) {
     });
     ceilT = canvasTex(256, (g, s) => { g.fillStyle = '#4a463d'; g.fillRect(0, 0, s, s); g.fillStyle = '#1f1c16'; for (let k = 0; k <= s; k += 85) { g.fillRect(k, 0, 6, s); g.fillRect(0, k, s, 6); } stains(g, s, 14, 'rgba(20,15,5,.6)', 1); cracks(g, s, 4); grain(g, s, 12); });
   }
+  else {                  // NEUES HAUS (Kapitel 2): helle, saubere Wände, Holzdielen
+    wallT = canvasTex(512, (g, s) => {
+      g.fillStyle = '#e8e2d6'; g.fillRect(0, 0, s, s);
+      for (let x = 0; x < s; x += 64) { g.fillStyle = 'rgba(0,0,0,.018)'; g.fillRect(x, 0, 32, s); }
+      stains(g, s, 5, 'rgba(120,100,70,.12)', 1, 30, 90);
+      const bg = g.createLinearGradient(0, 0, 0, s); bg.addColorStop(0, 'rgba(60,50,40,.12)'); bg.addColorStop(.1, 'rgba(0,0,0,0)'); bg.addColorStop(.92, 'rgba(0,0,0,0)'); bg.addColorStop(1, 'rgba(60,50,40,.16)');
+      g.fillStyle = bg; g.fillRect(0, 0, s, s); grain(g, s, 8);
+    });
+    floorT = canvasTex(512, (g, s) => {
+      for (let r = 0; r < 8; r++) { const y = r * 64; let x = -rnd(0, 120); while (x < s) { const w = rnd(150, 270), v = 120 + ((Math.random() * 28) | 0); g.fillStyle = 'rgb(' + (v + 40) + ',' + (v + 6) + ',' + (v - 38) + ')'; g.fillRect(x, y, w, 62); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x + w - 2, y, 2, 64); x += w; } g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(0, y, s, 2); }
+      g.strokeStyle = 'rgba(70,40,10,.18)'; for (let i = 0; i < 90; i++) { g.beginPath(); const y = rnd(0, s); g.moveTo(rnd(0, s), y); g.lineTo(rnd(0, s), y + rnd(-2, 2)); g.stroke(); }
+      stains(g, s, 6, 'rgba(60,40,20,.14)', 1, 30, 80); grain(g, s, 10);
+    });
+    ceilT = canvasTex(256, (g, s) => { g.fillStyle = '#efece6'; g.fillRect(0, 0, s, s); stains(g, s, 4, 'rgba(120,110,90,.1)', 1); grain(g, s, 6); });
+  }
   const mk = (map, rough, bump, metal) => new THREE.MeshStandardMaterial({ map, roughness: rough, metalness: metal || 0, bumpMap: bump ? map : null, bumpScale: bump || 1 });
-  THEME_CACHE[i] = { wall: mk(wallT, .95, .45), floor: mk(floorT, .5, .4, .12), ceil: mk(ceilT, 1, 0) };
+  THEME_CACHE[i] = { wall: mk(wallT, .95, i === 3 ? .1 : .45), floor: mk(floorT, i === 3 ? .42 : .5, i === 3 ? .15 : .4, i === 3 ? .02 : .12), ceil: mk(ceilT, 1, 0) };
   return THEME_CACHE[i];
 }
 
@@ -406,26 +473,51 @@ const BASE = [
 "#.....#######.#.........#",
 "#########################"
 ];
-const LOCKERS_ALL = [[14, 4], [9, 4], [23, 7], [23, 12], [1, 16], [9, 12], [19, 17]];
+const LOCKERS_ALL = [[14, 4], [9, 4], [23, 7], [23, 12], [1, 16], [9, 12], [19, 17], [3, 4], [9, 6], [1, 12], [13, 12], [11, 8], [15, 12], [23, 3], [20, 13], [5, 17], [16, 15], [22, 6]];
+// Fernseher-Plätze (Zelle an einer Wand, Bildschirm zeigt in den Raum)
+const TV_ALL = [[14, 1], [21, 4], [17, 6], [6, 12], [18, 13], [21, 15], [5, 16], [7, 1], [16, 8], [6, 6]];
+// Kapitel 2: das neue Haus (13 x 11 Zellen)
+const HOUSE_BASE = [
+"#############",
+"#...#.#.....#",
+"#...#.#.....#",
+"#...#.#.....#",
+"##D##D#.....#",
+"#...........#",
+"#...........#",
+"#...........#",
+"######Z######",
+"######.######",
+"#############"
+];
 const FLOORS = [
   { name: '3. OBERGESCHOSS — PATIENTENSTATION', short: '3. OG · PATIENTENSTATION', theme: 0, spd: 1.0, sight: 1.0, scare: 1.0, amb: 0.5, fog: 0.062, blackout: 0.0,
     need: { fuses: 2, notes: 0, key: 0 }, lore: 2, batteries: 2, cans: 3, deadLamps: 0.38, flickLamps: 0.3, props: 0.26,
     S: [1, 1], V: [13, 17], F: [10, 15], K: null, H: null, X: null, Z: null, archive: [], rect: null,
     pool: [[2, 3], [8, 2], [6, 4], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [6, 10], [8, 12], [17, 7], [22, 8], [16, 11], [22, 13], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10]],
     canPool: [[2, 2], [7, 1], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [5, 11], [12, 9], [18, 7], [21, 11], [11, 15], [3, 16], [17, 16], [22, 17]],
-    lockers: [0, 1, 2, 3, 4, 5, 6] },
+    lockers: [0, 1, 2, 3, 4, 6, 8, 10, 13, 16], tv: [0, 3, 6], tvPool: ['marco', 'popel', 'marco'], label: '3', chapter: 1 },
   { name: '2. OBERGESCHOSS — OP-TRAKT', short: '2. OG · OP-TRAKT', theme: 1, spd: 1.12, sight: 1.1, scare: 1.7, amb: 0.4, fog: 0.07, blackout: 0.5,
     need: { fuses: 0, notes: 4, key: 1 }, lore: 1, batteries: 2, cans: 3, deadLamps: 0.45, flickLamps: 0.45, props: 0.3,
     S: [13, 16], V: [23, 1], F: null, K: [21, 1], H: [7, 2], X: null, Z: [10, 11], archive: [[4, 10], [8, 12]], rect: [5, 1, 9, 4],
     pool: [[2, 3], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [17, 7], [22, 8], [16, 11], [22, 13], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10]],
     canPool: [[2, 2], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [12, 9], [18, 7], [21, 11], [11, 15], [3, 16], [17, 16], [22, 17]],
-    lockers: [0, 2, 3, 4, 5] },
+    lockers: [0, 2, 3, 6, 8, 10, 13, 14, 16], tv: [1, 5, 8], tvPool: ['popel', 'ring', 'marco'], label: '2', chapter: 1 },
   { name: 'ERDGESCHOSS — EINGANGSHALLE', short: 'EG · EINGANGSHALLE', theme: 2, spd: 1.25, sight: 1.25, scare: 2.5, amb: 0.3, fog: 0.078, blackout: 1.0,
     need: { fuses: 3, notes: 4, key: 1 }, lore: 1, batteries: 2, cans: 3, deadLamps: 0.55, flickLamps: 0.5, props: 0.3,
     S: [1, 1], V: null, F: [23, 15], K: [23, 16], H: [19, 11], X: [24, 17], Z: [10, 11], archive: [[4, 10], [8, 12]], rect: [15, 10, 23, 13],
     pool: [[2, 3], [8, 2], [6, 4], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [17, 7], [22, 8], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10], [11, 3], [19, 3]],
     canPool: [[2, 2], [7, 1], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [12, 9], [18, 7], [11, 15], [3, 16], [17, 16], [22, 17]],
-    lockers: [0, 1, 2, 4] }
+    lockers: [0, 1, 2, 6, 8, 10, 13, 16], tv: [0, 6, 2], tvPool: ['ring', 'marco', 'popel'], label: 'EG', chapter: 1 },
+  // ---------------- KAPITEL 2 ----------------
+  { name: 'KAPITEL 2 — DEIN NEUES HAUS', short: 'NEUES HAUS', theme: 3, kind: 'house', base: HOUSE_BASE, noEntity: true, spd: 0, sight: 0, scare: 0, amb: 0.95, fog: 0.02, blackout: 0,
+    need: { fuses: 0, notes: 0, key: 0 }, lore: 0, batteries: 0, cans: 0, deadLamps: 0, flickLamps: 0.04, props: 0, lampColor: 0xffdcae, S: [2, 2], V: null, F: null, K: null, H: null, X: null, Z: null, archive: [], rect: null,
+    pool: [], canPool: [], lockers: [], tv: [], tvPool: [], label: 'HAUS', chapter: 2 },
+  { name: 'KAPITEL 2 — DAS HAUS (WIEDER)', short: 'DAS HAUS', theme: 4, kind: 'dark', spd: 1.38, sight: 1.35, scare: 3.3, amb: 0.2, fog: 0.088, blackout: 1.5,
+    need: { fuses: 0, notes: 0, key: 1 }, lore: 4, batteries: 3, cans: 2, deadLamps: 0.62, flickLamps: 0.7, props: 0.34, S: [18, 11], V: null, F: null, K: null, H: [19, 11], X: null, Z: [10, 11], archive: [], rect: [15, 10, 23, 13], bed13: [6, 10], keyAtPool: true,
+    pool: [[2, 3], [8, 2], [6, 4], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [17, 7], [22, 8], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10], [11, 3], [19, 3]],
+    canPool: [[2, 2], [7, 1], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [12, 9], [18, 7], [11, 15], [3, 16], [17, 16], [22, 17]],
+    lockers: [0, 1, 2, 6, 8, 10, 13, 16], tv: [0, 1, 5, 6], tvPool: ['cam', 'cam', 'ring', 'cam'], label: 'HAUS', chapter: 2 }
 ];
 const LORE = [
   'Tag 3. Die Patienten flüstern nachts miteinander. Aber Station 4 ist leer.',
@@ -440,9 +532,9 @@ const LORE = [
 const GRAFFITI_TEXTS = ['ACT', 'RUN', 'HILFE', 'ER SIEHT DICH', 'LICHT AUS', 'NICHT ALLEIN', 'KEIN AUSGANG', 'HINTER DIR', 'ACT II', 'ER WARTET', 'NICHT ATMEN', 'LAUF', 'ACT III', 'ER HÖRT', 'ACT', 'VERSTECK DICH', 'ACT'];
 
 let FLN = -1, MW = 25, MH = 19, solid = [], items = [], lockers = [], doorList = [], feats = [], colliders = [], worldMeshes = [], openCells = [], zoneCells = new Set(),
-  lamps = [], chairInfo = null, worldGroup = null, startCell = { cx: 1, cy: 1 }, spawnE = null, floorDef = FLOORS[0], doorAnims = [];
+  lamps = [], houseWindows = [], chairInfo = null, worldGroup = null, startCell = { cx: 1, cy: 1 }, spawnE = null, floorDef = FLOORS[0], doorAnims = [];
 let GAME_SEED = 1, DIFF = 1; let GR_LOG = [];
-const team = { fuses: 0, fusesIn: 0, key: 0, notes: [null, null, null, null], codeOk: false, powered: false, code: [0, 0, 0, 0], doors: [] };
+const team = { fuses: 0, fusesIn: 0, key: 0, notes: [null, null, null, null], codeOk: false, powered: false, code: [0, 0, 0, 0], doors: [], stage: 0, finale: false };
 const isSolidCell = (cx, cy) => cx < 0 || cy < 0 || cx >= MW || cy >= MH || solid[cy][cx];
 const cellOf = v => Math.floor(v / CELL + 0.5);
 const wallDirOf = (cx, cy) => { for (const d of [[0, -1], [1, 0], [0, 1], [-1, 0]]) if (isSolidCell(cx + d[0], cy + d[1])) return d; return [0, -1]; };
@@ -666,7 +758,9 @@ function updateFeatureStates() {
   feats.forEach(f => { if (f.led) f.led.material.color.setHex(ok ? 0x20ff50 : 0xff2010); });
   fuseSlots.forEach((s, i) => { const on = i < team.fusesIn; s.material.color.setHex(on ? 0x40ff70 : 0x151515); s.material.emissive.setHex(on ? 0x20aa40 : 0x000000); });
   drawKeypadScreen();
-  signLight.intensity = (FLN === 2 && floorDef.X) ? (ok ? 1.1 : 0.45) : 0;
+  if (floorDef.kind === 'house') signLight.intensity = team.stage >= 2 ? .9 : 0;
+  else if (floorDef.bed13) signLight.intensity = .55;
+  else signLight.intensity = (FLN === 2 && floorDef.X) ? (ok ? 1.1 : 0.45) : 0;
 }
 
 /* ---------- Gegenstände (liegen auf dem Boden) ---------- */
@@ -695,6 +789,10 @@ function itemMesh(it) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(.04, .01, 6, 14), m); ring.rotation.x = Math.PI / 2; ring.position.set(-.1, .03, 0); g.add(ring);
     const shaft = new THREE.Mesh(new THREE.BoxGeometry(.18, .012, .012), m); shaft.position.set(.02, .03, 0); g.add(shaft);
     const teeth = new THREE.Mesh(new THREE.BoxGeometry(.03, .012, .04), m); teeth.position.set(.1, .03, .015); g.add(teeth); glow = 0xffd060; gs = 1.0;
+  } else if (it.type === 'pizza') {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(.46, .06, .46), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: .9 })); box.position.y = .04; g.add(box);
+    const top = new THREE.Mesh(new THREE.BoxGeometry(.4, .005, .4), new THREE.MeshStandardMaterial({ color: 0x7a2a1a, roughness: .9 })); top.position.y = .075; g.add(top);
+    const note = new THREE.Mesh(new THREE.BoxGeometry(.12, .004, .09), new THREE.MeshStandardMaterial({ color: 0xf0ecdc })); note.position.set(.12, .08, .1); note.rotation.y = .4; g.add(note); glow = 0xffd890; gs = 1.0;
   } else if (it.type === 'note') {
     const paper = new THREE.Mesh(new THREE.BoxGeometry(.2, .004, .28), new THREE.MeshStandardMaterial({ color: 0xd8d2b8, roughness: 1 })); paper.position.y = .012; paper.rotation.y = .4; g.add(paper);
     glow = 0xffffff; gs = .8;
@@ -709,21 +807,25 @@ function itemMesh(it) {
 /* ====================================================================
    buildFloor – baut eine Etage (deterministisch aus Seed)
 ==================================================================== */
+function registerHide(kind, x, z, fx, fz) {
+  const l = { id: lockers.length, kind, cx: cellOf(x), cy: cellOf(z), x, z, fx, fz, yaw: Math.atan2(-fx, -fz) };
+  lockers.push(l); return l;
+}
 function buildFloor(idx) {
   if (worldGroup) {
     scene.remove(worldGroup);
     worldGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []; ms.forEach(m => { if (m.map && m.map.disp) { m.map.dispose(); m.dispose(); } }); });
   }
   worldGroup = new THREE.Group(); scene.add(worldGroup);
-  FLN = idx; floorDef = FLOORS[idx]; const def = floorDef, T = getTheme(def.theme);
+  FLN = idx; floorDef = FLOORS[idx]; const def = floorDef, house = def.kind === 'house', T = getTheme(def.theme);
   wr = mulberry32(((GAME_SEED * 2654435761) ^ (idx * 40503 + 17)) >>> 0);
-  const rows = BASE.map(r => r.split(''));
+  const rows = (def.base || BASE).map(r => r.split(''));
   const set = (p, ch) => { if (p) rows[p[1]][p[0]] = ch; };
   set(def.S, 'S'); set(def.V, 'V'); set(def.F, 'F'); set(def.K, 'K'); set(def.X, 'X'); set(def.Z, 'Z');
   if (def.rect) for (let y = def.rect[1]; y <= def.rect[3]; y++) for (let x = def.rect[0]; x <= def.rect[2]; x++) if (rows[y][x] === '.') rows[y][x] = 'R';
   set(def.H, 'H');
   MH = rows.length; MW = rows[0].length;
-  solid = []; items = []; lockers = []; doorList = []; feats = []; colliders = []; worldMeshes = []; lamps = []; zoneCells = new Set(); chairInfo = null; openCells = []; doorAnims = []; fuseSlots = []; statusLights = [];
+  solid = []; items = []; lockers = []; doorList = []; feats = []; colliders = []; worldMeshes = []; lamps = []; zoneCells = new Set(); chairInfo = null; openCells = []; doorAnims = []; fuseSlots = []; statusLights = []; tvs = []; houseWindows = [];
   keypadCanvas = null; keypadTex = null;
   let sC = { cx: 1, cy: 1 };
   for (let y = 0; y < MH; y++) { solid[y] = []; for (let x = 0; x < MW; x++) {
@@ -733,12 +835,13 @@ function buildFloor(idx) {
     if (ch === 'R' || ch === 'H') zoneCells.add(y * MW + x);
     if (!solid[y][x]) openCells.push([x, y]);
   } }
+  if (def.rect) for (let y = def.rect[1]; y <= def.rect[3]; y++) for (let x = def.rect[0]; x <= def.rect[2]; x++) zoneCells.add(y * MW + x);
   startCell = sC; { let ls = 0; doorList.forEach(d => { if (d.locked) d.slot = ls++; }); }
   // Team-Zustand dieser Etage zurücksetzen
-  team.fuses = 0; team.fusesIn = 0; team.key = 0; team.notes = [null, null, null, null]; team.codeOk = false; team.powered = !def.need.fuses;
+  team.fuses = 0; team.fusesIn = 0; team.key = 0; team.notes = [null, null, null, null]; team.codeOk = false; team.powered = !def.need.fuses; team.stage = 0; team.finale = false;
   team.code = [0, 0, 0, 0].map(() => (wr() * 10) | 0); team.doors = doorList.filter(d => d.locked).map(() => 0);
-  // Skalierte Weltmaße / Atmosphäre
-  scene.fog.density = def.fog; ambientL.intensity = def.amb; scene.fog.color.setHex(def.theme === 1 ? 0x050808 : def.theme === 2 ? 0x080604 : 0x040605);
+  scene.fog.density = def.fog; ambientL.intensity = def.amb; scene.fog.color.setHex(def.theme === 1 ? 0x050808 : (def.theme === 2 || def.theme === 4) ? 0x080604 : def.theme === 3 ? 0x1a1c20 : 0x040605);
+  lightPool.forEach(l => l.color.setHex(def.lampColor || 0xcfe0c8)); signLight.color.setHex(0x33ff77); signLight.position.set(0, 2.5, 0);
 
   // Boden & Decke
   T.floor.map.repeat.set(MW, MH); T.ceil.map.repeat.set(MW * 1.5, MH * 1.5);
@@ -763,8 +866,8 @@ function buildFloor(idx) {
   // Fußleisten & Rohre an Wandflächen
   const faces = [], dirs4 = [['N', 0, -1], ['E', 1, 0], ['S', 0, 1], ['W', -1, 0]];
   for (const [x, y] of wallCells) for (const [f, dx, dy] of dirs4) if (!isSolidCell(x + dx, y + dy) && rows[y][x] === '#') faces.push({ x, y, f, ox: x + dx, oy: y + dy });
-  const baseInst = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL, .16, .05), new THREE.MeshStandardMaterial({ color: 0x1d1a16, roughness: .8 }), faces.length);
-  const pipeFaces = faces.filter(() => wr() < .2);
+  const baseInst = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL, .16, .05), new THREE.MeshStandardMaterial({ color: house ? 0xe8e4dc : 0x1d1a16, roughness: .8 }), faces.length);
+  const pipeFaces = house ? [] : faces.filter(() => wr() < .2);
   const pipeInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(.06, .06, CELL, 8), MAT.metal, Math.max(1, pipeFaces.length));
   const dummy = new THREE.Object3D();
   const placeFace = (inst, i, fc, y, off, rotZ) => {
@@ -788,11 +891,16 @@ function buildFloor(idx) {
     d.alongX = alongX; d.x = wx; d.z = wz;
     if (d.locked) {
       const piv = new THREE.Group(); piv.position.set(wx + (alongX ? 0 : -.7), 0, wz + (alongX ? -.7 : 0)); worldGroup.add(piv);
-      const leaf = new THREE.Mesh(new THREE.BoxGeometry(alongX ? .09 : 1.4, 2.35, alongX ? 1.4 : .09), MAT.door); leaf.position.set(alongX ? 0 : .7, 1.175, alongX ? .7 : 0);
+      const dm = house ? MAT.doorHome : MAT.door;
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(alongX ? .09 : 1.4, 2.35, alongX ? 1.4 : .09), dm); leaf.position.set(alongX ? 0 : .7, 1.175, alongX ? .7 : 0);
       leaf.castShadow = leaf.receiveShadow = true; piv.add(leaf);
       const handle = new THREE.Mesh(new THREE.BoxGeometry(alongX ? .12 : .05, .05, alongX ? .05 : .12), MAT.metal); handle.position.set(alongX ? 0 : 1.2, 1.05, alongX ? 1.2 : 0); piv.add(handle);
       const lock = new THREE.Mesh(new THREE.BoxGeometry(alongX ? .14 : .1, .12, alongX ? .1 : .14), MAT.darkMetal); lock.position.set(alongX ? 0 : 1.2, 1.2, alongX ? 1.2 : 0); piv.add(lock);
       worldMeshes.push(leaf); d.piv = piv; d.col = addCol(wx, wz, alongX ? .3 : 1.4, alongX ? 1.4 : .3); d.ang = 0;
+    } else if (house) { // Innentüren im Haus stehen offen
+      const piv = new THREE.Group(); piv.position.set(wx + (alongX ? 0 : -.7), 0, wz + (alongX ? -.7 : 0)); worldGroup.add(piv);
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(alongX ? .06 : 1.4, 2.3, alongX ? 1.4 : .06), MAT.doorHome); leaf.position.set(alongX ? 0 : .7, 1.15, alongX ? .7 : 0); leaf.castShadow = true; piv.add(leaf);
+      piv.rotation.y = alongX ? 1.75 : -1.75;
     }
   });
 
@@ -800,31 +908,42 @@ function buildFloor(idx) {
   const protect = new Set(), prot = (cx, cy, r) => { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) protect.add((cy + dy) * MW + cx + dx); };
   doorList.forEach(d => prot(d.cx, d.cy, 1)); prot(sC.cx, sC.cy, 2);
   [def.V, def.F, def.K, def.H].forEach(p => { if (p) prot(p[0], p[1], 1); }); if (def.X) prot(def.X[0] - 1, def.X[1], 2);
+  if (def.bed13) prot(def.bed13[0], def.bed13[1], 1);
   def.archive.forEach(p => prot(p[0], p[1], 1)); def.pool.forEach(p => prot(p[0], p[1], 0)); def.canPool.forEach(p => prot(p[0], p[1], 0));
   def.lockers.forEach(li => { const p = LOCKERS_ALL[li]; prot(p[0], p[1], 1); });
+  (def.tv || []).forEach(ti => prot(TV_ALL[ti][0], TV_ALL[ti][1], 1));
 
-  // Spinde
-  def.lockers.forEach(li => {
-    const [cx, cy] = LOCKERS_ALL[li]; const l = { cx, cy, id: lockers.length };
-    const wd = wallDirOf(cx, cy), off = CELL / 2 - .5;
-    l.x = cx * CELL + wd[0] * off; l.z = cy * CELL + wd[1] * off; l.fx = -wd[0]; l.fz = -wd[1]; l.yaw = Math.atan2(-l.fx, -l.fz);
-    const w = wd[0] !== 0 ? .9 : 1.0, d = wd[0] !== 0 ? 1.0 : .9;
-    const lm = new THREE.MeshStandardMaterial({ map: lockerTexture(), roughness: .65, metalness: .35 });
-    l.mesh = addBoxM(w, 2.1, d, l.x, 1.05, l.z, lm); addCol(l.x, l.z, w, d); lockers.push(l);
-  });
-
-  // Requisiten verteilen (wandnah, nie in Durchgängen)
-  const propSet = PROP_SETS[def.theme], totalW = propSet.reduce((s, p) => s + p[1], 0);
-  for (const [cx, cy] of openCells) {
-    if (protect.has(cy * MW + cx) || zoneCells.has(cy * MW + cx)) continue;
-    const wds = dirs4.filter(([f, dx, dy]) => isSolidCell(cx + dx, cy + dy)); if (!wds.length) continue;
-    if (wr() > def.props) continue;
-    let pick = wr() * totalW, name = propSet[0][0]; for (const [n, w] of propSet) { pick -= w; if (pick <= 0) { name = n; break; } }
-    const [, dx, dy] = wpick(wds), off = CELL / 2 - 0.62;
-    const x = cx * CELL + dx * off + (dy !== 0 ? wrnd(-.5, .5) : 0), z = cy * CELL + dy * off + (dx !== 0 ? wrnd(-.5, .5) : 0);
-    const rot = (dx !== 0) ? Math.PI / 2 : 0;
-    PROPS[name](x, z, rot + (wr() < .5 ? 0 : Math.PI));
-    prot(cx, cy, 0);
+  if (!house) {
+    // Spinde
+    def.lockers.forEach(li => {
+      const [cx, cy] = LOCKERS_ALL[li]; const wd = wallDirOf(cx, cy), off = CELL / 2 - .5;
+      const x = cx * CELL + wd[0] * off, z = cy * CELL + wd[1] * off, w = wd[0] !== 0 ? .9 : 1.0, d = wd[0] !== 0 ? 1.0 : .9;
+      const l = registerHide('locker', x, z, -wd[0], -wd[1]);
+      const lm = new THREE.MeshStandardMaterial({ map: lockerTexture(), roughness: .65, metalness: .35 });
+      l.mesh = addBoxM(w, 2.1, d, x, 1.05, z, lm); addCol(x, z, w, d);
+    });
+    // Fernseher
+    (def.tv || []).forEach((ti, k) => {
+      const [cx, cy] = TV_ALL[ti], wd = wallDirOf(cx, cy);
+      buildTV(cx * CELL + wd[0] * .95, cy * CELL + wd[1] * .95, -wd[0], -wd[1], def.tvPool[k % def.tvPool.length], false);
+    });
+    // Requisiten verteilen (wandnah, nie in Durchgängen) – Schränke & Betten sind begehbare Verstecke (je max. 4)
+    const hideCnt = { cabinet: 0, bed: 0 };
+    const propSet = PROP_SETS[def.theme >= 3 ? 2 : def.theme], totalW = propSet.reduce((s, p) => s + p[1], 0);
+    for (const [cx, cy] of openCells) {
+      if (protect.has(cy * MW + cx) || zoneCells.has(cy * MW + cx)) continue;
+      const wds = dirs4.filter(([f, dx, dy]) => isSolidCell(cx + dx, cy + dy)); if (!wds.length) continue;
+      if (wr() > def.props) continue;
+      let pick = wr() * totalW, name = propSet[0][0]; for (const [n, w] of propSet) { pick -= w; if (pick <= 0) { name = n; break; } }
+      const [, dx, dy] = wpick(wds), off = CELL / 2 - 0.62;
+      const x = cx * CELL + dx * off + (dy !== 0 ? wrnd(-.5, .5) : 0), z = cy * CELL + dy * off + (dx !== 0 ? wrnd(-.5, .5) : 0);
+      let rot = ((dx !== 0) ? Math.PI / 2 : 0) + (wr() < .5 ? 0 : Math.PI);
+      if (name === 'cabinet') rot = Math.atan2(-dx, -dy);        // Tür zeigt in den Raum
+      PROPS[name](x, z, rot);
+      if (name === 'cabinet' && hideCnt.cabinet < 4) { hideCnt.cabinet++; registerHide('cabinet', x, z, Math.sin(rot), Math.cos(rot)); }
+      if (name === 'bed' && hideCnt.bed < 4) { hideCnt.bed++; registerHide('bed', x, z, Math.cos(rot), -Math.sin(rot)); }
+      prot(cx, cy, 0);
+    }
   }
 
   // Lampen (feste Raster-Auswahl, Zustände aus dem Seed)
@@ -833,26 +952,30 @@ function buildFloor(idx) {
     const r = wr(), dead = r < def.deadLamps, flick = !dead && wr() < def.flickLamps / (1 - def.deadLamps + .001);
     const mat = new THREE.MeshBasicMaterial({ color: dead ? 0x101110 : 0x8a9a86 });
     const m = new THREE.Mesh(new THREE.BoxGeometry(1.1, .08, .3), mat); m.position.set(cx * CELL, WALLH - .05, cy * CELL); worldGroup.add(m);
-    const hs = new THREE.Mesh(new THREE.BoxGeometry(1.2, .06, .38), MAT.darkMetal); hs.position.set(cx * CELL, WALLH - .02, cy * CELL); worldGroup.add(hs);
-    lamps.push({ x: cx * CELL, z: cy * CELL, dead, flick, mat, phase: wr() * 100, powerDep: !!def.need.fuses && wr() < .55, lv: 0 });
+    const hs = new THREE.Mesh(new THREE.BoxGeometry(1.2, .06, .38), house ? MAT.plastic : MAT.darkMetal); hs.position.set(cx * CELL, WALLH - .02, cy * CELL); worldGroup.add(hs);
+    lamps.push({ x: cx * CELL, z: cy * CELL, dead, flick, mat, phase: wr() * 100, powerDep: !!def.need.fuses && wr() < .55, lv: 0, warm: !!def.lampColor });
   }
 
-  // Graffiti (nicht jede Wand!)
-  const gFaces = faces.filter(fc => !protect.has(fc.oy * MW + fc.ox) || wr() < .3);
-  wshuffle(gFaces); const gCount = 10 + idx * 3;
-  GR_LOG = []; const forced = ['ACT', 'ACT II'], kinds = ['text', 'text', 'text', 'eye', 'hands', 'tally', 'arrow', 'cross', 'scribble'];
-  for (let i = 0; i < gCount && i < gFaces.length; i++) {
-    const fc = gFaces[i]; let kind = i < forced.length ? 'text' : wpick(kinds), text = i < forced.length ? forced[i] : wpick(GRAFFITI_TEXTS);
-    if (idx === 2 && i === 2) text = 'ACT III';
-    const m = decalMesh(graffitiTexture(kind, text), kind === 'text' ? (text.length > 6 ? 2.6 : 1.9) : 1.4, kind === 'text' ? (text.length > 6 ? 1.3 : 1.0) : .85);
-    placeWallDecal(m, fc.x, fc.y, fc.f, wrnd(1.3, 2.0), wrnd(-.7, .7)); GR_LOG.push({ kind, text, x: fc.x, y: fc.y, ox: fc.ox, oy: fc.oy });
+  if (!house) {
+    // Graffiti (nicht jede Wand!)
+    const gFaces = faces.filter(fc => !protect.has(fc.oy * MW + fc.ox) || wr() < .3);
+    wshuffle(gFaces); const gCount = 10 + Math.min(idx, 4) * 3;
+    GR_LOG = []; const forced = ['ACT', 'ACT II'], kinds = ['text', 'text', 'text', 'eye', 'hands', 'tally', 'arrow', 'cross', 'scribble'];
+    for (let i = 0; i < gCount && i < gFaces.length; i++) {
+      const fc = gFaces[i]; let kind = i < forced.length ? 'text' : wpick(kinds), text = i < forced.length ? forced[i] : wpick(GRAFFITI_TEXTS);
+      if (idx === 2 && i === 2) text = 'ACT III';
+      if (idx === 4 && i === 2) { kind = 'text'; text = 'LENA'; }
+      if (idx === 4 && i === 3) { kind = 'text'; text = 'PAPA'; }
+      const m = decalMesh(graffitiTexture(kind, text), kind === 'text' ? (text.length > 6 ? 2.6 : 1.9) : 1.4, kind === 'text' ? (text.length > 6 ? 1.3 : 1.0) : .85);
+      placeWallDecal(m, fc.x, fc.y, fc.f, wrnd(1.3, 2.0), wrnd(-.7, .7)); GR_LOG.push({ kind, text, x: fc.x, y: fc.y, ox: fc.ox, oy: fc.oy });
+    }
+    // Blut
+    for (let i = 0; i < 6 + Math.min(idx, 4) * 3; i++) {
+      const [cx, cy] = wpick(openCells); const m = decalMesh(bloodTexA, wrnd(1.4, 3), wrnd(1.4, 3));
+      m.rotation.x = -Math.PI / 2; m.rotation.z = wrnd(0, 6.28); m.position.set(cx * CELL + wrnd(-1, 1), .012, cy * CELL + wrnd(-1, 1)); worldGroup.add(m);
+    }
+    for (let i = 0; i < 3 + Math.min(idx, 4) * 2; i++) { const fc = wpick(faces); const m = decalMesh(bloodTexA, wrnd(.8, 1.6), wrnd(.8, 1.6)); placeWallDecal(m, fc.x, fc.y, fc.f, wrnd(.8, 1.8), wrnd(-.8, .8)); }
   }
-  // Blut
-  for (let i = 0; i < 6 + idx * 3; i++) {
-    const [cx, cy] = wpick(openCells); const m = decalMesh(bloodTexA, wrnd(1.4, 3), wrnd(1.4, 3));
-    m.rotation.x = -Math.PI / 2; m.rotation.z = wrnd(0, 6.28); m.position.set(cx * CELL + wrnd(-1, 1), .012, cy * CELL + wrnd(-1, 1)); worldGroup.add(m);
-  }
-  for (let i = 0; i < 3 + idx * 2; i++) { const fc = wpick(faces); const m = decalMesh(bloodTexA, wrnd(.8, 1.6), wrnd(.8, 1.6)); placeWallDecal(m, fc.x, fc.y, fc.f, wrnd(.8, 1.8), wrnd(-.8, .8)); }
 
   // Wandobjekte
   if (def.F) buildFeature('fusebox', def.F[0], def.F[1]);
@@ -865,21 +988,23 @@ function buildFloor(idx) {
     const hx = def.H[0] * CELL, hz = def.H[1] * CELL;
     PROPS.chair(hx, hz, 0.0); worldGroup.children[worldGroup.children.length - 1].scale.setScalar(1.15);
     colliders.pop(); addCol(hx, hz, .55, .55);
-    [[-.22, .55], [.22, .55]].forEach(([sx, sy]) => { const st = addBoxM(.06, .04, .5, hx + sx, .62, hz - .05, MAT.rubber); });
+    [[-.22, .55], [.22, .55]].forEach(([sx, sy]) => { addBoxM(.06, .04, .5, hx + sx, .62, hz - .05, MAT.rubber); });
     addBoxM(.6, .04, .05, hx, .42, hz + .22, MAT.rubber);
     const pool = decalMesh(bloodTexA, 3.2, 3.2); pool.rotation.x = -Math.PI / 2; pool.position.set(hx, .014, hz); worldGroup.add(pool);
-    for (let i = 0; i < 3; i++) { const c = part(worldGroup, new THREE.CylinderGeometry(.012, .012, 1.4, 5), MAT.metal, hx + wrnd(-.9, .9), 2.5, hz + wrnd(-.9, .9)); }
+    for (let i = 0; i < 3; i++) { part(worldGroup, new THREE.CylinderGeometry(.012, .012, 1.4, 5), MAT.metal, hx + wrnd(-.9, .9), 2.5, hz + wrnd(-.9, .9)); }
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(.09, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff2010 })); bulb.position.set(hx, 2.65, hz); worldGroup.add(bulb);
     part(worldGroup, new THREE.CylinderGeometry(.01, .01, .55, 5), MAT.rubber, hx, 2.95, hz);
     chairInfo = { x: hx, z: hz, bulb, t: 0 };
     redL.position.set(hx, 2.4, hz); greenL.position.set(hx, 2.4, hz);
-    // Kratzspuren & Strichlisten im Raum
-    const rc = def.rect;
     for (let i = 0; i < 6; i++) {
       const wallFaces = faces.filter(fc => zoneCells.has(fc.oy * MW + fc.ox)); if (!wallFaces.length) break;
       const fc = wpick(wallFaces); const m = decalMesh(graffitiTexture(wpick(['tally', 'scribble', 'hands', 'eye']), ''), 1.3, .65); placeWallDecal(m, fc.x, fc.y, fc.f, wrnd(1.0, 1.9), wrnd(-.9, .9));
     }
   } else { redL.intensity = 0; greenL.intensity = 0; }
+
+  // Kapitel 2: Haus-Einrichtung bzw. "Zimmer 13" (Nachbau ihres Schlafzimmers)
+  if (house) buildHouseDecor(def, T, faces);
+  if (def.bed13) buildRoom13(def);
 
   // Gegenstände verteilen
   const pool = wshuffle(def.pool.map(p => p.slice())), cpool = wshuffle(def.canPool.map(p => p.slice()));
@@ -887,7 +1012,7 @@ function buildFloor(idx) {
   const digitOrder = wshuffle([0, 1, 2, 3]);
   const archSlots = def.archive.slice(), poolNotes = def.need.notes ? def.need.notes - archSlots.length : 0;
   for (let i = 0; i < def.need.fuses; i++) add('fuse', pool.pop());
-  if (def.need.key) add('key', def.H, { x: def.H[0] * CELL, z: def.H[1] * CELL - .0 }, .55, 0.3);
+  if (def.need.key) { if (def.keyAtPool) add('key', pool.pop()); else add('key', def.H, { x: def.H[0] * CELL, z: def.H[1] * CELL - .0 }, .55, 0.3); }
   let ni = 0;
   archSlots.forEach(p => { if (ni < def.need.notes) { add('note', p, { digit: team.code[digitOrder[ni]], pos: digitOrder[ni] }); ni++; } });
   for (let i = 0; i < poolNotes; i++) { add('note', pool.pop(), { digit: team.code[digitOrder[ni]], pos: digitOrder[ni] }); ni++; }
@@ -895,8 +1020,8 @@ function buildFloor(idx) {
   for (let i = 0; i < def.batteries; i++) add('battery', pool.pop());
   const colOrder = wshuffle([0, 1, 2, 3, 4]);
   for (let i = 0; i < def.cans; i++) add('spray', cpool.pop(), { col: colOrder[i] });
-  // Notizen mit Text versehen
-  items.filter(i => i.type === 'note').forEach((n, k) => { n.text = LORE[(idx * 3 + k * 2 + (GAME_SEED % 5)) % LORE.length]; });
+  const ln = LORE_FOR(idx); items.filter(i => i.type === 'note').forEach((n, k) => { n.text = ln[(k + (GAME_SEED % 5)) % ln.length]; });
+  if (house) { const pz = add('pizza', [6, 9], { x: 18, z: 27.0 }, 0, .4); pz.active = false; pz.mesh.visible = false; }
 
   // Wesen-Startpunkt: weit weg vom Start
   const dist = bfsDist(sC.cx, sC.cy); const far = openCells.filter(([x, y]) => dist[y * MW + x] >= 26 && !zoneCells.has(y * MW + x));
@@ -904,6 +1029,15 @@ function buildFloor(idx) {
   updateFeatureStates();
   document.title = 'LETZTE AUFNAHME – ' + def.short;
 }
+// Notiztexte: Kapitel 1 = Klinik-Tagebuch, Kapitel 2 = Briefe des Vaters
+const LORE2 = [
+  'Dr. Hallin: Mein Mädchen ist endlich zu Hause. Ich habe ihr ein neues Zimmer eingerichtet. Genau wie früher.',
+  'Dr. Hallin: Lena hat die Albträume. Sie träumt von dem Haus. Gut. So fängt der letzte Akt immer an.',
+  'Dr. Hallin: Die Pizza war ein Fehler von mir, sie hat zu schnell geschlafen. Das nächste Mal nehme ich die Kapseln.',
+  'Dr. Hallin: Wenn sie schläft, ist sie still. Wenn sie still ist, kann ich sie endlich festhalten. Für immer, mein Schatz.',
+  'Dr. Hallin: Sie rennt. Sie rennt immer. Aber ein Kind kommt immer nach Hause, wenn es müde ist.'
+];
+function LORE_FOR(idx) { return idx >= 3 ? LORE2 : LORE; }
 let _lockerTex = null;
 function lockerTexture() {
   if (_lockerTex) return _lockerTex;
@@ -957,6 +1091,366 @@ function openDoorSlot(slot, instant) {
 }
 function updateDoorAnims(dt) {
   for (let i = doorAnims.length - 1; i >= 0; i--) { const d = doorAnims[i]; d.ang = Math.min(1, d.ang + dt * 1.1); d.piv.rotation.y = (d.alongX ? 1 : -1) * 1.7 * (1 - Math.pow(1 - d.ang, 2)); if (d.ang >= 1) doorAnims.splice(i, 1); }
+}
+
+/* ====================================================================
+   KAPITEL 2: das neue Haus, Tageszeiten & "Zimmer 13"
+==================================================================== */
+const HM = {
+  wood: new THREE.MeshStandardMaterial({ color: 0xb08a5a, roughness: .7 }),
+  darkWood: new THREE.MeshStandardMaterial({ color: 0x5a4028, roughness: .75 }),
+  white: new THREE.MeshStandardMaterial({ color: 0xe9e6df, roughness: .85 }),
+  blue: new THREE.MeshStandardMaterial({ color: 0x34507a, roughness: 1 }),
+  gray: new THREE.MeshStandardMaterial({ color: 0x5d6066, roughness: 1 }),
+  cream: new THREE.MeshStandardMaterial({ color: 0xd9cfb6, roughness: 1 }),
+  red: new THREE.MeshStandardMaterial({ color: 0x8a2a2a, roughness: 1 }),
+  tile: new THREE.MeshStandardMaterial({ color: 0xd2d6d3, roughness: .35 }),
+  steel: new THREE.MeshStandardMaterial({ color: 0xb8bcc0, roughness: .3, metalness: .8 }),
+  plant: new THREE.MeshStandardMaterial({ color: 0x2f6b3a, roughness: .9 }),
+  pot: new THREE.MeshStandardMaterial({ color: 0x9a5a3a, roughness: .9 }),
+  black: new THREE.MeshStandardMaterial({ color: 0x111113, roughness: .5 }),
+  shade: new THREE.MeshBasicMaterial({ color: 0xffd9a0 })
+};
+MAT.doorHome = new THREE.MeshStandardMaterial({ color: 0xe6e2da, roughness: .6 });
+const houseState = { tod: 0, todTarget: 0 };
+function addFeat(type, x, z, prompt) { const f = { type, x, z, cx: cellOf(x), cy: cellOf(z), prompt }; feats.push(f); return f; }
+
+const HP = {
+  bedHome(x, z, rot) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(1.75, .32, 2.1), HM.wood, 0, .18, 0);
+    part(g, new THREE.BoxGeometry(1.65, .26, 2.0), HM.white, 0, .46, 0);
+    part(g, new THREE.BoxGeometry(1.67, .2, 1.3), HM.blue, 0, .6, .38);
+    [-.4, .4].forEach(px => part(g, new THREE.BoxGeometry(.6, .15, .38), HM.white, px, .64, -.75));
+    part(g, new THREE.BoxGeometry(1.85, .95, .07), HM.darkWood, 0, .7, -1.08);
+    finishProp(g, x, z, rot, 1.75, 2.1);
+  },
+  nightstand(x, z, rot) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(.5, .52, .42), HM.wood, 0, .26, 0);
+    part(g, new THREE.CylinderGeometry(.05, .07, .22, 10), HM.white, -.08, .63, 0);
+    part(g, new THREE.CylinderGeometry(.11, .16, .2, 12), HM.shade, -.08, .83, 0);
+    const fr = part(g, new THREE.BoxGeometry(.2, .16, .02), HM.darkWood, .12, .6, .05); fr.rotation.x = -.2;
+    const ph = new THREE.Mesh(new THREE.PlaneGeometry(.17, .13), new THREE.MeshBasicMaterial({ map: photoTex('family') })); ph.position.set(.12, .6, .066); ph.rotation.x = -.2; g.add(ph);
+    finishProp(g, x, z, rot, .5, .42);
+  },
+  wardrobe(x, z, rot) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(1.5, 2.1, .6), HM.wood, 0, 1.05, 0);
+    [-.37, .37].forEach(dx => part(g, new THREE.BoxGeometry(.72, 2.0, .03), HM.darkWood, dx, 1.05, .31));
+    [-.05, .05].forEach(dx => part(g, new THREE.BoxGeometry(.02, .18, .04), HM.steel, dx, 1.05, .34));
+    finishProp(g, x, z, rot, 1.5, .6);
+  },
+  desk(x, z, rot) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(1.4, .05, .7), HM.wood, 0, .75, 0);
+    [[-.65, -.3], [.65, -.3], [-.65, .3], [.65, .3]].forEach(([lx, lz]) => part(g, new THREE.BoxGeometry(.05, .75, .05), HM.black, lx, .37, lz));
+    part(g, new THREE.BoxGeometry(.36, .02, .25), HM.black, 0, .79, .05); const lid = part(g, new THREE.BoxGeometry(.36, .24, .02), HM.black, 0, .9, -.07); lid.rotation.x = -.25;
+    finishProp(g, x, z, rot, 1.4, .7);
+  },
+  sofa(x, z, rot) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(2.3, .42, .95), HM.gray, 0, .26, 0); part(g, new THREE.BoxGeometry(2.3, .55, .24), HM.gray, 0, .66, -.36);
+    [-1.1, 1.1].forEach(dx => part(g, new THREE.BoxGeometry(.2, .55, .95), HM.gray, dx, .45, 0));
+    [-.55, .55].forEach(dx => part(g, new THREE.BoxGeometry(.9, .14, .7), HM.cream, dx, .5, .05));
+    finishProp(g, x, z, rot, 2.3, .95);
+  },
+  table(x, z, rot, w, d, mat) {
+    const g = new THREE.Group();
+    part(g, new THREE.BoxGeometry(w, .06, d), mat || HM.wood, 0, .76, 0);
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => part(g, new THREE.BoxGeometry(.06, .76, .06), HM.darkWood, sx * (w / 2 - .08), .38, sz * (d / 2 - .08)));
+    finishProp(g, x, z, rot, w, d);
+  },
+  coffee(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(1.0, .05, .55), HM.darkWood, 0, .42, 0); [[-.42, -.2], [.42, -.2], [-.42, .2], [.42, .2]].forEach(([lx, lz]) => part(g, new THREE.BoxGeometry(.05, .42, .05), HM.black, lx, .21, lz)); finishProp(g, x, z, rot, 1.0, .55); },
+  plant(x, z) { const g = new THREE.Group(); part(g, new THREE.CylinderGeometry(.2, .15, .35, 10), HM.pot, 0, .18, 0); for (let i = 0; i < 6; i++) { const l = part(g, new THREE.SphereGeometry(.17, 8, 6), HM.plant, Math.sin(i * 1.1) * .13, .6 + (i % 3) * .18, Math.cos(i * 1.1) * .13); l.scale.set(1, 1.6, .5); } finishProp(g, x, z, 0, .45, .45); },
+  bookshelf(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(1.6, 2.0, .34), HM.darkWood, 0, 1.0, 0); for (let r = 0; r < 4; r++) for (let i = 0; i < 9; i++) part(g, new THREE.BoxGeometry(.1, .26, .22), [HM.red, HM.blue, HM.cream, HM.gray][(i + r) % 4], -.7 + i * .17, .3 + r * .45, .04); finishProp(g, x, z, rot, 1.6, .34); },
+  fridge(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(.9, 1.9, .75), HM.white, 0, .95, 0); part(g, new THREE.BoxGeometry(.03, .5, .04), HM.steel, .3, 1.3, .39); part(g, new THREE.BoxGeometry(.9, .02, .02), HM.black, 0, 1.2, .38); finishProp(g, x, z, rot, .9, .75); },
+  counter(x, z, rot, len) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(len, .9, .62), HM.white, 0, .45, 0); part(g, new THREE.BoxGeometry(len, .05, .66), HM.darkWood, 0, .93, 0); part(g, new THREE.BoxGeometry(len, .7, .34), HM.white, 0, 1.95, -.14);
+    const sink = part(g, new THREE.BoxGeometry(.6, .04, .4), HM.steel, len * .18, .96, .02); part(g, new THREE.CylinderGeometry(.015, .015, .25, 6), HM.steel, len * .18, 1.08, -.2);
+    for (let i = 0; i < 4; i++) { const hb = part(g, new THREE.CylinderGeometry(.09, .09, .02, 12), HM.black, -len * .3 + (i % 2) * .22, .96, (i < 2 ? -.1 : .1)); }
+    finishProp(g, x, z, rot, len, .62); },
+  toilet(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(.42, .4, .35), HM.tile, 0, .2, .1); part(g, new THREE.CylinderGeometry(.2, .17, .12, 12), HM.tile, 0, .44, .12); part(g, new THREE.BoxGeometry(.42, .42, .16), HM.tile, 0, .6, -.08); finishProp(g, x, z, rot, .45, .6); },
+  sink(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(.65, .8, .45), HM.white, 0, .4, 0); part(g, new THREE.BoxGeometry(.5, .05, .34), HM.tile, 0, .83, 0); part(g, new THREE.CylinderGeometry(.015, .015, .2, 6), HM.steel, 0, .95, -.15); finishProp(g, x, z, rot, .65, .45); },
+  tub(x, z, rot) { const g = new THREE.Group(); part(g, new THREE.BoxGeometry(.8, .55, 1.7), HM.tile, 0, .28, 0); part(g, new THREE.BoxGeometry(.64, .06, 1.54), HM.steel, 0, .57, 0); finishProp(g, x, z, rot, .8, 1.7); },
+  floorLamp(x, z) { const g = new THREE.Group(); part(g, new THREE.CylinderGeometry(.14, .16, .03, 10), HM.black, 0, .02, 0); part(g, new THREE.CylinderGeometry(.015, .015, 1.6, 6), HM.black, 0, .8, 0); part(g, new THREE.CylinderGeometry(.14, .22, .3, 12), HM.shade, 0, 1.65, 0); finishProp(g, x, z, 0, .3, .3); },
+  rug(x, z, w, d, col) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: col, roughness: 1 })); m.rotation.x = -Math.PI / 2; m.position.set(x, .018, z); m.receiveShadow = true; worldGroup.add(m); }
+};
+function photoTex(kind) {
+  const c = document.createElement('canvas'); c.width = 192; c.height = 144; const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 0, 144); grd.addColorStop(0, '#9fb7cf'); grd.addColorStop(1, '#6f8f5a'); g.fillStyle = grd; g.fillRect(0, 0, 192, 144);
+  // Vater (weißer Kittel) und Tochter
+  g.fillStyle = '#e8e8e2'; g.fillRect(40, 70, 56, 74); g.fillStyle = '#e8c4a0'; g.beginPath(); g.arc(68, 54, 17, 0, 7); g.fill(); g.fillStyle = '#8a8a8a'; g.beginPath(); g.arc(68, 44, 18, Math.PI, 0); g.fill();
+  g.fillStyle = '#222'; g.fillRect(60, 52, 5, 3); g.fillRect(71, 52, 5, 3); g.fillStyle = '#7a3a3a'; g.fillRect(63, 62, 11, 2);
+  g.fillStyle = '#f0c040'; g.fillRect(112, 92, 40, 52); g.fillStyle = '#e8c4a0'; g.beginPath(); g.arc(132, 78, 14, 0, 7); g.fill(); g.fillStyle = '#4a3020'; g.beginPath(); g.arc(132, 72, 15, Math.PI, 0); g.fill(); g.fillRect(144, 70, 8, 22);
+  g.fillStyle = '#222'; g.fillRect(126, 77, 4, 3); g.fillRect(135, 77, 4, 3); g.strokeStyle = '#a03030'; g.lineWidth = 2; g.beginPath(); g.arc(132, 83, 5, .1, Math.PI - .1); g.stroke();
+  g.fillStyle = 'rgba(40,20,0,.18)'; g.fillRect(0, 0, 192, 144);
+  const t = new THREE.CanvasTexture(c); t.disp = true; return t;
+}
+function mirrorTex() {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 192; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 128, 192); gr.addColorStop(0, '#5c6872'); gr.addColorStop(.5, '#2c333a'); gr.addColorStop(1, '#48525c'); g.fillStyle = gr; g.fillRect(0, 0, 128, 192);
+  g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(100, 70, 16, 24, 0, 0, 7); g.fill(); g.fillRect(84, 90, 34, 110); // schwacher Schatten hinter dir
+  g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 8; g.beginPath(); g.moveTo(10, 190); g.lineTo(80, 0); g.stroke();
+  g.strokeStyle = '#d8d4cc'; g.lineWidth = 8; g.strokeRect(0, 0, 128, 192);
+  const t = new THREE.CanvasTexture(c); t.disp = true; return t;
+}
+function addWindow(cx, cy, face, y, w, h) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: 0xcfe6ff, fog: false }));
+  placeWallDecal(m, cx, cy, face, y, 0); m.material.depthWrite = true;
+  const off = CELL / 2 + .03; const bx = (face === 'W' ? -1 : face === 'E' ? 1 : 0), bz = (face === 'N' ? -1 : face === 'S' ? 1 : 0);
+  const along = (face === 'N' || face === 'S');
+  const fr = (ww, hh, dx, dy) => { const f = new THREE.Mesh(new THREE.BoxGeometry(along ? ww : .06, hh, along ? .06 : ww), HM.white); f.position.set(cx * CELL + bx * (CELL / 2 + .035) + (along ? dx : 0), y + dy, cy * CELL + bz * (CELL / 2 + .035) + (along ? 0 : dx)); worldGroup.add(f); };
+  fr(w + .1, .07, 0, h / 2); fr(w + .1, .07, 0, -h / 2); fr(.07, h, -w / 2, 0); fr(.07, h, w / 2, 0); fr(.04, h, 0, 0); fr(w, .04, 0, 0);
+  houseWindows.push(m); return m;
+}
+
+/* ---------- Haus bauen ---------- */
+function buildHouseDecor(def, T, faces) {
+  const C3 = CELL;
+  // Schlafzimmer (x 1.5–10.5, z 1.5–10.5)
+  HP.bedHome(6, 2.65, 0); HP.nightstand(4.4, 1.95, 0); HP.nightstand(7.6, 1.95, 0);
+  HP.wardrobe(2.0, 6.4, Math.PI / 2); HP.desk(10.0, 7.7, Math.PI / 2); PROPS.chair(9.0, 7.7, -Math.PI / 2);
+  HP.rug(6, 6.8, 3.4, 2.4, 0x6a3a3a); HP.plant(2.4, 2.3);
+  addWindow(2, 0, 'S', 1.7, 1.7, 1.3);
+  const ph1 = decalMesh(photoTex('family'), .9, .68); placeWallDecal(ph1, 0, 4, 'E', 1.7, 0);
+  // Bad (x 13.5–16.5)
+  HP.toilet(15.0, 2.05, 0); HP.sink(16.1, 5.6, -Math.PI / 2); HP.tub(14.2, 8.7, 0);
+  const mr = new THREE.Mesh(new THREE.PlaneGeometry(.85, 1.25), new THREE.MeshStandardMaterial({ map: mirrorTex(), roughness: .12, metalness: .6 })); placeWallDecal(mr, 6, 2, 'W', 1.7, 0);
+  addFeat('mirror', 15.0, 6.0, () => '[E] In den Spiegel sehen');
+  // Küche (x 19.5–34.5, z 1.5–13.5)
+  HP.counter(25.2, 1.9, 0, 10.4); HP.fridge(33.8, 2.1, 0);
+  HP.table(27, 6.8, 0, 1.7, .95, HM.wood);
+  [[26.1, 5.7, Math.PI], [27.9, 5.7, Math.PI], [26.1, 7.9, 0], [27.9, 7.9, 0]].forEach(([x, z, r]) => PROPS.chair(x, z, r));
+  addWindow(9, 0, 'S', 1.7, 1.7, 1.3); addWindow(11, 0, 'S', 1.7, 1.4, 1.3);
+  const ph = new THREE.Mesh(new THREE.BoxGeometry(.14, .02, .26), HM.black); ph.position.set(23.6, .95, 1.95); worldGroup.add(ph);
+  const phs = new THREE.Mesh(new THREE.PlaneGeometry(.1, .2), new THREE.MeshBasicMaterial({ color: 0x4a7cff })); phs.rotation.x = -Math.PI / 2; phs.position.set(23.6, .962, 1.95); worldGroup.add(phs);
+  addFeat('phone', 24.0, 3.1, () => team.stage === 0 ? '[E] Handy nehmen — Pizza bestellen' : (team.stage === 1 ? 'Du wartest auf die Pizza …' : 'Das Handy ist leer.'));
+  addFeat('table', 27.0, 5.7, () => team.stage === 3 ? '[E] Pizza essen' : (team.stage < 3 ? 'Der Küchentisch.' : 'Du bist so müde …'));
+  // Wohnzimmer (x 1.5–34.5, z 13.5–22.5)
+  buildTV(2.4, 18.0, 1, 0, 'news', true);
+  HP.sofa(9.6, 18.0, -Math.PI / 2); HP.coffee(6.3, 18.0, Math.PI / 2); HP.rug(7.2, 18, 2.6, 3.4, 0x405a6a);
+  HP.plant(3.0, 14.3); HP.plant(33.4, 21.9); HP.plant(33.4, 14.5); HP.floorLamp(2.7, 21.6); HP.bookshelf(20.0, 22.0, Math.PI); HP.bookshelf(26, 22.0, Math.PI);
+  addWindow(2, 8, 'N', 1.7, 1.9, 1.3); addWindow(10, 8, 'N', 1.7, 1.9, 1.3);
+  const ph2 = decalMesh(photoTex('family'), 1.0, .75); placeWallDecal(ph2, 3, 4, 'S', 1.7, 0.2);
+  const ph3 = decalMesh(photoTex('family'), .8, .6); placeWallDecal(ph3, 1, 4, 'S', 1.6, -.2);
+  // Eingangsbereich: Fußmatte & Verandalicht (nach dem Klingeln an)
+  HP.rug(18, 22.6, 1.2, .7, 0x3a3a3a);
+  signLight.color.setHex(0xffc890); signLight.position.set(18, 2.3, 27.0);
+  // Haustür gehört zur Z-Tür (6,8): Interaktion über doorList
+  houseState.tod = 0; houseState.todTarget = 0; applyHouseTod(0);
+}
+/* ---------- Zimmer 13: Nachbau ihres Schlafzimmers in der Klinik ---------- */
+function buildRoom13(def) {
+  HP.bedHome(18, 27.5, 0); HP.nightstand(15.6, 26.9, 0); HP.nightstand(20.4, 26.9, 0);
+  HP.wardrobe(8.4, 32.5, Math.PI / 2); HP.desk(28.0, 28.5, Math.PI / 2); PROPS.chair(27.0, 28.5, -Math.PI / 2);
+  HP.rug(18, 31.5, 3.4, 2.4, 0x6a3a3a); HP.plant(9.2, 26.8);
+  const ph = decalMesh(photoTex('family'), .9, .68); placeWallDecal(ph, 2, 11, 'E', 1.7, 0);   // Foto an der Westwand des Raums
+  const lab = new THREE.Mesh(new THREE.PlaneGeometry(.9, .32), new THREE.MeshBasicMaterial({ map: labelTex('ZIMMER 13', '#16140f', '#d8d2c0', 256, 80, 40) })); placeWallDecal(lab, 10, 10, 'E', 2.0, 0);
+  addFeat('bed13', 18, 30.2, () => floorDef.bed13 && !doorList.find(d => d.slot === 0 && !d.open) ? '[E] Dich hinlegen (du kannst nicht mehr)' : 'Zimmer 13 ist verschlossen.');
+  signLight.color.setHex(0xffcf90); signLight.position.set(15.6, 1.35, 26.9);
+}
+function applyHouseTod(t) {
+  // 0 Morgen (hell, bläulich) → 1 Abend (orange) → 2 Nacht (dunkelblau)
+  const lerp3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  const M = [.82, .92, 1.0], D = [1.0, .55, .28], N = [.04, .06, .14];
+  const col = t < 1 ? lerp3(M, D, t) : lerp3(D, N, t - 1);
+  houseWindows.forEach(w => w.material.color.setRGB(col[0], col[1], col[2]));
+  houseState.amb = t < 1 ? .95 - .4 * t : .55 - .3 * (t - 1);
+}
+function updateHouse(dt) {
+  houseState.tod += (houseState.todTarget - houseState.tod) * Math.min(1, dt * .6); applyHouseTod(houseState.tod);
+  scene.fog.color.setRGB(.1 + .04 * (2 - houseState.tod), .11 + .03 * (2 - houseState.tod), .14);
+}
+
+/* ====================================================================
+   FERNSEHER: Programme, Zuschauen, Jumpscare
+   marco = "Onkel Marco" (SCM-Kinderstunde) · popel = "Popelmütze" · ring = Brunnen-Video
+   cam = Überwachungsbild (Kapitel 2) · news = Nachrichten (Haus)
+==================================================================== */
+let tvs = [], tvWatch = 0, tvWatching = null, tvDrawT = 0, tvNoteT = 0, tvHint = 0, tvFovFX = 0;
+const TVW = 192, TVH = 144;
+const tvLight = new THREE.PointLight(0x9fb6ff, 0, 9, 2); scene.add(tvLight);
+const TVMAT = { body: new THREE.MeshStandardMaterial({ color: 0x4f4b42, roughness: .75 }), stand: new THREE.MeshStandardMaterial({ color: 0x3a2c20, roughness: .85 }) };
+function tvNoise(g, n, a) { for (let i = 0; i < n; i++) { const v = (Math.random() * 255) | 0; g.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',' + a + ')'; g.fillRect(Math.random() * TVW, Math.random() * TVH, 2 + Math.random() * 6, 1 + Math.random() * 2); } }
+function tvLines(g, a) { g.fillStyle = 'rgba(0,0,0,' + a + ')'; for (let y = 0; y < TVH; y += 3) g.fillRect(0, y, TVW, 1); }
+
+function drawMarco(g, t, k) {
+  const W = TVW, H = TVH, cols = ['#e8453c', '#f4a020', '#f2e03a', '#4cc24a', '#3a8de0', '#7a4cc2', '#e060b0'], bw = W / 7, sc = (t * 14) % (bw * 7);
+  for (let i = -7; i < 8; i++) { g.fillStyle = cols[((i % 7) + 7) % 7]; g.fillRect(i * bw + sc, 0, bw + 1, H); }
+  g.fillStyle = 'rgba(0,0,0,' + (.08 + k * .6) + ')'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#1e3a9a'; g.beginPath(); g.ellipse(W / 2, H + 8, 74, 40, 0, 0, 7); g.fill();
+  g.fillStyle = '#f0f0f0'; g.fillRect(W / 2 - 10, H - 40, 20, 40);
+  g.fillStyle = '#d02030'; g.beginPath(); g.moveTo(W / 2, H - 36); g.lineTo(W / 2 - 17, H - 45); g.lineTo(W / 2 - 17, H - 27); g.closePath(); g.fill(); g.beginPath(); g.moveTo(W / 2, H - 36); g.lineTo(W / 2 + 17, H - 45); g.lineTo(W / 2 + 17, H - 27); g.closePath(); g.fill();
+  const bob = Math.sin(t * 3) * 2 + k * Math.sin(t * 25) * 1.6, cx = W / 2, cy = 58 + bob;
+  g.fillStyle = '#e8601a'; for (let i = 0; i < 11; i++) { const a = Math.PI + i / 10 * Math.PI; g.beginPath(); g.moveTo(cx + Math.cos(a) * 36, cy + Math.sin(a) * 40); g.lineTo(cx + Math.cos(a) * 60, cy + Math.sin(a) * 64 - 4); g.lineTo(cx + Math.cos(a + .25) * 36, cy + Math.sin(a + .25) * 40); g.fill(); }
+  g.fillStyle = k > .6 ? '#d9c2b0' : '#f2c9a0'; g.beginPath(); g.ellipse(cx, cy, 38, 44, 0, 0, 7); g.fill();
+  g.fillStyle = 'rgba(230,80,80,.55)'; g.beginPath(); g.arc(cx - 25, cy + 10, 8, 0, 7); g.arc(cx + 25, cy + 10, 8, 0, 7); g.fill();
+  const er = 9 + k * 4;
+  for (const sx of [-1, 1]) {
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(cx + sx * 15, cy - 8, er, er * 1.2, 0, 0, 7); g.fill();
+    g.fillStyle = '#000'; g.beginPath(); g.arc(cx + sx * 15 + Math.sin(t * .7) * 2 * (1 - k), cy - 6 + k * 3, 3.5 + k * 3.8, 0, 7); g.fill(); g.fillStyle = '#fff'; g.fillRect(cx + sx * 15 - 1, cy - 9 + k * 3, 2, 2);
+  }
+  g.fillStyle = '#e02020'; g.beginPath(); g.arc(cx, cy + 6, 8 + k * 2, 0, 7); g.fill();
+  const talk = Math.max(0, Math.sin(t * 7.3)) * (6 + k * 10) + 3 + k * 6;
+  g.fillStyle = '#300'; g.beginPath(); g.ellipse(cx, cy + 26, 20 + k * 9, talk, 0, 0, Math.PI); g.fill();
+  if (k > .4) { g.fillStyle = '#fff'; for (let i = 0; i < 7; i++) g.fillRect(cx - 18 - k * 8 + i * (5 + k * 2.4), cy + 26, 3, 4 + k * 5); }
+  g.fillStyle = 'rgba(0,0,0,.65)'; g.fillRect(0, H - 22, W, 22); g.fillStyle = '#fff'; g.font = 'bold 12px Arial'; g.fillText('ONKEL MARCO', 8, H - 8);
+  const lines = ['Hallo, liebe Kinder!', 'Heute spielen wir Verstecken.', 'Ich zähle bis zehn … und du?', 'Ich seh dich.', 'Dreh dich nicht um.', 'Komm näher, ich beiße nicht.'];
+  g.font = '10px Arial'; g.fillText(lines[Math.floor(t / 3.2) % lines.length], 92, H - 8);
+  g.fillStyle = '#e8453c'; g.fillRect(W - 34, 6, 28, 14); g.fillStyle = '#fff'; g.font = 'bold 11px Arial'; g.fillText('SCM', W - 31, 17);
+}
+function drawPopel(g, t, k) {
+  const W = TVW, H = TVH;
+  const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#0b1430'); sky.addColorStop(.6, '#1b3a28'); sky.addColorStop(1, '#10261a'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#e8e6c8'; g.beginPath(); g.arc(150, 26, 12, 0, 7); g.fill(); g.fillStyle = '#0b1430'; g.beginPath(); g.arc(155, 23, 10, 0, 7); g.fill();
+  g.fillStyle = '#cfcab8'; for (let i = 0; i < 14; i++) { g.fillRect(i * 15 + 2, 82, 9, 40); g.beginPath(); g.moveTo(i * 15 + 2, 82); g.lineTo(i * 15 + 6.5, 74); g.lineTo(i * 15 + 11, 82); g.fill(); } g.fillRect(0, 92, W, 5); g.fillRect(0, 108, W, 5);
+  g.fillStyle = '#0c2414'; for (let i = 0; i < 40; i++) g.fillRect(i * 5, 118 + Math.sin(i + t) * 2, 3, 26);
+  const cx = 96, bob = Math.sin(t * 2.2) * 2.5, tip = Math.sin(t * 1.7) * 10;
+  g.fillStyle = '#a81c1c'; g.beginPath(); g.ellipse(cx, H + 2, 44, 56, 0, 0, 7); g.fill(); g.fillStyle = '#2a1a10'; g.fillRect(cx - 44, H - 38, 88, 7);
+  g.fillStyle = '#e9b894'; g.beginPath(); g.arc(cx, 62 + bob, 24, 0, 7); g.fill();
+  g.fillStyle = '#f2f2f2'; g.beginPath(); g.moveTo(cx - 25, 64 + bob); g.quadraticCurveTo(cx, 130 + bob + k * 14, cx + 25, 64 + bob); g.lineTo(cx + 14, 58 + bob); g.lineTo(cx - 14, 58 + bob); g.fill();
+  g.fillStyle = '#d01c1c'; g.beginPath(); g.moveTo(cx - 27, 48 + bob); g.lineTo(cx + tip + 8, -8 + bob * .5 - k * 8); g.lineTo(cx + 27, 48 + bob); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(cx + tip + 8, -6 + bob * .5 - k * 8, 5, 0, 7); g.fill();
+  g.fillStyle = '#e07a70'; g.beginPath(); g.arc(cx, 65 + bob, 6 + k * 2, 0, 7); g.fill();
+  for (const sx of [-1, 1]) { if (k < .35) { g.fillStyle = '#111'; g.beginPath(); g.arc(cx + sx * 10, 54 + bob, 2.6, 0, 7); g.fill(); } else { g.fillStyle = '#000'; g.beginPath(); g.ellipse(cx + sx * 10, 54 + bob, 5, 7 + k * 3, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.fillRect(cx + sx * 10 - 1, 53 + bob, 2, 2); } }
+  g.fillStyle = '#240808'; g.beginPath(); g.ellipse(cx, 80 + bob, 9 + k * 7, 3 + Math.max(0, Math.sin(t * 5)) * (4 + k * 9), 0, 0, 7); g.fill();
+  g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, H - 20, W, 20); g.fillStyle = '#ffe7a8'; g.font = 'bold 12px Arial'; g.fillText('POPELMÜTZE', 8, H - 6);
+  const lines = ['Popelmütze hat euch lieb.', 'Schlaft schön, Kinder.', 'Wer nicht schläft …', '… kommt in den Keller.', 'Popelmütze sieht alles.'];
+  g.font = '10px Arial'; g.fillText(lines[Math.floor(t / 3.4) % lines.length], 92, H - 6);
+}
+function drawRing(g, t, k) {
+  const W = TVW, H = TVH, sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#4a555c'); sky.addColorStop(.55, '#2a3135'); sky.addColorStop(1, '#14181a'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  g.strokeStyle = '#1c2224'; g.lineWidth = 1; for (let i = 0; i < 70; i++) { const x = (i * 29) % W, y = 100 + (i * 13) % 44; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.sin(t + i) * 3, y - 10); g.stroke(); }
+  g.fillStyle = '#505456'; g.beginPath(); g.ellipse(96, 112, 40, 14, 0, 0, 7); g.fill(); g.fillStyle = '#6a6e70'; g.fillRect(56, 112, 80, 24); g.fillStyle = '#35383a'; for (let r = 0; r < 3; r++) for (let c = 0; c < 8; c++) g.fillRect(58 + c * 10 + (r % 2) * 5, 116 + r * 7, 8, 5);
+  g.fillStyle = '#050607'; g.beginPath(); g.ellipse(96, 110, 31, 10, 0, 0, 7); g.fill();
+  const p = Math.max(0, Math.min(1.5, ((t % 18) - 3) / 10 + k * .75));
+  if (p > 0) {
+    const gx = 96, gy = 108 + p * 32, sc = .32 + p * 1.2;
+    g.fillStyle = '#d6d6cc'; for (let f = 0; f < 4; f++) { g.fillRect(70 + f * 4, 104 - p * 4, 3, 10); g.fillRect(118 + f * 4, 104 - p * 4, 3, 10); }
+    g.fillStyle = '#040404'; g.beginPath(); g.ellipse(gx, gy - 22 * sc, 21 * sc, 30 * sc, 0, 0, 7); g.fill();
+    for (let i = 0; i < 12; i++) { g.fillRect(gx - 20 * sc + i * 3.4 * sc, gy - 20 * sc, 2 * sc, (30 + (i % 4) * 8) * sc); }
+    g.fillStyle = '#d8d8d0'; g.beginPath(); g.arc(gx + 5 * sc, gy - 26 * sc, 5.5 * sc, 0, 7); g.fill(); g.fillStyle = '#000'; g.beginPath(); g.arc(gx + 6 * sc, gy - 26 * sc, 2.6 * sc, 0, 7); g.fill();
+    g.fillStyle = '#c8c8c0'; g.fillRect(gx - 9 * sc, gy - 4 * sc, 18 * sc, 8 * sc);
+  }
+  const tx = 'SIEBEN TAGE'; if ((t % 18) > 7 && (t % 18) < 15) { g.fillStyle = 'rgba(220,220,210,.85)'; g.font = 'bold 14px "Courier New"'; g.fillText(tx.slice(0, Math.min(tx.length, Math.floor(((t % 18) - 7) * 3))), 52, 24); }
+  const band = Math.floor(t * 8) % 12; g.drawImage(g.canvas, 0, band * 12, W, 6, 5, band * 12, W, 6);
+  g.fillStyle = 'rgba(120,150,160,.12)'; g.fillRect(0, 0, W, H);
+}
+function drawCam(g, t, k) {
+  const W = TVW, H = TVH; g.fillStyle = '#131713'; g.fillRect(0, 0, W, H); g.fillStyle = '#212721'; g.fillRect(0, 0, W, 70); g.fillStyle = '#0a110a'; g.fillRect(18, 14, 38, 34);
+  g.fillStyle = '#191e19'; g.fillRect(0, 70, W, 74); g.fillStyle = '#2b322b'; g.fillRect(38, 80, 116, 32); g.fillRect(38, 66, 116, 18); g.fillStyle = '#3a423a'; g.beginPath(); g.ellipse(102, 94 + Math.sin(t * 1.3) * .8, 38, 10, 0, 0, 7); g.fill(); g.fillStyle = '#1e241e'; g.beginPath(); g.arc(66, 92, 9, 0, 7); g.fill();
+  const a = Math.min(1, Math.max(0, ((t % 26) - 9) / 10) + k);
+  g.fillStyle = 'rgba(2,4,2,' + (a * .92) + ')'; g.fillRect(114, 30 - a * 4, 16, 58); g.beginPath(); g.arc(122, 25 - a * 4, 9, 0, 7); g.fill();
+  if (a > .7) { g.fillStyle = 'rgba(210,230,210,' + (a - .6) + ')'; g.fillRect(118, 24 - a * 4, 2, 2); g.fillRect(124, 24 - a * 4, 2, 2); }
+  g.fillStyle = 'rgba(140,255,140,.8)'; g.font = '9px "Courier New"'; const s = 11000 + Math.floor(t); g.fillText('CAM 2 · WOHNZIMMER', 6, 12); g.fillText('03:' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'), 6, H - 6);
+  g.fillStyle = Math.floor(t * 2) % 2 ? '#e33' : '#511'; g.beginPath(); g.arc(W - 14, 12, 4, 0, 7); g.fill(); g.fillStyle = 'rgba(0,30,0,.18)'; g.fillRect(0, 0, W, H);
+}
+function drawNews(g, t, k) {
+  const W = TVW, H = TVH, bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#1a3764'); bg.addColorStop(1, '#0c1a33'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#26466f'; g.fillRect(0, 100, W, 44); g.fillStyle = '#d9b898'; g.beginPath(); g.arc(70, 56, 16, 0, 7); g.fill(); g.fillStyle = '#1b1b1f'; g.beginPath(); g.ellipse(70, 100, 34, 30, 0, Math.PI, 0); g.fill(); g.fillRect(36, 100, 68, 20);
+  g.fillStyle = '#d02030'; g.fillRect(0, 118, W, 18); g.fillStyle = '#fff'; g.font = 'bold 11px Arial'; const tk = '+++ KLINIK ST. AURELIA: WACHTEAM WEITER VERMISST +++ POLIZEI SUCHT ZEUGEN +++ ';
+  g.fillText(tk + tk, -((t * 40) % (tk.length * 6.2)), 131); g.fillStyle = '#fff'; g.fillRect(W - 54, 8, 46, 14); g.fillStyle = '#1a3764'; g.font = 'bold 10px Arial'; g.fillText('AUREN TV', W - 51, 18);
+  g.fillStyle = 'rgba(255,255,255,.1)'; g.fillRect(100, 40, 70, 40); g.fillStyle = '#fff'; g.font = '9px Arial'; g.fillText('VERMISST', 108, 56); g.fillText('seit 3 Wochen', 108, 68);
+}
+function drawScare(g, prog, t) {
+  const W = TVW, H = TVH; g.fillStyle = prog === 'ring' ? '#0a0e10' : '#220000'; g.fillRect(0, 0, W, H);
+  const long = (prog === 'ring' || prog === 'cam');
+  if (prog === 'marco') { g.fillStyle = '#e8601a'; for (let i = 0; i < 14; i++) { const a = Math.PI + i / 13 * Math.PI; g.beginPath(); g.moveTo(96 + Math.cos(a) * 66, 80 + Math.sin(a) * 80); g.lineTo(96 + Math.cos(a) * 110, 80 + Math.sin(a) * 120); g.lineTo(96 + Math.cos(a + .2) * 66, 80 + Math.sin(a + .2) * 80); g.fill(); } }
+  if (prog === 'popel') { g.fillStyle = '#d01c1c'; g.beginPath(); g.moveTo(40, 40); g.lineTo(96, -50); g.lineTo(152, 40); g.fill(); g.fillStyle = '#f2f2f2'; g.beginPath(); g.moveTo(40, 100); g.quadraticCurveTo(96, 200, 152, 100); g.fill(); }
+  g.fillStyle = '#cfc6b6'; g.beginPath(); g.ellipse(96, 78, 68, 84, 0, 0, 7); g.fill();
+  if (long) { g.fillStyle = '#030303'; g.beginPath(); g.ellipse(96, 54, 74, 68, 0, Math.PI, 0); g.fill(); g.fillRect(22, 54, 22, 110); g.fillRect(150, 54, 22, 110); for (let i = 0; i < 20; i++) g.fillRect(40 + i * 6, 30, 3, 60 + (i % 5) * 12); }
+  g.fillStyle = '#000'; g.beginPath(); g.ellipse(68, 62, 18, 26, 0, 0, 7); g.ellipse(124, 62, 18, 26, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(68, 64, 2.5, 0, 7); g.arc(124, 64, 2.5, 0, 7); g.fill();
+  g.fillStyle = '#000'; g.beginPath(); g.ellipse(96, 118, 38, 26 + Math.sin(t * 50) * 6, 0, 0, 7); g.fill(); g.fillStyle = '#e8e2cc'; for (let i = 0; i < 10; i++) { g.beginPath(); g.moveTo(62 + i * 7.5, 98); g.lineTo(66 + i * 7.5, 118); g.lineTo(70 + i * 7.5, 98); g.fill(); }
+  g.fillStyle = 'rgba(200,0,0,.28)'; g.fillRect(0, 0, W, H);
+}
+const TV_DRAW = { marco: drawMarco, popel: drawPopel, ring: drawRing, cam: drawCam, news: drawNews };
+function drawTV(tv, t, k) {
+  const g = tv.ctx;
+  if (tv.scareT > 0) { drawScare(g, tv.prog, t); tvNoise(g, 80, .7); }
+  else if (tv.dead) { g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, TVW, TVH); if (Math.random() < .5) tvNoise(g, 40, .6); }
+  else { (TV_DRAW[tv.prog] || drawNews)(g, t + tv.id * 3.7, k); tvNoise(g, 20 + Math.floor(k * 120), .18 + k * .4); tvLines(g, .22); if (k > .6 && Math.random() < .25) { g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(0, Math.random() * TVH, TVW, 6); } }
+  tv.tex.needsUpdate = true;
+}
+function buildTV(x, z, fx, fz, prog, safe) {
+  const g = new THREE.Group();
+  part(g, new THREE.BoxGeometry(.85, .55, .52), TVMAT.stand, 0, .275, 0);
+  part(g, new THREE.BoxGeometry(.72, .58, .55), TVMAT.body, 0, .84, 0);
+  const cv = document.createElement('canvas'); cv.width = TVW; cv.height = TVH; const ctx = cv.getContext('2d'); const tex = new THREE.CanvasTexture(cv); tex.disp = true;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(.5, .38), new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: .95, roughness: .3, color: 0x161616 }));
+  scr.position.set(-.05, .85, .28); g.add(scr);
+  part(g, new THREE.CylinderGeometry(.03, .03, .03, 8), MAT.darkMetal, .27, .95, .28).rotation.x = Math.PI / 2; part(g, new THREE.CylinderGeometry(.03, .03, .03, 8), MAT.darkMetal, .27, .82, .28).rotation.x = Math.PI / 2;
+  [-.12, .12].forEach((dx, i) => { const a = part(g, new THREE.CylinderGeometry(.006, .006, .6, 4), MAT.metal, dx, 1.3, -.05); a.rotation.z = (i ? -1 : 1) * .5; });
+  g.position.set(x, 0, z); g.rotation.y = Math.atan2(fx, fz); worldGroup.add(g); g.traverse(o => { if (o.isMesh) worldMeshes.push(o); });
+  const wide = Math.abs(fz) > .5; addCol(x, z, wide ? .9 : .55, wide ? .55 : .9);
+  const tv = { id: tvs.length, x, z, fx, fz, prog, safe: !!safe, ctx, tex, cv, dead: false, scareT: 0, d: 99 };
+  tvs.push(tv); drawTV(tv, 0, 0); return tv;
+}
+
+/* ---------- Ton der Fernseher ---------- */
+const TVSND = { started: false, panner: null, noiseGain: null, tonal: null };
+function tvAudioInit() {
+  if (!AC || TVSND.started) return; TVSND.started = true;
+  const p = AC.createPanner(); p.panningModel = 'HRTF'; p.refDistance = 2; p.rolloffFactor = 1.3; p.maxDistance = 30; p.connect(master); TVSND.panner = p;
+  const n = noiseSrc(), hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1500; const g = AC.createGain(); g.gain.value = 0; n.connect(hp); hp.connect(g); g.connect(p); TVSND.noiseGain = g;
+  const tg = AC.createGain(); tg.gain.value = 1; tg.connect(p); TVSND.tonal = tg;
+}
+function tvTone(type, f, dur, vol, dest) {
+  const t = AC.currentTime, o = AC.createOscillator(); o.type = type; o.frequency.value = f; const g = AC.createGain();
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + dur); o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + .05);
+}
+function tvNote(prog, k) {
+  const out = TVSND.tonal; if (!out) return; const pick = a => a[(Math.random() * a.length) | 0];
+  if (prog === 'marco') { tvTone('triangle', pick([523.25, 587.33, 659.25, 783.99, 880]) * (1 - k * .05 * Math.random()), .5, .22, out); return .32 + Math.random() * .3; }
+  if (prog === 'popel') { const f = pick([293.66, 349.23, 392, 440, 466.16]); tvTone('sine', f, 1.3, .24, out); tvTone('sine', f * 1.005 + k * 4, 1.3, .12, out); return .9 + Math.random() * .8; }
+  if (prog === 'ring') { tvTone('sawtooth', 55, 2.8, .13, out); if (Math.random() < .5) { tvTone('sine', 1400 - Math.random() * 500, .12, .14, out); } return 2.2; }
+  if (prog === 'cam') { tvTone('sine', 118, .8, .13, out); if (Math.random() < .3) tvTone('square', 3000, .03, .06, out); return 1.2; }
+  const t = AC.currentTime, s = AC.createBufferSource(); s.buffer = noiseBuf; const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500 + Math.random() * 900; bp.Q.value = 3; const g = AC.createGain();
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.2, t + .05); g.gain.linearRampToValueAtTime(0, t + .4); s.connect(bp); bp.connect(g); g.connect(out); s.start(t, Math.random()); s.stop(t + .45); return .45 + Math.random() * .4;
+}
+const tvThreshold = () => [11, 8, 5.5][DIFF] || 8;
+
+/* ---------- Zuschauen & Jumpscare ---------- */
+function updateTVs(dt) {
+  if (!tvs.length) { tvFovFX = 0; return; }
+  const playing = state === 'play' && !inputBlocked && !fadeBusy && !keypadOpen;
+  let nearest = null, nd = 99;
+  tvs.forEach(tv => { tv.d = Math.hypot(tv.x - P.x, tv.z - P.z); if (!tv.dead && tv.d < nd) { nd = tv.d; nearest = tv; } if (tv.scareT > 0) { tv.scareT -= dt; if (tv.scareT <= 0) tv.dead = true; } });
+  // Blickkontakt?
+  let w = null;
+  if (playing && !P.hidden) for (const tv of tvs) {
+    if (tv.dead || tv.safe || tv.d > 8.5 || tv.d < .8) continue;
+    const dx = P.x - tv.x, dz = P.z - tv.z; if ((dx * tv.fx + dz * tv.fz) / tv.d < .35) continue;
+    const fx = -Math.sin(P.yaw), fz = -Math.cos(P.yaw); if ((fx * -dx + fz * -dz) / tv.d < .86) continue;
+    if (!hasLOS(tv.x, tv.z, P.x, P.z)) continue; w = tv; break;
+  }
+  if (w) { tvWatching = w; tvWatch += dt / tvThreshold(); if (tvWatch > .3 && tvHint <= 0) { tvHint = 6; say(w.prog === 'marco' ? 'Onkel Marco lächelt mich an … ich kann nicht wegsehen.' : w.prog === 'popel' ? 'Dieses Lied … ich kann nicht wegsehen.' : 'Das Mädchen kommt näher … ich kann nicht wegsehen.', 3500); } if (tvWatch >= 1) { tvWatch = 0; triggerTVScare(w); } }
+  else { tvWatch = Math.max(0, tvWatch - dt * .9); if (tvWatch === 0) tvWatching = null; }
+  tvHint -= dt;
+  tvFovFX += ((-15 * Math.min(1, tvWatch * 1.2)) - tvFovFX) * Math.min(1, dt * 6);
+  // Zeichnen (nur Fernseher in der Nähe, ~12 Bilder/s)
+  tvDrawT -= dt;
+  if (tvDrawT <= 0) { tvDrawT = .083; tvs.forEach(tv => { if (tv.d < 18 || tv.scareT > 0) drawTV(tv, tNow, tv === tvWatching ? Math.min(1, tvWatch * 1.1) : (tv.d < 12 ? .12 : 0)); }); }
+  // Ton & Licht des nächsten Geräts
+  if (nearest && nearest.d < 13 && AC) {
+    tvAudioInit(); const vol = Math.max(0, 1 - nearest.d / 13), k = nearest === tvWatching ? tvWatch : 0;
+    setPanner(TVSND.panner, nearest.x, 1.0, nearest.z); TVSND.noiseGain.gain.setTargetAtTime((.015 + k * .12) * vol, AC.currentTime, .1);
+    tvNoteT -= dt; if (tvNoteT <= 0) { tvNoteT = tvNote(nearest.prog, k) || .5; }
+    tvLight.position.set(nearest.x + nearest.fx * .7, 1.1, nearest.z + nearest.fz * .7); tvLight.color.setHex({ marco: 0xffd9a0, popel: 0xa8e0b0, ring: 0x9fb6c8, cam: 0x8fe08f, news: 0x9fb6ff }[nearest.prog] || 0x9fb6ff);
+    tvLight.intensity = (.35 + .35 * Math.sin(tNow * 17) * Math.sin(tNow * 5.3) + k * .5) * Math.min(1, vol * 1.6);
+  } else { tvLight.intensity = 0; if (AC && TVSND.noiseGain) TVSND.noiseGain.gain.setTargetAtTime(0, AC.currentTime, .1); }
+}
+function triggerTVScare(tv) { if (isHost()) hostTVScare(tv.id, net.id); else netSend(net.hostConn, { t: 'tv', i: tv.id }); }
+function hostTVScare(id, pid) {
+  const tv = tvs[id]; if (!tv || tv.dead || tv.safe || tv.scareT > 0 || gameOver) return;
+  const r = remotes.get(pid), by = pid === net.id ? 0 : (r ? r.idx : -1);
+  emit('tvscare', { i: id, by });
+  // Das Wesen steigt aus dem Fernseher und jagt den Zuschauer
+  E.x = tv.x + tv.fx * 1.15; E.z = tv.z + tv.fz * 1.15; E.state = 'chase'; E.path = []; E.pathT = 0; E.focusId = pid; E.freeze = 1.0; E.grace = 0; E.lostT = 0; E.curSpeed = 0; entity.rotation.y = Math.atan2(tv.fx, tv.fz);
+  E.lastSeen = pid === net.id ? { x: P.x, z: P.z } : (r ? { x: r.rx, z: r.rz } : null);
+}
+function tvScareVisual(tv, mine) {
+  tv.scareT = 1.4; drawTV(tv, tNow, 1);
+  if (mine) { sting(1.2); scream(); flashKick = 1; glitchKick = 1; tvWatch = 0; deathShake = Math.max(deathShake, .02); setTimeout(() => { if (state === 'play') deathShake = 0; }, 450); say('LAUF!', 2500); }
+  else if (tv.d < 14) { sting(.7); glitchKick = Math.max(glitchKick, .8); }
 }
 
 /* ====================================================================
@@ -1055,7 +1549,7 @@ const entity = buildCreature(false); scene.add(entity);
 const ghost = buildCreature(true); ghost.visible = false; scene.add(ghost);
 
 const E = { x: 0, z: 0, state: 'dormant', path: [], pathT: 0, speed: 1.5, wait: 0, target: null, lastSeen: null, lostT: 0, hideT: 0, checks: false, near: false,
-  walk: 0, stepT: 0, dist: 99, los: false, grace: 20, huntT: 0, focusId: null, curSpeed: 0, synced: false, prevState: 'dormant', pose: 0, attack: 0, tx: 0, tz: 0, try: 0, crouchK: 0 };
+  walk: 0, stepT: 0, dist: 99, los: false, grace: 20, freeze: 0, huntT: 0, focusId: null, curSpeed: 0, synced: false, prevState: 'dormant', pose: 0, attack: 0, tx: 0, tz: 0, try: 0, crouchK: 0 };
 const hash1 = n => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
 
 function poseCreature(root, who, dt, attack) {
@@ -1101,7 +1595,7 @@ function entityVisuals(dt) {
 /* ---------- KI (nur der Host rechnet; Clients bekommen Snapshots) ---------- */
 function respawnEntity() {
   E.x = spawnE.x; E.z = spawnE.z; E.state = 'dormant'; E.path = []; E.focusId = null; E.lostT = 0; E.hideT = 0; E.near = false; E.huntT = 0; E.attack = 0; E.pose = 0; E.curSpeed = 0;
-  E.grace = [22, 15, 10][FLN] * dcfg().grace; E.synced = false; entity.rotation.y = 0; entity.position.set(E.x, 0, E.z);
+  E.grace = ([22, 15, 10, 9999, 7][FLN] || 10) * dcfg().grace; if (floorDef.noEntity) E.grace = 1e9; E.synced = false; entity.rotation.y = 0; entity.position.set(E.x, 0, E.z);
 }
 function aiTargets() {
   const T = [];
@@ -1112,7 +1606,9 @@ function aiTargets() {
 function updateEntityHost(dt) {
   if (net.mode === 'solo' && state === 'dead') return;
   if (state === 'win' || state === 'menu' || state === 'lobby' || state === 'lost' || fadeBusy) return;
+  if (floorDef.noEntity) { E.state = 'dormant'; E.curSpeed = 0; E.dist = 99; entity.visible = false; return; }
   const D = dcfg(), T = aiTargets();
+  if (E.freeze > 0) { E.freeze -= dt; E.curSpeed = 0; E.dist = Math.hypot(P.x - E.x, P.z - E.z); const tg = remotes.size || state === 'play' ? { x: P.x, z: P.z } : null; if (tg) { const ty = Math.atan2(tg.x - E.x, tg.z - E.z); let dy = ty - entity.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); entity.rotation.y += dy * Math.min(1, dt * 6); } entityVisuals(dt); return; }
   if (E.state === 'dormant') { E.grace -= dt; if (E.grace <= 0) { E.state = 'patrol'; E.wait = 0; } }
   const act = E.state !== 'dormant';
   const nearest = a => a.reduce((m, t) => (!m || t.dist < m.dist) ? t : m, null);
@@ -1244,6 +1740,7 @@ function startScare(kind) {
   }
 }
 function updateScares(dt) {
+  if (floorDef.noEntity || floorDef.noScare) return;
   if (state !== 'play' || fadeBusy) { if (ghost.visible && state !== 'play') ghost.visible = false; return; }
   if (blackoutT > 0) { blackoutT -= dt; if (blackoutT <= 0) { flickerAll = 1.2; if (SC.ghostPending) { const s = ghostSpot(2.5, 5); if (s) { ghost.position.set(s.x, 0, s.z); ghost.rotation.y = Math.atan2(P.x - s.x, P.z - s.z); ghost.visible = true; SC.kind = 'flashghost'; SC.k = 0; sting(1); glitchKick = 1; } SC.ghostPending = false; } } }
   if (!SC.kind) { SC.t -= dt * scareRate() * .7; if (SC.t <= 0 && !P.hidden) { SC.t = nextScareDelay(); startScare(pickScare()); } return; }
@@ -1404,6 +1901,45 @@ function whisper(px, pz) {
 function bang(px, pz) { if (!AC) return; thud(1.0, 260, makeTempPanner(px, pz), .3); }
 function doorSlam(px, pz) { if (!AC) return; const p = makeTempPanner(px, pz); thud(1.0, 200, p, .35); setTimeout(() => thud(.5, 300, p, .2), 120); }
 
+/* ---------- Kapitel 2: Schreie, Klopfen, Türklingel, Essen, Schlafparalyse, Stich ---------- */
+function humanScream(px, pz, vol) {
+  if (!AC) return; const t = AC.currentTime, p = makeTempPanner(px, pz), v = vol || .5, dur = rnd(1.1, 2.0), f0 = rnd(360, 640);
+  const o = AC.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f0 * 1.55, t + .3); o.frequency.linearRampToValueAtTime(f0 * 1.1, t + dur);
+  const lfo = AC.createOscillator(); lfo.frequency.value = rnd(5.5, 7.5); const lg = AC.createGain(); lg.gain.value = 14; lfo.connect(lg); lg.connect(o.frequency);
+  const g = AC.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v * .5, t + .06); g.gain.setValueAtTime(v * .5, t + dur * .55); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  [[800, 6, 1], [1250, 7, .7], [2700, 8, .35]].forEach(([fq, q, gn]) => { const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fq; bp.Q.value = q; const bg = AC.createGain(); bg.gain.value = gn; o.connect(bp); bp.connect(bg); bg.connect(g); });
+  const s = AC.createBufferSource(); s.buffer = noiseBuf; const nb = AC.createBiquadFilter(); nb.type = 'bandpass'; nb.frequency.value = 2200; nb.Q.value = .8; const ng = AC.createGain(); ng.gain.value = .35; s.connect(nb); nb.connect(ng); ng.connect(g);
+  g.connect(p); o.start(t); lfo.start(t); s.start(t, Math.random()); o.stop(t + dur + .1); lfo.stop(t + dur + .1); s.stop(t + dur + .1);
+}
+function knock(px, pz, n) { for (let i = 0; i < (n || 3); i++) setTimeout(() => { if (AC) thud(.8, 240, makeTempPanner(px, pz), .2); }, i * 230); }
+function doorbell() {
+  if (!AC) return; const t = AC.currentTime;
+  [[659.25, 0], [523.25, .55]].forEach(([f, d]) => { [1, 2.76, 5.4].forEach((m, i) => { const o = AC.createOscillator(); o.frequency.value = f * m; const g = AC.createGain(); g.gain.setValueAtTime(0, t + d); g.gain.linearRampToValueAtTime(.18 / (i + 1), t + d + .01); g.gain.exponentialRampToValueAtTime(.001, t + d + 1.4); o.connect(g); g.connect(master); g.connect(revIn); o.start(t + d); o.stop(t + d + 1.5); }); });
+}
+function eatSound() { if (!AC) return; for (let i = 0; i < 7; i++) setTimeout(() => { const t = AC.currentTime, s = AC.createBufferSource(); s.buffer = noiseBuf; const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1600 + Math.random() * 900; f.Q.value = 1.2; const g = AC.createGain(); g.gain.setValueAtTime(.4, t); g.gain.exponentialRampToValueAtTime(.001, t + .09); s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + .12); }, i * 340); }
+function stabSound() {
+  if (!AC) return; const t = AC.currentTime;
+  const s = AC.createBufferSource(); s.buffer = noiseBuf; const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800; const g = AC.createGain(); g.gain.setValueAtTime(.7, t); g.gain.exponentialRampToValueAtTime(.001, t + .12); s.connect(hp); hp.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + .15);
+  thud(1.0, 260, master, .22); const s2 = AC.createBufferSource(); s2.buffer = noiseBuf; const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 600; const g2 = AC.createGain(); g2.gain.setValueAtTime(.5, t + .04); g2.gain.exponentialRampToValueAtTime(.001, t + .5); s2.connect(bp); bp.connect(g2); g2.connect(master); g2.connect(revIn); s2.start(t + .04, Math.random()); s2.stop(t + .55);
+}
+function maleWhisper(px, pz) {
+  if (!AC) return; const t = AC.currentTime, p = makeTempPanner(px, pz), s = AC.createBufferSource(); s.buffer = noiseBuf;
+  const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 5; bp.frequency.setValueAtTime(600, t); for (let i = 1; i < 8; i++) bp.frequency.linearRampToValueAtTime(rnd(380, 1500), t + i * .24);
+  const g = AC.createGain(); g.gain.setValueAtTime(0, t); for (let i = 0; i < 7; i++) { g.gain.linearRampToValueAtTime(rnd(.18, .55), t + i * .24 + .08); g.gain.linearRampToValueAtTime(.03, t + i * .24 + .2); } g.gain.linearRampToValueAtTime(0, t + 1.9);
+  s.connect(bp); bp.connect(g); g.connect(p); s.start(t, Math.random()); s.stop(t + 2);
+}
+let sleepAudio = null;
+function setSleepAudio(level) {   // Druck auf der Brust, Tinnitus, Herzschlag-Rumpeln
+  if (!AC) return;
+  if (!sleepAudio) {
+    const g = AC.createGain(); g.gain.value = 0; g.connect(master);
+    const o1 = AC.createOscillator(); o1.frequency.value = 52; const o2 = AC.createOscillator(); o2.frequency.value = 54.3; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 160; o1.connect(lp); o2.connect(lp); lp.connect(g);
+    const tin = AC.createOscillator(); tin.frequency.value = 4100; const tg = AC.createGain(); tg.gain.value = .05; tin.connect(tg); tg.connect(g); o1.start(); o2.start(); tin.start(); sleepAudio = { g };
+  }
+  sleepAudio.g.gain.setTargetAtTime(level * .35, AC.currentTime, .4);
+}
+function breath(vol) { if (!AC) return; const t = AC.currentTime, s = AC.createBufferSource(); s.buffer = noiseBuf; const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 700; bp.Q.value = .8; const g = AC.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol || .12, t + .7); g.gain.linearRampToValueAtTime(0, t + 1.5); s.connect(bp); bp.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + 1.6); }
+
 /* ====================================================================
    SPIELER, EINGABE, KAMERA, LICHT
 ==================================================================== */
@@ -1413,7 +1949,7 @@ const remotes = new Map(), voices = new Map();
 const SPAWN = [[0, 0], [1.1, 0], [0, 1.1], [1.1, 1.1]];
 const AV_COLORS = [0x2f4f6f, 0x7a2e2e, 0x2f6f3f, 0x7a652f];
 const isHost = () => net.mode !== 'client';
-let state = 'menu', tNow = 0, tGame = 0, deathT = 0, subTimer = 0, glitchKick = 0, flashKick = 0, fadeBusy = false, inputBlocked = false,
+let state = 'boot', tNow = 0, tGame = 0, deathT = 0, subTimer = 0, glitchKick = 0, flashKick = 0, fadeBusy = false, inputBlocked = false,
   spraying = false, camBlend = 0, camDistNow = 0, winT = 0, spectateId = null, gameOver = null, deadShown = false, rosterT = 0, taskT = 0, zoneK = 0, keypadOpen = false;
 const P = {
   x: 3, z: 3, yaw: Math.PI, pitch: 0, vyaw: Math.PI, vpitch: 0, lyaw: Math.PI, lpitch: 0, vx: 0, vz: 0, stamina: 1, exhausted: false, sprintIdle: 0,
@@ -1449,7 +1985,7 @@ window.addEventListener('keyup', e => { keysDown[e.code] = false; });
 document.addEventListener('mousemove', e => {
   if (state !== 'play' || inputBlocked) return;
   if (document.pointerLockElement !== canvas && !(e.buttons & 2)) return;
-  const s = 0.0021;
+  const s = 0.0021 * (1 - .55 * Math.min(1, tvWatch));
   if (P.hidden) P.yaw = Math.max(P.hidden.yaw - 0.6, Math.min(P.hidden.yaw + 0.6, P.yaw - e.movementX * s)); else P.yaw -= e.movementX * s;
   P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - e.movementY * s));
 });
@@ -1480,7 +2016,7 @@ function updatePlayer(dt) {
   const f = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
   const r = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
   const sprint = (keys.ShiftLeft || keys.ShiftRight) && f > 0 && !P.crouch && !P.exhausted && P.stamina > 0 && !P.hidden;
-  if (P.hidden) { P.vx = P.vz = 0; P.moving = 0; P.sprinting = false; P.noise = 0.4; return; }
+  if (P.hidden) { P.vx = P.vz = 0; P.moving = 0; P.sprinting = false; P.noise = 0.4; P.camY += ((P.hidden.kind === 'bed' ? .4 : 1.4) - P.camY) * Math.min(1, dt * 6); return; }
   const speed = P.crouch ? 1.15 : (sprint ? 4.3 : 2.35);
   let dx = -Math.sin(P.yaw) * f + Math.cos(P.yaw) * r, dz = -Math.cos(P.yaw) * f - Math.sin(P.yaw) * r;
   const l = Math.hypot(dx, dz); if (l > 0) { dx /= l; dz /= l; }
@@ -1585,13 +2121,14 @@ function updateCamera(dt) {
   dy = Math.atan2(Math.sin(P.vyaw - P.lyaw), Math.cos(P.vyaw - P.lyaw)); P.lyaw += dy * k2; P.lpitch += (P.vpitch - P.lpitch) * k2;
   const m = P.moving, t = tNow;
   const bobY = Math.sin(P.bob * 2) * 0.045 * m + Math.sin(t * 1.4) * 0.006, bobX = Math.cos(P.bob) * 0.035 * m;
-  const roll = Math.sin(P.bob) * 0.022 * m + Math.sin(t * .9) * 0.004;
+  const roll = Math.sin(P.bob) * 0.022 * m + Math.sin(t * .9) * 0.004 + Math.sin(t * 1.3) * .035 * drowsy;
   const jit = (P.sprinting ? 0.012 : 0.0025) + P.moving * 0.004;
-  const shake = (state === 'dead' ? deathShake : 0) + glitchKick * 0.008;
-  const hx = P.x + Math.cos(P.vyaw) * bobX, hy = P.camY + bobY + (state === 'dead' ? deathDy : 0), hz = P.z - Math.sin(P.vyaw) * bobX;
-  const pitch = P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m + (state === 'dead' ? deathPitch : 0);
+  const shake = deathShake + glitchKick * 0.008;
+  const hx = P.x + Math.cos(P.vyaw) * bobX, hy = P.camY + bobY + deathDy, hz = P.z - Math.sin(P.vyaw) * bobX;
+  const pitch = P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m + deathPitch;
   const yaw = P.vyaw + Math.sin(t * 5.1) * jit + (Math.random() - .5) * shake;
-  camera.rotation.set(pitch, yaw, roll + (state === 'dead' ? deathRoll : 0), 'YXZ');
+  camera.rotation.set(pitch, yaw, roll + deathRoll, 'YXZ');
+  const fovT = 88 + tvFovFX + fovFX; if (Math.abs(camera.fov - fovT) > .05) { camera.fov = fovT; camera.updateProjectionMatrix(); }
   const wantTP = P.third && state === 'play' && !P.hidden;
   camBlend += ((wantTP ? 1 : 0) - camBlend) * Math.min(1, dt * 7); camDistNow = 0;
   if (camBlend > 0.02) {
@@ -1617,7 +2154,7 @@ function updateCamera(dt) {
   updateLocalAvatar(!fp && state === 'play');
 }
 // Kamera-Effekte der Todesszene (werden von game.js gesetzt)
-let deathShake = 0, deathDy = 0, deathPitch = 0, deathRoll = 0;
+let deathShake = 0, deathDy = 0, deathPitch = 0, deathRoll = 0, fovFX = 0;
 
 /* ---------- Licht: flackernde Lampen, Stromausfall, dunkle Räume, Stuhl-Strobo ---------- */
 function updateLights(dt) {
@@ -1647,7 +2184,7 @@ function updateLights(dt) {
       if (l.kill > 0) { l.kill -= dt; lv *= .05; }
     }
     const prev = l.lv; l.lv += (lv - l.lv) * Math.min(1, dt * 28);
-    l.mat.color.setScalar(.06 + l.lv * .7);
+    { const sc = .06 + l.lv * .7; if (l.warm) l.mat.color.setRGB(sc, sc * .86, sc * .62); else l.mat.color.setScalar(sc); }
     const d = Math.hypot(l.x - P.x, l.z - P.z);
     if (l.lv > .04 && d < 15) lit.push([l, d]);
     if (!l.dead && d < humDist) { humDist = d; hum = l.lv; }
@@ -1659,7 +2196,8 @@ function updateLights(dt) {
   // dunkle Räume: Umgebungslicht & Nebel
   const inZone = zoneCells.size && zoneCells.has(cellOf(P.z) * MW + cellOf(P.x));
   zoneK += ((inZone ? 1 : 0) - zoneK) * Math.min(1, dt * 3);
-  ambientL.intensity = floorDef.amb * (1 - .85 * zoneK) * (blackoutT > 0 ? .35 : 1); hemiL.intensity = .25 * (1 - .85 * zoneK);
+  const baseAmb = floorDef.kind === 'house' ? houseState.amb : floorDef.amb;
+  ambientL.intensity = baseAmb * (1 - .85 * zoneK) * (blackoutT > 0 ? .35 : 1); hemiL.intensity = (floorDef.kind === 'house' ? .45 : .25) * (1 - .85 * zoneK);
   scene.fog.density = floorDef.fog * (1 + .8 * zoneK);
   // rot-grünes Flackerlicht über dem Stuhl
   if (chairInfo) {
@@ -1690,7 +2228,7 @@ function updateFade(dt) {
 function showBanner() {
   const b = $('floorbn'); b.textContent = floorDef.name; b.style.transition = 'none'; b.style.opacity = 1;
   setTimeout(() => { b.style.transition = 'opacity 2.5s'; b.style.opacity = 0; }, 2600);
-  $('fl').textContent = ['3', '2', 'EG'][FLN]; $('camfloor').textContent = floorDef.short;
+  $('fl').textContent = floorDef.label; $('camfloor').textContent = floorDef.short;
 }
 
 /* ---------- Menü & Lobby ---------- */
@@ -1724,12 +2262,12 @@ function updateLobbyList() {
 function lobbyBroadcast() { updateLobbyList(); if (net.mode === 'host') broadcast({ t: 'lobby', players: [...remotes.values()].map(r => r.idx), diff: DIFF }); }
 function restartRequest() {
   if (net.mode === 'client') { $('deadtxt').textContent = $('wintxt').textContent = 'Warte auf den Host – er startet die nächste Runde …'; return; }
-  if (state === 'win' || FLN < 0) { const seed = randSeed(); if (net.mode === 'host') broadcast({ t: 'start', seed, diff: DIFF }); startRun(seed, DIFF); }
+  if (state === 'win' || state === 'end' || FLN < 0) { const seed = randSeed(); if (net.mode === 'host') broadcast({ t: 'start', seed, diff: DIFF }); startRun(seed, DIFF); }
   else hostFloorChange(FLN, true);
 }
 function startRun(seed, diff, floor) {
   initAudio(); GAME_SEED = seed; DIFF = diff; gameRunning = true; net.running = true;
-  ['menu', 'lobby', 'pause', 'dead', 'win'].forEach(id => $(id).style.display = 'none'); $('hud').style.display = 'block';
+  ['menu', 'lobby', 'pause', 'dead', 'win', 'end', 'boot', 'trailer'].forEach(id => $(id).style.display = 'none'); $('hud').style.display = 'block'; CHAPTER = 1; cinS.mode = null; houseSkipped = false;
   P.paint = [0, 0, 0, 0, 0]; P.sel = -1; P.third = false; P.bat = 100; P.stamina = 1; P.flash = true; gameOver = null; deadShown = false; tGame = 0;
   postMat.uniforms.fade.value = 0;
   enterFloor(floor || 0, false); lockPointer();
@@ -1737,18 +2275,21 @@ function startRun(seed, diff, floor) {
   $('dead').querySelector('h1').textContent = 'SIGNAL VERLOREN';
 }
 function enterFloor(n, retry) {
-  fadeBusy = true; buildFloor(n); clearDots(); $('dead').style.display = 'none'; $('win').style.display = 'none'; $('hud').style.display = 'block'; endDeathScene(); $('hideov').style.display = 'none'; $('spec').style.display = 'none'; $('gore').getContext('2d').clearRect(0, 0, 9999, 9999);
-  placePlayerAtStart(); spraying = false; P.spraying = false; state = 'play'; deadShown = false; gameOver = null; bleedK = 0; deathShake = deathDy = deathPitch = deathRoll = 0; E.attack = 0;
-  entity.visible = true; ghost.visible = false; SC.kind = null; SC.t = 30 / dcfg().scare; blackoutT = 0; flickerAll = 0; flashOut = 0;
+  fadeBusy = true; buildFloor(n); clearDots(); hideCard(); inputBlocked = false; cinS.mode = null; $('lids').style.display = 'none'; closeKeypad(); CHAPTER = floorDef.chapter || 1; tvWatch = 0; tvFovFX = 0; fovFX = 0;
+  $('dead').style.display = 'none'; $('win').style.display = 'none'; $('end').style.display = 'none'; $('hud').style.display = 'block'; endDeathScene(); $('hideov').style.display = 'none'; $('spec').style.display = 'none'; $('gore').getContext('2d').clearRect(0, 0, 9999, 9999);
+  placePlayerAtStart(); spraying = false; P.spraying = false; state = 'play'; deadShown = false; gameOver = null; bleedK = 0; deathShake = deathDy = deathPitch = deathRoll = 0; E.attack = 0; FATHER.visible = false;
+  entity.visible = !floorDef.noEntity; ghost.visible = false; SC.kind = null; SC.t = 30 / dcfg().scare; blackoutT = 0; flickerAll = 0; flashOut = 0;
+  $('camname').textContent = CHAPTER === 2 ? 'AUFNAHME // L. HALLIN' : 'CAM-07 // K. MARLOW'; postMat.uniforms.warm.value = floorDef.kind === 'house' ? 1 : 0;
   remotes.forEach(r => { const sp = SPAWN[r.idx % 4]; r.rx = r.x = startCell.cx * CELL + sp[0]; r.rz = r.z = startCell.cy * CELL + sp[1]; r.alive = true; r.hidden = -1; });
-  if (isHost()) respawnEntity(); else { E.state = 'dormant'; E.synced = false; }
+  if (isHost()) { respawnEntity(); if (FLN === 4 && !retry) E.grace += 12; } else { E.state = 'dormant'; E.synced = false; }
   updateFeatureStates(); showBanner(); if (!retry) P.bat = Math.min(100, P.bat + 25);
   fadeTo(1, 1.4, () => { fadeBusy = false; });
+  if (FLN === 3) startWake(); else if (FLN === 4 && !retry) startAbductWake();
 }
 function hostFloorChange(n, retry) { broadcast({ t: 'ev', k: 'floor', n, retry: retry ? 1 : 0 }); changeFloor(n, retry); }
 function changeFloor(n, retry) {
   if (fadeBusy) return; fadeBusy = true; closeKeypad();
-  fadeTo(0, .9, () => { enterFloor(n, retry); say(retry ? 'Noch einmal von vorn …' : 'Ihr steigt hinab. Es wird kälter.', 4000); if (isHost() && net.mode !== 'solo') broadcast({ t: 'lobby', players: [...remotes.values()].map(r => r.idx), diff: DIFF }); });
+  fadeTo(0, .9, () => { enterFloor(n, retry); if (n < 3 || retry) say(retry ? 'Noch einmal von vorn …' : 'Ihr steigt hinab. Es wird kälter.', 4000); if (isHost() && net.mode !== 'solo') broadcast({ t: 'lobby', players: [...remotes.values()].map(r => r.idx), diff: DIFF }); });
 }
 
 /* ---------- Interaktion ---------- */
@@ -1763,10 +2304,11 @@ function findInteractable() {
   doorList.forEach(d => { if (d.slot !== undefined && !d.open) consider(d, 'door', d.x, d.z); });
   return best;
 }
-const ITEM_PROMPT = { fuse: '[E] Sicherung aufnehmen', key: '[E] Schlüssel nehmen', note: '[E] Notiz lesen', battery: '[E] Batterien nehmen', spray: '[E] Spraydose aufnehmen' };
+const ITEM_PROMPT = { pizza: '[E] Pizzakarton nehmen', fuse: '[E] Sicherung aufnehmen', key: '[E] Schlüssel nehmen', note: '[E] Notiz lesen', battery: '[E] Batterien nehmen', spray: '[E] Spraydose aufnehmen' };
 function promptFor(it) {
-  if (it.type === 'unhide') return '[E] Spind verlassen'; if (it.type === 'locker') return '[E] Im Spind verstecken';
-  if (it.type === 'door') return team.key > 0 ? '[E] Tür aufschließen' : 'Verschlossen — ein Schlüssel fehlt';
+  if (it.type === 'unhide') return P.hidden && P.hidden.kind === 'bed' ? '[E] Unter dem Bett hervorkriechen' : '[E] Versteck verlassen';
+  if (it.type === 'locker') return it.o.kind === 'bed' ? '[E] Unter das Bett kriechen' : it.o.kind === 'cabinet' ? '[E] In den Schrank steigen' : '[E] Im Spind verstecken';
+  if (it.type === 'door') { if (floorDef.kind === 'house') return team.stage === 2 ? '[E] Haustür öffnen' : 'Die Haustür ist abgeschlossen.'; return team.key > 0 ? '[E] Tür aufschließen' : 'Verschlossen — ein Schlüssel fehlt'; }
   if (it.o && it.o.prompt) return it.o.prompt(); return ITEM_PROMPT[it.type] || '';
 }
 function interact() {
@@ -1776,6 +2318,11 @@ function interact() {
   if (ITEM_PROMPT[it.type]) { if (isHost()) hostPick(net.id, it.o.id); else netSend(net.hostConn, { t: 'pick', i: it.o.id }); return; }
   if (it.type === 'fusebox') { if (team.powered) say('Der Strom ist schon wieder an.', 2500); else if (team.fuses <= 0) say('Hier fehlen Sicherungen (' + team.fusesIn + '/' + floorDef.need.fuses + ').', 3000); else if (isHost()) hostFuse(); else netSend(net.hostConn, { t: 'fuse' }); return; }
   if (it.type === 'keypad') { if (team.codeOk) say('Das Tastenfeld ist bereits entsperrt.', 2500); else if (floorDef.need.fuses && !team.powered) say('Das Tastenfeld hat keinen Strom.', 3000); else openKeypad(); return; }
+  if (it.type === 'phone') { if (team.stage === 0) { if (isHost()) hostPhone(); else netSend(net.hostConn, { t: 'c2', s: 'phone' }); } else say(team.stage === 1 ? 'Ich warte auf die Pizza.' : 'Der Akku ist fast leer.', 2500); return; }
+  if (it.type === 'mirror') { say(team.stage >= 3 ? 'Du siehst furchtbar aus … da ist doch etwas hinter dir? … nein.' : 'Du siehst furchtbar aus. Zu wenig Schlaf.', 3500); return; }
+  if (it.type === 'table') { if (team.stage === 4) { if (isHost()) hostEat(); else netSend(net.hostConn, { t: 'c2', s: 'eat' }); } else say('Der Küchentisch.', 1500); return; }
+  if (it.type === 'bed13') { if (doorList.find(d => d.slot === 0 && !d.open)) say('Zimmer 13 ist verschlossen.', 2500); else if (isHost()) hostSleep(); else netSend(net.hostConn, { t: 'c2', s: 'sleep' }); return; }
+  if (it.type === 'door' && floorDef.kind === 'house') { if (team.stage === 2) { if (isHost()) hostHouseDoor(); else netSend(net.hostConn, { t: 'c2', s: 'door' }); } else say('Die Haustür ist abgeschlossen. Ich erwarte niemanden.', 3000); return; }
   if (it.type === 'door') { if (team.key > 0) { if (isHost()) hostDoor(it.o.slot); else netSend(net.hostConn, { t: 'door', s: it.o.slot }); } else say('Verschlossen. Der Schlüssel muss irgendwo hier sein …', 3500); return; }
   if (it.type === 'stairs' || it.type === 'exit') {
     if (!reqMet()) { say(missingText(), 4000); return; }
@@ -1787,7 +2334,7 @@ function missingText() {
   if (n.fuses && !team.powered) m.push('Strom (Sicherungen ' + team.fusesIn + '/' + n.fuses + ')'); if (n.notes && !team.codeOk) m.push('Code');
   return 'Verriegelt. Es fehlt: ' + m.join(' und ') + '.';
 }
-function hostAdvance() { if (!reqMet() || gameOver || fadeBusy) return; if (FLN >= TOTAL_FLOORS - 1) { gameOver = 'win'; broadcast({ t: 'over', k: 'win' }); win(); } else hostFloorChange(FLN + 1, false); }
+function hostAdvance() { if (!reqMet() || gameOver || fadeBusy) return; if (FLN >= TOTAL_FLOORS - 1) emit('chapter', { n: 2 }); else hostFloorChange(FLN + 1, false); }
 function emit(k, data) { const m = Object.assign({ t: 'ev', k }, data || {}); broadcast(m); handleEvent(m); }
 function hostPick(pid, idx) {
   const it = items[idx]; if (!it || !it.active || gameOver) return;
@@ -1796,14 +2343,15 @@ function hostPick(pid, idx) {
   if (it.type === 'fuse') { team.fuses++; emit('pick', { type: 'fuse', by, n: team.fuses + team.fusesIn }); }
   else if (it.type === 'key') { team.key++; emit('pick', { type: 'key', by }); if (floorDef.H && Math.abs(it.cx - floorDef.H[0]) <= 1 && Math.abs(it.cy - floorDef.H[1]) <= 1) emit('chair', {}); }
   else if (it.type === 'note') { if (it.lore) emit('pick', { type: 'lore', by, text: it.text }); else { team.notes[it.pos] = it.digit; emit('pick', { type: 'note', by, pos: it.pos, digit: it.digit, text: it.text }); } }
+  else if (it.type === 'pizza') { team.stage = 4; emit('pick', { type: 'pizza', by }); }
   else if (it.type === 'spray') { if (pid === net.id) gotSpray(it.col); else netSend(net.conns.get(pid), { t: 'spray', c: it.col }); }
   else if (it.type === 'battery') { if (pid === net.id) gotBattery(); else netSend(net.conns.get(pid), { t: 'bat' }); }
 }
-function hostFuse() { if (team.fuses <= 0 || team.powered) return; team.fusesIn += team.fuses; team.fuses = 0; if (team.fusesIn >= floorDef.need.fuses) team.powered = true; emit('fusein', { n: team.fusesIn, need: floorDef.need.fuses, powered: team.powered ? 1 : 0 }); }
+function hostFuse() { if (team.fuses <= 0 || team.powered) return; team.fusesIn += team.fuses; team.fuses = 0; if (team.fusesIn >= floorDef.need.fuses) team.powered = true; emit('fusein', { n: team.fusesIn, need: floorDef.need.fuses, powered: team.powered ? 1 : 0 }); checkFinale(); }
 function hostDoor(slot) { if (team.key <= 0) return; const d = doorList.find(q => q.slot === slot); if (!d || d.open) return; team.key--; team.doors[slot] = 1; emit('unlock', { slot }); }
 function hostCode(str, pid) {
   const ok = str === team.code.join('');
-  if (ok) { team.codeOk = true; emit('codeok', {}); } else { if (pid === net.id) handleEvent({ k: 'codebad' }); else netSend(net.conns.get(pid), { t: 'ev', k: 'codebad' }); }
+  if (ok) { team.codeOk = true; emit('codeok', {}); checkFinale(); } else { if (pid === net.id) handleEvent({ k: 'codebad' }); else netSend(net.conns.get(pid), { t: 'ev', k: 'codebad' }); }
 }
 function who(by) { return (by === net.idx || net.mode === 'solo') ? '' : 'Spieler ' + (by + 1) + ': '; }
 function handleEvent(m) {
@@ -1812,6 +2360,7 @@ function handleEvent(m) {
     beep(1200, .08); setTimeout(() => beep(1600, .12), 100); glitchKick = .5;
     if (m.type === 'fuse') say(who(m.by) + 'Sicherung gefunden (' + m.n + '/' + floorDef.need.fuses + '). Zum Sicherungskasten!', 4500);
     else if (m.type === 'key') say(who(m.by) + 'Ein alter Schlüssel. Er passt bestimmt zum Archiv.', 4500);
+    else if (m.type === 'pizza') say(who(m.by) + 'Eine Pizza. Auf dem Karton klebt ein Zettel: »Guten Appetit, Lena. — P.« … Pizza Paradiso, nehme ich an.', 6500);
     else if (m.type === 'lore') say(who(m.by) + '»' + m.text + '«', 7000);
     else if (m.type === 'note') say(who(m.by) + 'NOTIZ — »' + m.text + '«  ·  Ziffer ' + (m.pos + 1) + ' des Codes: ' + m.digit, 9000);
   } else if (k === 'fusein') { zap(); flickerAll = 1.2; say(m.powered ? 'Der Strom ist zurück! Das Haus erwacht … und etwas mit ihm.' : 'Sicherung eingesetzt (' + m.n + '/' + m.need + ').', 5000); if (m.powered) { clunk(); glitchKick = 1; } }
@@ -1820,6 +2369,11 @@ function handleEvent(m) {
   else if (k === 'codebad') { beep(180, .35, .09); glitchKick = .6; say('Falscher Code.', 2500); kpClear(); }
   else if (k === 'floor') changeFloor(m.n, !!m.retry);
   else if (k === 'chair') chairScare();
+  else if (k === 'tvscare') { const tv = tvs[m.i]; if (tv) tvScareVisual(tv, m.by === net.idx); }
+  else if (k === 'finale') finaleEvent();
+  else if (k === 'chapter') chapterEnd();
+  else if (k === 'sleep') startSleepEnding();
+  else if (k === 'c2') handleC2(m);
 }
 function chairScare() {
   if (chairInfo) chairInfo.boost = 3; sting(1.0); clunk(); glitchKick = 1; flashKick = .6; flashOut = 1.4; blackoutT = 2.6;
@@ -1831,9 +2385,9 @@ function gotSpray(c) { P.paint[c] = 100; if (P.sel < 0 || P.paint[P.sel] <= 0) P
 function gotBattery() { P.bat = Math.min(100, P.bat + 45); beep(700, .1); say('Batterien. Die Lampe hält wieder länger.', 3000); }
 function enterLocker(l) {
   P.hidden = l; P.x = l.x; P.z = l.z; P.yaw = l.yaw; P.pitch = 0; P.vx = P.vz = 0; P.flashWas = P.flash; P.flash = false; P.crouch = false;
-  $('hideov').style.display = 'block'; thud(.5, 200); say('Nicht bewegen. Nicht atmen.', 2500);
+  $('hideov').className = 'hid-' + (l.kind || 'locker'); $('hideov').style.display = 'block'; thud(.5, 200); say(l.kind === 'bed' ? 'Unter dem Bett. Nicht bewegen. Nicht atmen.' : 'Nicht bewegen. Nicht atmen.', 2500);
 }
-function leaveLocker() { const l = P.hidden; P.hidden = null; P.flash = P.flashWas && P.bat > 0; P.x = l.x + l.fx * 0.9; P.z = l.z + l.fz * 0.9; $('hideov').style.display = 'none'; thud(.4, 200); }
+function leaveLocker() { const l = P.hidden; P.hidden = null; P.flash = P.flashWas && P.bat > 0; const off = l.kind === 'bed' ? 1.08 : .95; P.x = l.x + l.fx * off; P.z = l.z + l.fz * off; $('hideov').style.display = 'none'; thud(.4, 200); }
 
 /* ---------- Tastenfeld ---------- */
 let kpBuf = '';
@@ -1938,7 +2492,14 @@ function win() {
 /* ---------- Ambiente & HUD ---------- */
 let eventT = 14;
 function updateAmbientEvents(dt) {
-  eventT -= dt; if (eventT > 0 || !AC) return; eventT = rnd(12, 30) / (1 + FLN * .4);
+  eventT -= dt; if (eventT > 0 || !AC) return;
+  if (floorDef.kind === 'house') { eventT = rnd(16, 30); if (Math.random() < .5) creak(P.x + rnd(-8, 8), P.z + rnd(-8, 8)); return; }
+  if (FLN === 4) {   // Kapitel 2: Schreie, Klopfen, Flüstern in den Wänden
+    eventT = rnd(4.5, 10); const a = rnd(0, 6.28), d = rnd(6, 20), px = P.x + Math.cos(a) * d, pz = P.z + Math.sin(a) * d, r = Math.random();
+    if (r < .5) humanScream(px, pz, .55 + Math.random() * .4); else if (r < .72) knock(px, pz, 3 + ((Math.random() * 4) | 0)); else if (r < .9) whisper(P.x + Math.cos(a) * 2.5, P.z + Math.sin(a) * 2.5); else bang(px, pz);
+    glitchKick = Math.max(glitchKick, .3); return;
+  }
+  eventT = rnd(12, 30) / (1 + FLN * .4);
   const a = rnd(0, 6.28), d = rnd(5, 14), px = P.x + Math.cos(a) * d, pz = P.z + Math.sin(a) * d, r = Math.random();
   if (r < .35) creak(px, pz); else if (r < .7) bang(px, pz); else whisper(P.x + Math.cos(a) * 2.5, P.z + Math.sin(a) * 2.5);
   if (r > .5) glitchKick = Math.max(glitchKick, .25);
@@ -1952,11 +2513,20 @@ function updateAudio(dt) {
   if (fear > 0.12) { hbT -= dt; if (hbT <= 0) { hbT = 60 / (62 + fear * 110); heartbeat(0.18 + fear * 0.55); } }
 }
 function taskLines() {
+  if (floorDef.kind === 'house') {
+    const s = team.stage, L = [[s >= 1, 'HUNGER: PIZZA BESTELLEN (HANDY IN DER KÜCHE)']];
+    if (s === 1) L.push([false, 'AUF DIE PIZZA WARTEN …']);
+    if (s >= 2) L.push([s >= 3, 'ES HAT GEKLINGELT: HAUSTÜR ÖFFNEN']);
+    if (s >= 3) L.push([s >= 4, 'PIZZAKARTON NEHMEN']);
+    if (s >= 4) L.push([s >= 5, 'PIZZA ESSEN (KÜCHENTISCH)']);
+    return L;
+  }
+  if (floorDef.kind === 'dark') { const open = team.doors.length ? team.doors.every(x => x) : false; return [[team.key > 0 || open, 'SCHLÜSSEL FINDEN'], [open, 'ZIMMER 13 AUFSCHLIESSEN'], [false, 'SCHLAFEN … (ZIMMER 13)']]; }
   const n = floorDef.need, L = [], archiveOpen = team.doors.length ? team.doors.every(x => x) : true;
   if (n.fuses) L.push([team.powered, 'SICHERUNGEN ' + (team.fuses + team.fusesIn) + '/' + n.fuses + ' gefunden · ' + team.fusesIn + '/' + n.fuses + ' eingesetzt']);
   if (n.key) { L.push([team.key > 0 || archiveOpen, 'SCHLÜSSEL FINDEN (STUHLRAUM)']); L.push([archiveOpen, 'ARCHIV AUFSCHLIESSEN']); }
   if (n.notes) { L.push([team.notes.every(x => x !== null), 'NOTIZEN — CODE: ' + team.notes.map(d => d === null ? '_' : d).join(' ')]); L.push([team.codeOk, 'CODE AM TASTENFELD EINGEBEN']); }
-  L.push([false, FLN < TOTAL_FLOORS - 1 ? 'TREPPE NACH UNTEN NEHMEN' : 'AUSGANG ÖFFNEN & FLIEHEN']);
+  L.push([false, FLN < TOTAL_FLOORS - 1 ? 'TREPPE NACH UNTEN NEHMEN' : (team.finale ? 'RENN ZUM AUSGANG!' : 'AUSGANG ÖFFNEN & FLIEHEN')]);
   return L;
 }
 function updateHUD(dt) {
@@ -1967,7 +2537,8 @@ function updateHUD(dt) {
   $('stam').firstElementChild.style.width = (P.stamina * 100) + '%'; $('stam').style.opacity = P.stamina > .98 ? .25 : .9;
   const e = Math.floor(tGame), p2 = n => String(n).padStart(2, '0');
   $('rect').textContent = p2(Math.floor(e / 3600)) + ':' + p2(Math.floor(e / 60) % 60) + ':' + p2(e % 60);
-  const d = new Date(Date.UTC(2024, 9, 31, 23, 47, 12) + e * 1000);
+  const clk0 = FLN === 3 ? Date.UTC(2024, 10, 2, 14, 12, 0) + (team.stage >= 1 ? 20160000 : 0) : FLN === 4 ? Date.UTC(2024, 10, 3, 3, 12, 0) : Date.UTC(2024, 9, 31, 23, 47, 12);
+  const d = new Date(clk0 + e * 1000);
   $('ts').textContent = d.getUTCFullYear() + '-' + p2(d.getUTCMonth() + 1) + '-' + p2(d.getUTCDate()) + ' ' + p2(d.getUTCHours()) + ':' + p2(d.getUTCMinutes()) + ':' + p2(d.getUTCSeconds());
   const pe = $('prompt'), it = (state === 'play' && !inputBlocked && !keypadOpen) ? findInteractable() : null;
   if (it) { pe.textContent = promptFor(it); pe.style.display = 'block'; } else pe.style.display = 'none';
@@ -1984,6 +2555,176 @@ function updateHUD(dt) {
     }
   }
 }
+
+/* ====================================================================
+   STORY: Kapitelwechsel, Aufwachen, Pizza, Entführung, Schlafparalyse, Ende
+==================================================================== */
+let CHAPTER = 1, houseSkipped = false, drowsy = 0, endT = 0, endFlags = {}, endShow = { ghost: false, shadow: false, father: false };
+const cinS = { mode: null, t: 0, f: {} };
+const once = (key, t0, fn) => { if (cinS.t >= t0 && !cinS.f[key]) { cinS.f[key] = 1; fn(); } };
+const smooth01 = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+function setLids(open) { $('lids').style.display = open >= 1 ? 'none' : 'block'; const h = (50 * (1 - Math.max(0, Math.min(1, open)))) + '%'; $('lidt').style.height = h; $('lidb').style.height = h; }
+function showCard(title, sub, ms, cb, hold) {
+  const c = $('card'); c.querySelector('h1').textContent = title || ''; c.querySelector('p').textContent = sub || '';
+  inputBlocked = true; c.style.display = 'flex'; void c.offsetHeight; c.style.opacity = 1;
+  setTimeout(() => {
+    if (cb) cb();
+    if (!hold) { if (!cinS.mode) inputBlocked = false; c.style.opacity = 0; setTimeout(() => { if (c.style.opacity === '0') c.style.display = 'none'; }, 1300); }
+  }, ms + 1000);
+}
+function hideCard() { const c = $('card'); c.style.opacity = 0; c.style.display = 'none'; }
+
+/* ---------- Finale von Kapitel 1: es weiß, dass ihr geht ---------- */
+function checkFinale() { if (!isHost() || FLN !== 2 || team.finale || !reqMet()) return; team.finale = true; emit('finale', {}); }
+function finaleEvent() {
+  sting(1); growl(); glitchKick = 1; flashOut = 1.2; flickerAll = 3; say('Es weiß, dass wir gehen … RENN ZUM AUSGANG!', 5200);
+  tvs.forEach(tv => { if (!tv.dead && tv.scareT <= 0) tv.scareT = 2.2; });
+  if (isHost()) { const T = aiTargets(); const t = T.length ? T[0] : null; E.state = 'chase'; E.grace = 0; E.freeze = .7; E.lostT = 0; E.path = []; E.focusId = t ? t.id : net.id; if (t) E.lastSeen = { x: t.x, z: t.z }; }
+  updateFeatureStates();
+}
+function chapterEnd() {   // Kapitel 1 endet: Tür auf, gleißendes Licht, Karten, Kapitel 2
+  if (cinS.mode === 'chapter') return; cinS.mode = 'chapter'; fadeBusy = true; closeKeypad(); spraying = false; inputBlocked = true;
+  creak(P.x + 2, P.z); thud(.9, 200); setTimeout(() => { sting(.6); }, 600);
+  postMat.uniforms.flashCol.value.set(1, 1, 1); endFlash = 0.001; say('Die Tür … Licht. Endlich Licht …', 3500);
+  setTimeout(() => {
+    showCard('KAPITEL 1', 'DAS HAUS — ENDE', 3000, () => {
+      showCard('KAPITEL 2', 'DER ALBTRAUM IST VORBEI …', 3600, () => { endFlash = 0; cinS.mode = null; postMat.uniforms.flash.value = 0; enterFloor(3, false); }, false);
+    }, true);
+  }, 2400);
+}
+let endFlash = 0;
+
+/* ---------- Haus: Aufwachen ---------- */
+function startWake() {
+  cinS.mode = 'wake'; cinS.t = 0; cinS.f = {}; inputBlocked = true; P.flash = false;
+  P.x = 6; P.z = 2.75; P.yaw = P.vyaw = P.lyaw = Math.PI; P.pitch = P.vpitch = 0; deathDy = -.78; deathPitch = 1.15; setLids(0); $('hud').style.display = 'block';
+}
+function startAbductWake() {
+  cinS.mode = 'abduct'; cinS.t = 0; cinS.f = {}; inputBlocked = true; P.flash = true; drowsy = 1;
+  P.x = 57.0; P.z = 33.15; P.yaw = P.vyaw = P.lyaw = Math.PI; P.pitch = P.vpitch = 0; deathDy = -.16; deathPitch = -.45; setLids(0);
+}
+function startCollapse() { cinS.mode = 'collapse'; cinS.t = 0; cinS.f = {}; inputBlocked = true; spraying = false; eatSound(); }
+function updateCine(dt) {
+  const c = cinS; if (!c.mode || c.mode === 'chapter') return; c.t += dt; const t = c.t;
+  if (c.mode === 'wake') {
+    let lid = smooth01((t - .8) / 2.4); if (t > 3.6 && t < 3.95) lid *= Math.abs(t - 3.78) / .18; setLids(lid);
+    once('a', 2.2, () => say('… Was für ein Albtraum.', 3000)); once('b', 5.2, () => say('Dieses Haus. Diese Gänge. Und dieses Ding mit den weißen Augen …', 4600));
+    const k = smooth01((t - 6.4) / 2.4);
+    if (t >= 6.4) { deathDy = -.78 * (1 - k); deathPitch = 1.15 * (1 - k); P.x = 6 + 1.9 * k; P.z = 2.75 + 2.2 * k; }
+    once('c', 9.6, () => say('Ich sollte aufhören, so spät noch Horrorfilme zu schauen.', 4500));
+    if (t >= 9.0) { c.mode = null; inputBlocked = false; deathDy = deathPitch = 0; setLids(1); P.x = 7.9; P.z = 4.95; }
+  } else if (c.mode === 'abduct') {
+    let lid = smooth01((t - 1.0) / 3.5); if (t > 5.0 && t < 5.4) lid *= Math.abs(t - 5.2) / .2; setLids(lid);
+    glitchKick = Math.max(glitchKick, .35 * (1 - smooth01(t / 8)));
+    once('a', 3.8, () => say('Wo … bin ich? Mein Kopf …', 3200)); once('b', 7.4, () => say('Das ist … das Haus. Das Haus aus meinem Traum.', 4200)); once('c', 11.6, () => say('Das war kein Traum.', 3000));
+    deathPitch = -.45 * (1 - smooth01((t - 3.5) / 3)); if (t > 6.5 && !c.f.sc) { c.f.sc = 1; humanScream(P.x + 18, P.z - 12, .5); }
+    const k = smooth01((t - 12.0) / 1.6); if (t >= 12.0) { deathDy = -.16 * (1 - k); P.x = 57 - 2.4 * k; P.z = 33.15 + .5 * k; }
+    if (t >= 13.8) { c.mode = null; inputBlocked = false; deathDy = deathPitch = 0; setLids(1); P.x = 54.6; P.z = 33.65; }
+  } else if (c.mode === 'collapse') {
+    const dk = Math.min(1, t / 5);
+    once('a', .6, () => say('Mhm … die Pizza schmeckt irgendwie komisch.', 3200)); once('b', 3.6, () => say('Mir ist … so schwindelig …', 3000));
+    deathRoll = Math.sin(t * 1.7) * .07 * dk; deathPitch = Math.sin(t * 1.2) * .05 * dk; fovFX = Math.sin(t * 2.1) * 4 * dk; glitchKick = Math.max(glitchKick, .22 * dk);
+    if (t > 5.0) { const k = smooth01((t - 5.0) / 1.2); deathDy = -1.05 * k; deathRoll = .9 * k + Math.sin(t * 9) * .03; deathPitch = -.15 * k; setLids(1 - smooth01((t - 5.2) / 1.2)); }
+    once('card', 6.6, () => { showCard('', '…', 4000, null, true); });
+    if (t > 10.5) { c.mode = null; }
+  }
+}
+
+/* ---------- Haus: Host-Logik der Handlung ---------- */
+function hostPhone() { if (team.stage !== 0 || gameOver) return; team.stage = 1; emit('c2', { s: 'phone' }); setTimeout(() => { if (FLN === 3 && team.stage === 1) { team.stage = 2; emit('c2', { s: 'bell' }); } }, 11000); }
+function hostHouseDoor() {
+  if (team.stage !== 2) return; team.stage = 3; team.doors[0] = 1; const pz = items.find(i => i.type === 'pizza'); if (pz) { pz.active = true; pz.mesh.visible = true; } emit('c2', { s: 'door' });
+}
+function hostEat() { if (team.stage !== 4) return; team.stage = 5; emit('c2', { s: 'eat' }); setTimeout(() => { if (FLN === 3) hostFloorChange(4, false); }, 10800); }
+function hostSleep() { if (gameOver) return; gameOver = 'end'; emit('sleep', {}); }
+function handleC2(m) {
+  const s = m.s;
+  if (s === 'phone') { [0, 1, 2, 3].forEach(i => setTimeout(() => beep(900 + i * 140, .07, .05), i * 130)); say('Ich hab keine Lust zu kochen … ein bisschen Pizza wäre schön.', 4200); setTimeout(timeSkip, 3800); }
+  else if (s === 'bell') { doorbell(); say('Es klingelt. Das muss die Pizza sein.', 4200); updateFeatureStates(); }
+  else if (s === 'door') { openDoorSlot(0, false); creak(18, 24); thud(.5, 200); say('Niemand zu sehen. Nur ein Pizzakarton auf der Fußmatte.', 4500); updateFeatureStates(); }
+  else if (s === 'eat') startCollapse();
+}
+function timeSkip() { houseSkipped = true; showCard('', 'EIN PAAR STUNDEN SPÄTER …', 3000, () => { houseState.tod = houseState.todTarget = 1.15; applyHouseTod(1.15); }); }
+function syncHouseFromStage() { if (floorDef.kind !== 'house') return; const want = team.stage >= 1 ? 1.15 : 0; if (houseSkipped !== (team.stage >= 1) && !cinS.mode) { houseSkipped = team.stage >= 1; houseState.todTarget = want; } }
+
+/* ---------- DER VATER ---------- */
+function buildFather() {
+  const g = new THREE.Group();
+  const M = c => new THREE.MeshStandardMaterial({ color: c, roughness: .85 });
+  const coat = M(0xcfcbc0), skin = M(0xc6a48a), dark = M(0x1b1b1f), hair = M(0x8c8c8c), blood = new THREE.MeshStandardMaterial({ color: 0x5a0808, roughness: .5 }), steel = new THREE.MeshStandardMaterial({ color: 0xdfe4e8, metalness: .9, roughness: .12 });
+  const seg = (parent, geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m; };
+  seg(g, new THREE.BoxGeometry(.18, .92, .16), dark, -.12, .46, 0); seg(g, new THREE.BoxGeometry(.18, .92, .16), dark, .12, .46, 0);
+  const skirt = seg(g, new THREE.CylinderGeometry(.27, .37, .95, 14), coat, 0, .98, 0); skirt.scale.z = .6;
+  seg(g, new THREE.BoxGeometry(.52, .62, .3), coat, 0, 1.5, 0); seg(g, new THREE.BoxGeometry(.1, .3, .02), dark, 0, 1.55, .16);
+  for (let i = 0; i < 5; i++) { const b = seg(g, new THREE.SphereGeometry(.07 + Math.random() * .05, 6, 5), blood, rnd(-.18, .18), 1.2 + Math.random() * .5, .17); b.scale.z = .15; }
+  const armL = new THREE.Group(); armL.position.set(-.34, 1.72, 0); g.add(armL); seg(armL, new THREE.BoxGeometry(.12, .6, .12), coat, 0, -.3, 0); seg(armL, new THREE.BoxGeometry(.1, .1, .1), skin, 0, -.64, 0);
+  const armR = new THREE.Group(); armR.position.set(.34, 1.72, 0); g.add(armR); seg(armR, new THREE.BoxGeometry(.12, .6, .12), coat, 0, -.3, 0);
+  const el = new THREE.Group(); el.position.y = -.6; armR.add(el); seg(el, new THREE.BoxGeometry(.1, .5, .1), coat, 0, -.25, 0); const hand = seg(el, new THREE.BoxGeometry(.1, .1, .1), skin, 0, -.55, 0);
+  const knife = new THREE.Group(); knife.position.set(0, -.6, 0); el.add(knife); seg(knife, new THREE.BoxGeometry(.035, .12, .035), dark, 0, 0, 0); seg(knife, new THREE.BoxGeometry(.03, .34, .006), steel, 0, -.22, 0);
+  const head = new THREE.Group(); head.position.set(0, 1.95, .02); g.add(head);
+  const sk = seg(head, new THREE.SphereGeometry(.12, 14, 12), skin, 0, 0, 0); sk.scale.set(.9, 1.2, 1); seg(head, new THREE.SphereGeometry(.125, 14, 8, 0, 6.283, 0, 1.2), hair, 0, .03, -.01);
+  [-1, 1].forEach(sx => { const ring = seg(head, new THREE.TorusGeometry(.04, .006, 6, 14), dark, sx * .05, .02, .11); seg(head, new THREE.SphereGeometry(.012, 6, 5), dark, sx * .05, .02, .112); });
+  seg(head, new THREE.BoxGeometry(.04, .006, .006), dark, 0, .025, .115); seg(head, new THREE.BoxGeometry(.06, .008, .01), M(0x5a2a2a), 0, -.055, .105);
+  g.userData = { armR, el, head, armL }; return g;
+}
+const FATHER = buildFather(); FATHER.visible = false; scene.add(FATHER);
+
+/* ---------- ENDE: Schlafparalyse ---------- */
+function startSleepEnding() {
+  if (state === 'ending' || state === 'end') return;
+  closeKeypad(); state = 'ending'; endT = 0; endFlags = {}; spraying = false; P.hidden = null; P.flash = false; $('hideov').style.display = 'none'; $('prompt').style.display = 'none'; $('sub').style.display = 'none';
+  $('hud').style.display = 'none'; hideCard(); entity.visible = false; endShow = { ghost: false, shadow: false, father: false }; gameOver = 'end';
+  P.x = 18; P.z = 27.85; P.camY = 1.4; P.yaw = P.vyaw = P.lyaw = Math.PI; P.pitch = P.vpitch = 0; deathDy = -.78; deathPitch = 0; deathRoll = 0; deathShake = 0; $('lids').style.display = 'block'; setLids(1);
+  FATHER.position.set(19.55, 0, 27.8); FATHER.rotation.y = -Math.PI / 2; FATHER.userData.armR.rotation.x = 0; FATHER.userData.el.rotation.x = 0;
+  document.exitPointerLock && document.exitPointerLock();
+}
+const endOnce = (k, t0, fn) => { if (endT >= t0 && !endFlags[k]) { endFlags[k] = 1; fn(); } };
+const eSay = (txt, ms) => { const el = $('sub'); el.textContent = txt; el.style.display = 'block'; subTimer = ms || 4000; };
+function updateEnding(dt) {
+  endT += dt; const t = endT; P.x = 18; P.z = 27.85; P.camY = 1.4; P.moving = 0; P.sprinting = false;
+  // Lider: hinlegen → schwarz → Augen auf (gelähmt)
+  let lid = 1;
+  if (t < 1.2) lid = 1; else if (t < 2.6) lid = 1 - smooth01((t - 1.2) / 1.4); else if (t < 4.2) lid = 0; else lid = smooth01((t - 4.2) / 1.8);
+  [6.3, 8.4, 10.4, 15.0].forEach(b => { if (Math.abs(t - b) < .16) lid *= Math.abs(t - b) / .16; });
+  if (t > 25.9) lid = 1 - smooth01((t - 25.9) / .5);
+  setLids(lid);
+  endOnce('s1', .4, () => eSay('Nur kurz die Augen zumachen …', 3000));
+  endOnce('au', 1.4, () => setSleepAudio(.5)); endOnce('s2', 4.4, () => { setSleepAudio(1); eSay('Ich bin wach … aber ich kann mich nicht bewegen!', 4600); });
+  // Blick: Decke → später zum Vater
+  let pitchT = 1.2, yawT = Math.PI; if (t > 13.2) { const k = smooth01((t - 13.2) / 2.4); pitchT = 1.2 + (.64 - 1.2) * k; yawT = Math.PI + (-Math.PI / 2 - Math.PI) * k; }
+  P.yaw = yawT; P.pitch = pitchT;
+  // Halluzinationen: Schatten kommen bei jedem Blinzeln näher
+  if (t >= 6.3 && t < 8.4) { endShow.ghost = true; ghost.position.set(17.1, 0, 30.7); ghost.rotation.y = Math.atan2(18 - 17.1, 27.85 - 30.7); }
+  if (t >= 8.4 && t < 10.4) { ghost.position.set(17.8, 0, 29.2); ghost.rotation.y = Math.atan2(.2, -1.35); }
+  if (t >= 10.4 && t < 15.0) { endShow.ghost = false; endShow.shadow = true; deathCreature.position.set(16.3, 0, 28.3); deathCreature.rotation.y = Math.atan2(1.7, -.4); }
+  endOnce('w1', 7.0, () => whisper(17.2, 29.5)); endOnce('w2', 10.6, () => maleWhisper(16.6, 28.6)); endOnce('w3', 11.4, () => eSay('(…Lena …)', 2200));
+  endOnce('door', 12.2, () => { creak(30, 33); if (AC) { clunk(); } });
+  if (t > 12.6 && t < 15.6) { endFlags.stp = (endFlags.stp || 0) - dt; if (endFlags.stp <= 0) { endFlags.stp = .62; const k = (t - 12.6) / 3.0; thud(.45 + k * .3, 330, makeTempPanner(30 - 10 * k, 33 - 5 * k), .16); } }
+  if (t >= 15.0 && t < 25.6) { endShow.shadow = false; endShow.ghost = false; endShow.father = true; }
+  // der Vater spricht
+  endOnce('f1', 16.0, () => { maleWhisper(19.4, 27.6); eSay('»Schsch … ganz ruhig, Lena.«', 2600); });
+  endOnce('f2', 18.2, () => { maleWhisper(19.4, 27.6); eSay('»Du bist wieder zu Hause.«', 2600); });
+  endOnce('f3', 20.2, () => { maleWhisper(19.4, 27.6); eSay('»Ich hab dein Zimmer genau so gemacht, wie es früher war.«', 3200); });
+  endOnce('f4', 23.0, () => { maleWhisper(19.4, 27.6); eSay('»Diesmal läufst du nicht weg.«', 2200); });
+  if (t > 23.0) { const k = smooth01((t - 23.0) / .9); FATHER.userData.armR.rotation.x = -2.55 * k; FATHER.userData.el.rotation.x = -.5 * k; }
+  endOnce('knife', 23.2, () => { sting(1.0); glitchKick = .8; });
+  endOnce('s5', 24.0, () => eSay('(Sie will schreien. Kein Laut kommt heraus.)', 2000));
+  hbEnd(dt, t);
+  // der Stich (angedeutet): Blitz, Geräusch, Blut auf der Linse, Schwarz
+  endOnce('st1', 25.3, () => { flashKick = 1; stabSound(); addGore(14); deathShake = .08; deathPitch = .25; });
+  endOnce('st2', 25.7, () => { flashKick = .8; stabSound(); addGore(24, true); });
+  endOnce('st3', 26.1, () => { flashKick = 1; stabSound(); addGore(40, true); postMat.uniforms.bleed.value = .9; });
+  endOnce('blk', 26.5, () => { setSleepAudio(0); flatline(); fadeAnim = null; postMat.uniforms.fade.value = 0; });
+  if (t > 26.7 && !endFlags.fin) { endFlags.fin = 1; }
+  if (t > 29.5 && !endFlags.end) { endFlags.end = 1; showEnd(); }
+}
+function hbEnd(dt, t) { if (t < 4.4 || t > 26.4) return; endFlags.hb = (endFlags.hb || 0) - dt; if (endFlags.hb <= 0) { endFlags.hb = 60 / (50 + Math.min(90, (t - 4) * 5)); heartbeat(.3 + Math.min(.6, t / 40)); } }
+function showEnd() {
+  state = 'end'; hideCard(); setLids(1); $('lids').style.display = 'none'; FATHER.visible = false; deathCreature.visible = false; ghost.visible = false; postMat.uniforms.bleed.value = 0; goreG.clearRect(0, 0, goreCv.width, goreCv.height); postMat.uniforms.fade.value = 1; flashKick = 0; deathShake = deathDy = deathPitch = deathRoll = 0;
+  $('endtxt').textContent = 'Lena Hallin wurde am nächsten Morgen nicht in ihrem neuen Haus gefunden. Ihr Vater gab eine Vermisstenanzeige auf. Die Klinik St. Aurelia steht noch immer – und das Bett in Zimmer 13 ist frisch bezogen.';
+  $('end').style.display = 'flex'; $('hud').style.display = 'none'; document.exitPointerLock && document.exitPointerLock();
+}
+$('endagain').addEventListener('click', restartRequest);
 
 /* ====================================================================
    SPRAYEN (Ego & Third-Person)
@@ -2128,6 +2869,8 @@ function onHostData(pid, m) {
   } else if (m.t === 'pick') { const it = items[m.i]; if (it && r.alive && Math.hypot(r.rx - it.x, r.rz - it.z) < 5) hostPick(pid, m.i); }
   else if (m.t === 'fuse') { if (r.alive) hostFuse(); }
   else if (m.t === 'door') { if (r.alive) hostDoor(m.s); }
+  else if (m.t === 'c2') { if (r.alive) { if (m.s === 'phone') hostPhone(); else if (m.s === 'eat') hostEat(); else if (m.s === 'door') hostHouseDoor(); else if (m.s === 'sleep') hostSleep(); } }
+  else if (m.t === 'tv') { if (r.alive) hostTVScare(m.i, pid); }
   else if (m.t === 'code') { if (r.alive && typeof m.c === 'string' && m.c.length === 4 && (!floorDef.need.fuses || team.powered)) hostCode(m.c, pid); }
   else if (m.t === 'adv') { if (r.alive) hostAdvance(); }
   else if (m.t === 'sp' && Array.isArray(m.d)) {
@@ -2152,22 +2895,25 @@ function onClientData(m) {
   else if (m.t === 'full') { net.mode = 'solo'; netMsg('Der Raum ist voll (max. 4 Spieler).'); try { net.peer.destroy(); } catch (e) {} }
 }
 function localFlags() { return (P.flash && P.bat > 0 ? 1 : 0) | (P.crouch ? 2 : 0) | (P.sprinting ? 4 : 0) | (P.talk ? 8 : 0) | (P.spraying ? 16 : 0); }
-function teamArr() { return [team.fuses, team.fusesIn, team.key, team.codeOk ? 1 : 0, team.notes.map(d => d === null ? '-' : d).join(''), team.doors.join(''), team.powered ? 1 : 0]; }
+function teamArr() { return [team.fuses, team.fusesIn, team.key, team.codeOk ? 1 : 0, team.notes.map(d => d === null ? '-' : d).join(''), team.doors.join(''), team.powered ? 1 : 0, team.stage, team.finale ? 1 : 0]; }
 function applyTeam(a) {
   const prev = { powered: team.powered, codeOk: team.codeOk, doors: team.doors.slice() };
   team.fuses = a[0]; team.fusesIn = a[1]; team.key = a[2]; team.codeOk = !!a[3]; team.notes = a[4].split('').map(c => c === '-' ? null : +c); team.doors = String(a[5]).split('').filter(c => c !== '').map(c => +c); team.powered = !!a[6];
+  const ps = team.stage; team.stage = a[7] | 0; team.finale = !!a[8];
   team.doors.forEach((v, i) => { if (v && !prev.doors[i]) openDoorSlot(i, false); });
-  if (team.powered !== prev.powered || team.codeOk !== prev.codeOk) updateFeatureStates(); else if (a[1] !== undefined) updateFeatureStates();
+  if (team.stage !== ps) syncHouseFromStage();
+  updateFeatureStates();
 }
 function buildSnapshot() {
   const p = [[net.id, 0, r2(P.x), r2(P.z), r2(P.vyaw), r2(P.vpitch), localFlags(), P.hidden ? P.hidden.id : -1, state === 'play' ? 1 : 0]];
   remotes.forEach(r => p.push([r.id, r.idx, r2(r.rx), r2(r.rz), r2(r.ryaw), r2(r.rpitch), (r.flash ? 1 : 0) | (r.crouch ? 2 : 0) | (r.sprint ? 4 : 0) | (r.talk ? 8 : 0) | (r.spray ? 16 : 0), r.hidden, r.alive ? 1 : 0]));
-  return { t: 's', g: r2(tGame), fl: FLN, tm: teamArr(), i: items.map(i => i.active ? 1 : 0).join(''), e: [r2(E.x), r2(E.z), r2(entity.rotation.y), Math.max(0, STATES.indexOf(E.state)), r2(E.curSpeed || 0)], p };
+  return { t: 's', g: r2(tGame), fl: FLN, tm: teamArr(), i: items.map(i => i.active ? 1 : 0).join(''), tvd: tvs.map(t => (t.dead || t.scareT > 0) ? 1 : 0).join(''), e: [r2(E.x), r2(E.z), r2(entity.rotation.y), Math.max(0, STATES.indexOf(E.state)), r2(E.curSpeed || 0)], p };
 }
 function applySnapshot(m) {
   if (!gameRunning || m.fl !== FLN || fadeBusy) return;
   if (state !== 'play' && state !== 'dead' && state !== 'spectate' && state !== 'win') return;
   tGame = m.g; applyTeam(m.tm);
+  if (m.tvd) for (let i = 0; i < tvs.length; i++) if (m.tvd[i] === '1' && !tvs[i].dead && tvs[i].scareT <= 0) tvs[i].dead = true;
   for (let i = 0; i < items.length; i++) { const a = m.i[i] === '1'; if (items[i].active !== a) { items[i].active = a; items[i].mesh.visible = a; } }
   E.tx = m.e[0]; E.tz = m.e[1]; E.try = m.e[2]; E.state = STATES[m.e[3]] || 'dormant'; E.curSpeed = m.e[4];
   const seen = new Set();
@@ -2209,6 +2955,82 @@ function updateTalk() {
 }
 
 /* ====================================================================
+   LADEBILDSCHIRM & TRAILER
+==================================================================== */
+const BOOT_MSGS = ['BAND WIRD GELADEN …', 'KLINIK ST. AURELIA — NACHTSCHICHT', 'WARNUNG: BILDMATERIAL BESCHÄDIGT', 'DAS WACHTEAM IST NICHT MEHR DA', 'SIE HÖRT DEIN ATMEN', 'TONSPUR WIRD REPARIERT …', 'ETWAS STEHT HINTER DIR'];
+let bootPct = 0, bootReady = false, bootTimer = null, bootFrame = 0, trailT = 0, trailFlags = {}, trailStarted = false;
+const bootEls = { bar: $('bootbar'), pct: $('bootpct'), msg: $('bootmsg'), cnt: $('bootcount'), go: $('bootgo'), face: $('bootface') };
+function corrupt(s) { const ch = '▓▒░█#%&@'; return s.split('').map(c => (c !== ' ' && Math.random() < .12) ? ch[(Math.random() * ch.length) | 0] : c).join(''); }
+function flashFace() {   // einzelner, kurzer Bildfehler: ein Gesicht im Rauschen
+  const cv = bootEls.face, g = cv.getContext('2d'), W = cv.width, H = cv.height; g.clearRect(0, 0, W, H);
+  g.fillStyle = '#cfc8b8'; g.beginPath(); g.ellipse(W / 2, H / 2 + 6, 46, 70, 0, 0, 7); g.fill();
+  g.fillStyle = '#000'; g.beginPath(); g.ellipse(W / 2 - 18, H / 2 - 12, 11, 17, 0, 0, 7); g.ellipse(W / 2 + 18, H / 2 - 12, 11, 17, 0, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.fillRect(W / 2 - 19, H / 2 - 11, 2, 2); g.fillRect(W / 2 + 17, H / 2 - 11, 2, 2);
+  g.fillStyle = '#000'; g.beginPath(); g.ellipse(W / 2, H / 2 + 40, 24, 22, 0, 0, 7); g.fill(); g.fillStyle = '#d8d2bc'; for (let i = 0; i < 8; i++) { g.beginPath(); g.moveTo(W / 2 - 22 + i * 6, H / 2 + 26); g.lineTo(W / 2 - 19 + i * 6, H / 2 + 40); g.lineTo(W / 2 - 16 + i * 6, H / 2 + 26); g.fill(); }
+  for (let i = 0; i < 30; i++) { g.fillStyle = 'rgba(255,255,255,' + Math.random() * .5 + ')'; g.fillRect(Math.random() * W, Math.random() * H, 30 + Math.random() * 120, 1 + Math.random() * 3); }
+  cv.style.opacity = .75; setTimeout(() => { cv.style.opacity = 0; }, 85);
+}
+function bootTick() {
+  bootFrame++;
+  if (!bootReady) {
+    if (Math.random() < .12) { /* Aussetzer */ } else bootPct = Math.min(100, bootPct + rnd(.35, 1.6));
+    if (bootPct > 38 && !bootTick.f1) { bootTick.f1 = 1; flashFace(); } if (bootPct > 77 && !bootTick.f2) { bootTick.f2 = 1; flashFace(); }
+    bootEls.bar.style.width = bootPct + '%'; bootEls.pct.textContent = Math.floor(bootPct) + '%';
+    const mi = Math.min(BOOT_MSGS.length - 1, Math.floor(bootPct / 15)); const m = BOOT_MSGS[mi]; bootEls.msg.textContent = Math.random() < .08 ? corrupt(m) : m;
+    if (bootPct >= 100) { bootReady = true; bootEls.msg.textContent = 'BEREIT.'; bootEls.go.style.display = 'inline-block'; }
+  }
+  const s = Math.floor(bootFrame / 16), f = bootFrame % 16; bootEls.cnt.textContent = '00:' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + ':' + String(f).padStart(2, '0');
+}
+function bootStart() { bootTimer = setInterval(bootTick, 62); }
+function bootGo() {
+  if (!bootReady || trailStarted) return; clearInterval(bootTimer); initAudio(); startTrailer();
+}
+bootEls.go.addEventListener('click', bootGo);
+$('boot').addEventListener('click', bootGo);
+window.addEventListener('keydown', e => { if (state === 'boot' && bootReady && ['Enter', 'Space', 'KeyE'].includes(e.code)) bootGo(); if (state === 'trailer') endTrailer(); });
+$('trailer').addEventListener('click', endTrailer);
+
+/* ---------- Trailer (läuft in der echten Spielwelt) ---------- */
+function setTrailText(t, sub) { const a = $('trailtext'), b = $('trailsub'); a.textContent = t || ''; a.style.opacity = t ? 1 : 0; b.textContent = sub || ''; b.style.opacity = sub ? .8 : 0; }
+function startTrailer() {
+  trailStarted = true; $('boot').style.display = 'none'; $('trailer').style.display = 'block'; state = 'trailer'; trailT = 0; trailFlags = {};
+  P.x = 36; P.z = 46; P.yaw = P.vyaw = P.lyaw = 0; P.pitch = P.vpitch = P.lpitch = 0; P.flash = true; P.bat = 100; P.bob = 0; P.moving = .5;
+  E.x = 36; E.z = 10; E.state = 'dormant'; E.curSpeed = 0; E.attack = 0; E.pose = 0; entity.visible = false; blackoutT = 0; flashOut = 0; postMat.uniforms.fade.value = 0; fadeAnim = null; deathShake = 0;
+}
+const tOnce = (k, t0, fn) => { if (trailT >= t0 && !trailFlags[k]) { trailFlags[k] = 1; fn(); } };
+function updateTrailer(dt) {
+  trailT += dt; const t = trailT;
+  // Kamera: geht den langen Gang entlang, bleibt dann stehen
+  const walk = Math.min(t, 6.2), z = 46 - walk * 1.75 - (t > 6.2 ? Math.min(4.8, (t - 6.2) * .25) : 0);
+  P.x = 36; P.z = z; P.moving = t < 6.2 ? .55 : .1; P.bob += dt * (t < 6.2 ? 3.4 : .7); P.flash = true;
+  if (blackoutT > 0) blackoutT -= dt;
+  postMat.uniforms.fade.value = t < 1.1 ? smooth01(t / 1.1) : (t > 12.2 ? 0 : 1);
+  tOnce('t1', .6, () => setTrailText('23:47 — KLINIK ST. AURELIA')); tOnce('t1x', 3.0, () => setTrailText(''));
+  tOnce('t2', 3.3, () => setTrailText('DAS WACHTEAM IST VERSCHWUNDEN.')); tOnce('t2x', 5.8, () => setTrailText(''));
+  tOnce('wh', 4.4, () => whisper(P.x + 1.2, P.z + 3));
+  tOnce('fl', 5.5, () => { flickerAll = 1; sting(.35); });
+  tOnce('bo1', 6.1, () => { blackoutT = 1.5; clunk(); flashOut = 1.2; });
+  tOnce('c1', 7.6, () => { E.x = 36; E.z = P.z - 17; E.state = 'patrol'; E.curSpeed = 0; entity.visible = true; sting(.9); glitchKick = .9; setTrailText('ES HÖRT DICH.'); });
+  tOnce('t3x', 9.0, () => setTrailText(''));
+  tOnce('bo2', 9.3, () => { blackoutT = 1.2; flashOut = 1.0; heartbeat(.8); });
+  tOnce('c2', 10.5, () => { E.z = P.z - 7.5; E.state = 'chase'; growl(); glitchKick = 1; setTrailText('ES SIEHT DEIN LICHT.'); });
+  tOnce('lunge', 11.8, () => { setTrailText(''); scream(); flashKick = 1; glitchKick = 1; trailFlags.lungeT = 0; });
+  if (trailFlags.lunge) { trailFlags.lungeT += dt; const k = Math.min(1, trailFlags.lungeT / .34); E.attack = 1; E.z = (P.z - 7.5) + (7.5 - .75) * k * k; deathShake = .03 + k * .05; }
+  tOnce('blk', 12.25, () => { deathShake = 0; entity.visible = false; E.attack = 0; });
+  tOnce('title', 13.0, () => { setTrailText('LETZTE AUFNAHME', 'KAPITEL 1 · DAS HAUS      KAPITEL 2 · DER ALBTRAUM'); const a = $('trailtext'); a.style.fontSize = 'clamp(26px,8vh,86px)'; sting(.5); });
+  tOnce('end', 17.2, () => endTrailer());
+  E.dist = Math.hypot(P.x - E.x, P.z - E.z); E.walk += 0;
+  if (entity.visible) { entity.rotation.y = Math.atan2(P.x - E.x, P.z - E.z); entityVisuals(dt); }
+  flashKick = Math.max(0, flashKick - dt * 3);
+}
+function endTrailer() {
+  if (!trailStarted || state === 'menu') return; trailStarted = false; $('trailer').style.display = 'none'; setTrailText(''); $('trailtext').style.fontSize = '';
+  entity.visible = false; E.state = 'dormant'; E.attack = 0; E.curSpeed = 0; blackoutT = 0; flashOut = 0; flickerAll = 0; deathShake = 0; postMat.uniforms.fade.value = 1; flashKick = 0; glitchKick = 0;
+  P.moving = 0; P.x = startCell.cx * CELL; P.z = startCell.cy * CELL; state = 'menu'; $('menu').style.display = 'flex';
+  if (AC) { entGain.gain.setTargetAtTime(0, AC.currentTime, .05); chaseGain.gain.setTargetAtTime(0, AC.currentTime, .1); }
+}
+
+/* ====================================================================
    HAUPTSCHLEIFE
 ==================================================================== */
 const DBG = { noGlitch: false, noFlicker: false };
@@ -2216,41 +3038,51 @@ let last = performance.now();
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, (now - last) / 1000); last = now; tNow = now / 1000;
-  updateFade(dt); updateDoorAnims(dt);
+  updateFade(dt); updateDoorAnims(dt); updateCine(dt); drowsy = Math.max(0, drowsy - dt / 40);
+  if (cinS.mode === 'chapter') endFlash = Math.min(1, endFlash + dt * .55);
   const live = state === 'play' || state === 'spectate' || state === 'dead';
   if (state === 'play') { tGame += dt; updatePlayer(dt); } else if (state === 'spectate') spectateFollow(dt);
   if (live) {
     if (net.mode === 'client') updateEntityClient(dt); else updateEntityHost(dt);
     updateRemotes(dt); netTick(dt); updateLights(dt); if (state === 'play') updateScares(dt);
     if (state === 'play') updateAmbientEvents(dt);
+    if (state === 'play') updateTVs(dt); else tvFovFX += (0 - tvFovFX) * Math.min(1, dt * 5);
+    if (floorDef.kind === 'house') updateHouse(dt);
     if (state === 'play' || state === 'spectate') updateHUD(dt);
     updateAudio(dt);
-  } else if (state === 'menu' || state === 'lobby') { updateLights(dt); }
+  } else if (state === 'menu' || state === 'lobby' || state === 'boot') { updateLights(dt); }
+  else if (state === 'trailer') { updateTrailer(dt); updateLights(dt); updateAudio(dt); }
+  else if (state === 'ending') { updateEnding(dt); updateLights(dt); if (ghost.visible) poseCreature(ghost, Gh, dt, 0); if (deathCreature.visible) poseCreature(deathCreature, DC, dt, 0); }
   if (state === 'dead') updateDeath(dt);
-  else if (state === 'win') { winT += dt; postMat.uniforms.fade.value = Math.max(0, 1 - winT / 2.2); }
   if (state === 'spectate' && gameOver === 'dead' && !deadShown) showDeadScreen();
-  if (live) updateCamera(dt); else if (state === 'menu' || state === 'lobby') { P.vyaw = P.yaw + Math.sin(tNow * .1) * .6; P.vpitch = 0; updateCamera(dt); }
+  if (live || state === 'trailer' || state === 'ending') updateCamera(dt);
+  else if (state === 'menu' || state === 'lobby' || state === 'boot') { P.vyaw = P.yaw + Math.sin(tNow * .1) * .6; P.vpitch = 0; updateCamera(dt); }
   if (state === 'play') updateSpray(dt); else if (P.spraying) { P.spraying = false; setHiss(false); }
-  entity.visible = live && state !== 'dead' || (state === 'dead' && !deathCreature.visible); if (!live) { entity.visible = false; ghost.visible = false; }
+  // Sichtbarkeit der Figuren je nach Zustand
+  if (state === 'trailer') { /* Trailer steuert das Wesen selbst */ }
+  else if (state === 'ending') { entity.visible = false; ghost.visible = endShow.ghost; deathCreature.visible = endShow.shadow; FATHER.visible = endShow.father; }
+  else { entity.visible = live && !floorDef.noEntity && (state !== 'dead' || !deathCreature.visible); if (!live) { entity.visible = false; ghost.visible = false; } }
 
   glitchKick = Math.max(0, glitchKick - dt * 1.4); flashKick = Math.max(0, flashKick - dt * 3);
   const proxG = (live && E.state !== 'dormant') ? Math.max(0, 1 - E.dist / 7) : 0;
-  postMat.uniforms.glitch.value = Math.min(1, glitchKick + proxG * proxG * 0.6 + (E.state === 'chase' && state === 'play' ? .08 : 0));
+  postMat.uniforms.glitch.value = Math.min(1, glitchKick + proxG * proxG * 0.6 + (E.state === 'chase' && state === 'play' ? .08 : 0) + (state === 'ending' ? .05 + (endT > 4 ? Math.min(.25, (endT - 4) * .02) : 0) : 0));
   if (DBG.noGlitch) postMat.uniforms.glitch.value = 0;
-  postMat.uniforms.flash.value = flashKick * 0.8; postMat.uniforms.time.value = tNow % 1000;
-  postMat.uniforms.expo.value = 1.0 + zoneK * .25;
+  postMat.uniforms.flash.value = Math.max(flashKick * 0.8, endFlash); postMat.uniforms.time.value = tNow % 1000;
+  postMat.uniforms.expo.value = 1.0 + zoneK * .25 + (floorDef.kind === 'house' ? .35 : 0);
   renderer.setRenderTarget(rt); renderer.render(scene, camera);
   renderer.setRenderTarget(null); renderer.render(postScene, postCam);
 }
-// Start: Kulisse für das Menü aufbauen
+// Start: Kulisse (für Menü, Lobby, Trailer) aufbauen
 GAME_SEED = randSeed(); DIFF = 1; buildFloor(0); placePlayerAtStart(); entity.visible = false;
 resize();
 requestAnimationFrame(frame);
+if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state = 'menu'; $('menu').style.display = 'flex'; } else bootStart();
 window.__game = { get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
-  startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; } };
+  startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
+  get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; } };
 
-})();
+}, 40); }); });
 </script>
 </body>
 </html>
