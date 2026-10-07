@@ -23,6 +23,9 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 #tasks{top:8.5vh;left:50%;transform:translateX(-50%);text-align:left;opacity:.8;font-size:.9em;line-height:1.55;white-space:nowrap}
 #tasks .ok{opacity:.55;text-decoration:line-through}
 #prompt{top:58%;left:50%;transform:translateX(-50%);text-align:center;font-size:1.15em;display:none}
+#vrec{position:fixed;top:5.5vh;left:50%;transform:translateX(-50%);z-index:5;display:none;color:#ff3b2b;font-weight:bold;letter-spacing:.2em;font-size:1em;text-shadow:0 0 8px #800;animation:vb 1.2s steps(2) infinite}
+@keyframes vb{50%{opacity:.35}}
+.clips{margin-top:1.4em;font-size:.95em;max-height:28vh;overflow:auto}.clips .ch{opacity:.6;letter-spacing:.2em;margin-bottom:.4em}.clips a{display:block;color:#8fff9f;margin:.25em 0;text-decoration:underline;cursor:pointer}
 #subl{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.45);color:#c40000;font-size:9vw;font-weight:bold;letter-spacing:.3em;text-align:center;text-shadow:3px 0 #0ff,-3px 0 #f00,0 0 30px #600}
 #sub{bottom:13vh;left:50%;transform:translateX(-50%);width:min(80vw,900px);text-align:center;font-size:1.2em;line-height:1.5;
   background:rgba(0,0,0,.35);padding:.3em .8em;display:none}
@@ -107,6 +110,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
   <div id="spec">ZUSCHAUER — LEERTASTE: nächster Spieler</div>
   <div id="cross"></div>
   <div id="prompt"></div>
+  <div id="vrec">● AUFNAHME <span id="vrect">00:00</span></div>
   <div id="subl"></div>
   <div id="sub"></div>
   <div id="hideov"></div>
@@ -132,7 +136,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
      <b>Kapitel 1:</b> Das Haus hat 3 Etagen. Auf jeder musst du Rätsel lösen (Sicherungen, Schlüssel, Codes), um nach unten zu kommen – und am Ende zu fliehen.
      Etwas jagt dich. Es hört dich, und es sieht dein Licht. Such dir Verstecke: Spinde, Schränke, unter Betten. Und schau nicht zu lange in die Fernseher …
      <b>Kapitel 2:</b> Der Albtraum ist vorbei. Oder?</p>
-  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; E – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; G – Lampe &nbsp;·&nbsp; F – benutzen / aufnehmen / verstecken<br>
+  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; E – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; B – Videokamera aufnehmen &nbsp;·&nbsp; MAUSRAD – Zoom &nbsp;·&nbsp; G – Lampe &nbsp;·&nbsp; F – benutzen / aufnehmen / verstecken<br>
      LINKE MAUSTASTE – sprühen (Dosen liegen auf dem Boden) &nbsp;·&nbsp; Q – Farbe &nbsp;·&nbsp; T – Ego / Third-Person &nbsp;·&nbsp; V – Mikrofon &nbsp;·&nbsp; ESC – Pause</p>
   <div class="k" style="margin-top:.8em">SCHWIERIGKEIT</div>
   <div class="diffrow">
@@ -1786,6 +1790,7 @@ function initAudio() {
     AC = new (window.AudioContext || window.webkitAudioContext)();
     master = AC.createGain(); master.gain.value = .85;
     const comp = AC.createDynamicsCompressor(); master.connect(comp); comp.connect(AC.destination);
+    try { recDest = AC.createMediaStreamDestination(); comp.connect(recDest); } catch (e) { recDest = null; }
     const conv = AC.createConvolver(); conv.buffer = impulse(2.8, 2.3);
     const wet = AC.createGain(); wet.gain.value = .45; revIn = AC.createGain(); revIn.connect(conv); conv.connect(wet); wet.connect(master);
     sfx = AC.createGain(); sfx.connect(master); sfx.connect(revIn);
@@ -1992,6 +1997,7 @@ window.addEventListener('keydown', e => {
   if (state === 'play') {
     if (e.code === 'KeyG' && !P.hidden) { if (P.bat > 0) { P.flash = !P.flash; beep(P.flash ? 900 : 600, .04, .03); } }
     if (e.code === 'KeyC' && !P.hidden) P.crouch = !P.crouch;
+    if (e.code === 'KeyB') toggleRec();
     if (e.code === 'KeyF') interact();
     if (e.code === 'KeyV') toggleMic();
     if (e.code === 'KeyT') togglePerspective();
@@ -2005,7 +2011,7 @@ window.addEventListener('keyup', e => { keysDown[e.code] = false; });
 document.addEventListener('mousemove', e => {
   if (state !== 'play' || inputBlocked) return;
   if (document.pointerLockElement !== canvas && !(e.buttons & 2)) return;
-  const s = 0.0021 * (1 - .55 * Math.min(1, tvWatch));
+  const s = 0.0021 * (1 - .55 * Math.min(1, tvWatch)) / (1 + (camZoom - 1) * .7);
   if (P.hidden) P.yaw = Math.max(P.hidden.yaw - 0.6, Math.min(P.hidden.yaw + 0.6, P.yaw - e.movementX * s)); else P.yaw -= e.movementX * s;
   P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - e.movementY * s));
 });
@@ -2148,7 +2154,7 @@ function updateCamera(dt) {
   const pitch = P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m + deathPitch;
   const yaw = P.vyaw + Math.sin(t * 5.1) * jit + (Math.random() - .5) * shake;
   camera.rotation.set(pitch, yaw, roll + deathRoll, 'YXZ');
-  const fovT = 88 + tvFovFX + fovFX; if (Math.abs(camera.fov - fovT) > .05) { camera.fov = fovT; camera.updateProjectionMatrix(); }
+  const fov0 = 88 + tvFovFX + fovFX, fovT = camZoom > 1.005 ? 2 * Math.atan(Math.tan(fov0 * Math.PI / 360) / camZoom) * 180 / Math.PI : fov0; if (Math.abs(camera.fov - fovT) > .05) { camera.fov = fovT; camera.updateProjectionMatrix(); }
   const wantTP = P.third && state === 'play' && !P.hidden;
   camBlend += ((wantTP ? 1 : 0) - camBlend) * Math.min(1, dt * 7); camDistNow = 0;
   if (camBlend > 0.02) {
@@ -2818,6 +2824,104 @@ function updateCreep(dt) {
 }
 
 /* ====================================================================
+   VIDEOKAMERA IN DER HAND: B = Aufnahme starten/stoppen, Mausrad = Zoom.
+   Die Aufnahme ist echt (MediaRecorder: Bild + Ton + Zeitstempel) und
+   kann nach dem Stoppen als Videodatei gespeichert werden.
+==================================================================== */
+const CAMC = { rec: false, t: 0, clips: [], zoomT: 1, mr: null, chunks: [], cv: document.createElement('canvas'), mime: '', hinted: false, endT: 0, ledT: 0, scrT: 0, vis: 0 };
+let camZoom = 1, recDest = null;
+CAMC.cx = CAMC.cv.getContext('2d');
+const camGrp = new THREE.Group(); camera.add(camGrp); camGrp.position.set(.2, -.155, -.43); camGrp.rotation.set(.04, -.16, 0);
+let camOrd = 900;
+const cMat = c => new THREE.MeshBasicMaterial({ color: c, depthTest: false, fog: false });
+function cBox(w, h, d, c, x, y, z, rx) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cMat(c)); m.position.set(x, y, z); if (rx) m.rotation.x = rx; m.renderOrder = camOrd++; camGrp.add(m); return m; }
+cBox(.13, .115, .27, 0x1d1d20, 0, 0, 0); cBox(.131, .012, .27, 0x2c2c31, 0, .06, 0); cBox(.04, .05, .06, 0x151517, 0, .085, .1); cBox(.05, .05, .09, 0x101012, 0, .0, -.17);
+{ const m = new THREE.Mesh(new THREE.CylinderGeometry(.043, .047, .08, 18), cMat(0x0b0b0d)); m.rotation.x = Math.PI / 2; m.position.set(0, 0, -.22); m.renderOrder = camOrd++; camGrp.add(m);
+  const g = new THREE.Mesh(new THREE.CircleGeometry(.036, 18), cMat(0x0c1a26)); g.position.set(0, 0, -.262); g.renderOrder = camOrd++; camGrp.add(g); }
+cBox(.015, .02, .03, 0x3a3a40, .045, .07, -.09);                       // Mikro-Halter
+cBox(.075, .065, .13, 0x3a2a25, .0, -.095, .03); cBox(.04, .045, .1, 0x3a2a25, -.055, -.07, .0, .2); cBox(.09, .09, .5, 0x161616, .06, -.15, .38, -.35);   // Hand / Arm
+const scrCv = document.createElement('canvas'); scrCv.width = 128; scrCv.height = 96; const scx = scrCv.getContext('2d');
+const scrTex = new THREE.CanvasTexture(scrCv); scrTex.minFilter = THREE.LinearFilter;
+const scrM = new THREE.Mesh(new THREE.PlaneGeometry(.105, .078), new THREE.MeshBasicMaterial({ map: scrTex, depthTest: false, fog: false })); scrM.position.set(0, .004, .1365); scrM.renderOrder = camOrd++; camGrp.add(scrM);
+const ledM = new THREE.Mesh(new THREE.SphereGeometry(.007, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2010, depthTest: false, fog: false })); ledM.position.set(.05, .05, .139); ledM.renderOrder = camOrd++; camGrp.add(ledM);
+camGrp.visible = false;
+
+function fmtT(s) { s = Math.floor(s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function drawScreen() {
+  scx.fillStyle = '#0a1210'; scx.fillRect(0, 0, 128, 96);
+  scx.fillStyle = 'rgba(120,255,160,.07)'; for (let y = 0; y < 96; y += 3) scx.fillRect(0, y, 128, 1);
+  scx.font = 'bold 15px monospace'; scx.textBaseline = 'top';
+  if (CAMC.rec) { if (Math.floor(tNow * 1.6) % 2 === 0) { scx.fillStyle = '#ff2a1a'; scx.beginPath(); scx.arc(14, 14, 6, 0, 6.3); scx.fill(); } scx.fillStyle = '#ff6a5a'; scx.fillText('REC', 26, 6); scx.fillStyle = '#d8ffe0'; scx.fillText(fmtT(CAMC.t), 70, 6); }
+  else { scx.fillStyle = '#7dff9c'; scx.fillText('STBY', 8, 6); scx.font = '11px monospace'; scx.fillText('[B] REC', 8, 30); }
+  scx.font = '11px monospace'; scx.fillStyle = '#8fdca0'; scx.fillText('ZOOM x' + camZoom.toFixed(1), 8, 70); scx.fillText('BAT ' + Math.round(P.bat) + '%', 8, 82);
+  scx.strokeStyle = 'rgba(160,255,190,.55)'; scx.strokeRect(34, 26, 60, 36);
+  scrTex.needsUpdate = true;
+}
+function recBlock() { return typeof MediaRecorder === 'undefined' || !CAMC.cv.captureStream; }
+function startRec() {
+  if (CAMC.rec) return; if (recBlock()) { say('Dieser Browser kann nicht aufnehmen.', 3000); return; }
+  CAMC.cv.width = 960; CAMC.cv.height = Math.max(240, Math.round(960 * canvas.height / canvas.width));
+  let st; try { st = CAMC.cv.captureStream(30); } catch (e) { say('Aufnahme nicht möglich.', 3000); return; }
+  if (recDest) recDest.stream.getAudioTracks().forEach(t => st.addTrack(t));
+  const mt = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+  let mr; try { mr = new MediaRecorder(st, mt ? { mimeType: mt, videoBitsPerSecond: 3000000 } : { videoBitsPerSecond: 3000000 }); } catch (e) { say('Aufnahme nicht möglich.', 3000); return; }
+  CAMC.mime = mt; CAMC.chunks = []; const n = CAMC.clips.length + 1;
+  mr.ondataavailable = e => { if (e.data && e.data.size) CAMC.chunks.push(e.data); };
+  mr.onstop = () => saveClip(CAMC.chunks, CAMC.mime, CAMC.t, n);
+  mr.start(1000); CAMC.mr = mr; CAMC.rec = true; CAMC.t = 0; CAMC.endT = 0; beep(1200, .06, .05); setTimeout(() => beep(1600, .06, .05), 90);
+  $('vrec').style.display = 'block';
+}
+function stopRec() {
+  if (!CAMC.rec) return; CAMC.rec = false; $('vrec').style.display = 'none'; beep(900, .06, .05);
+  try { CAMC.mr.stop(); } catch (e) {} CAMC.mr = null;
+}
+function toggleRec() { if (CAMC.rec) { stopRec(); say('Aufnahme gespeichert – Esc (Pause) → Videos herunterladen.', 4500); } else startRec(); }
+let lastRecNum = 0;
+function saveClip(chunks, mime, dur, n) {
+  if (!chunks.length) return;
+  const blob = new Blob(chunks, { type: mime || 'video/webm' }), ext = /mp4/.test(mime) ? 'mp4' : 'webm';
+  CAMC.clips.push({ url: URL.createObjectURL(blob), name: 'LETZTE_AUFNAHME_' + (++lastRecNum) + '.' + ext, dur });
+  while (CAMC.clips.length > 6) URL.revokeObjectURL(CAMC.clips.shift().url);
+  renderClips();
+}
+document.querySelectorAll('#pause,#dead,#win,#end').forEach(el => { const d = document.createElement('div'); d.className = 'clips'; d.addEventListener('click', e => e.stopPropagation()); el.appendChild(d); });
+function renderClips() {
+  const html = CAMC.clips.length ? '<div class="ch">DEINE AUFNAHMEN</div>' + CAMC.clips.map(c => '<a href="' + c.url + '" download="' + c.name + '">▶ ' + c.name + ' (' + fmtT(c.dur) + ') – speichern</a>').join('') : '';
+  document.querySelectorAll('.clips').forEach(d => { d.innerHTML = html; });
+}
+function recFrame() {   // wird direkt nach dem Rendern aufgerufen: Bild + Bodycam-Einblendungen
+  if (!CAMC.rec) return; const c = CAMC.cx, W = CAMC.cv.width, H = CAMC.cv.height;
+  c.drawImage(canvas, 0, 0, W, H);
+  c.font = 'bold ' + Math.round(H * .045) + 'px monospace'; c.textBaseline = 'top'; c.fillStyle = '#fff'; c.shadowColor = '#000'; c.shadowBlur = 4;
+  if (Math.floor(tNow * 1.6) % 2 === 0) { c.fillStyle = '#ff2a1a'; c.beginPath(); c.arc(W * .035, H * .06, H * .017, 0, 6.3); c.fill(); }
+  c.fillStyle = '#fff'; c.fillText('REC ' + fmtT(CAMC.t), W * .06, H * .035); c.textAlign = 'right'; c.fillText($('ts').textContent, W * .975, H * .035); c.textAlign = 'left';
+  c.fillText($('camname').textContent, W * .02, H * .915);
+  const sub = $('sub'); if (sub.style.display !== 'none' && sub.textContent) { c.textAlign = 'center'; c.fillText(sub.textContent.slice(0, 90), W / 2, H * .82); c.textAlign = 'left'; }
+  c.shadowBlur = 0;
+}
+window.addEventListener('wheel', e => { if (state === 'play' && !inputBlocked && !keypadOpen && !P.hidden) camZoomT_set(e.deltaY < 0 ? 1.2 : 1 / 1.2); }, { passive: true });
+function camZoomT_set(k) { CAMC.zoomT = Math.max(1, Math.min(3.4, CAMC.zoomT * k)); }
+function updateCamcorder(dt) {
+  const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy;
+  CAMC.vis += ((show ? 1 : 0) - CAMC.vis) * Math.min(1, dt * 8); camGrp.visible = CAMC.vis > .05;
+  if (!show || P.hidden) CAMC.zoomT = 1;
+  camZoom += (CAMC.zoomT - camZoom) * Math.min(1, dt * 7);
+  if (camGrp.visible) {
+    const mv = P.moving ? Math.min(1, Math.hypot(P.vx || 0, P.vz || 0) / 3) : 0, sp = P.sprinting ? 1 : 0;
+    camGrp.position.x = .2 - (1 - CAMC.vis) * .1 + Math.sin(P.bob) * .006 * mv; camGrp.position.y = -.155 - (1 - CAMC.vis) * .15 - sp * .02 + Math.abs(Math.sin(P.bob)) * .008 * mv - (camZoom - 1) * .01;
+    camGrp.rotation.x += ((.04 + sp * .1) - camGrp.rotation.x) * Math.min(1, dt * 6);
+    CAMC.scrT -= dt; if (CAMC.scrT <= 0) { CAMC.scrT = .2; drawScreen(); }
+    ledM.visible = CAMC.rec ? Math.floor(tNow * 1.6) % 2 === 0 : false;
+  }
+  if (CAMC.rec) {
+    CAMC.t += dt; $('vrect').textContent = fmtT(CAMC.t);
+    if (CAMC.t > 600 || state === 'menu' || state === 'lobby') { stopRec(); say('Aufnahme beendet (max. 10 Minuten).', 3000); }
+    else if (state === 'dead' || state === 'end') { CAMC.endT += dt; if (CAMC.endT > 5) stopRec(); }
+  }
+  if (!CAMC.hinted && state === 'play' && tGame > 7 && !inputBlocked) { CAMC.hinted = true; say('Videokamera: B = Aufnahme · Mausrad = Zoom', 5500); }
+}
+
+/* ====================================================================
    SPRAYEN (Ego & Third-Person)
 ==================================================================== */
 const MAX_DOTS = 6000;
@@ -3129,7 +3233,7 @@ let last = performance.now();
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, (now - last) / 1000); last = now; tNow = now / 1000;
-  updateFade(dt); updateDoorAnims(dt); updateCine(dt); drowsy = Math.max(0, drowsy - dt / 40);
+  updateFade(dt); updateDoorAnims(dt); updateCine(dt); updateCamcorder(dt); drowsy = Math.max(0, drowsy - dt / 40);
   if (cinS.mode === 'chapter') endFlash = Math.min(1, endFlash + dt * .55);
   const live = state === 'play' || state === 'spectate' || state === 'dead';
   if (state === 'play') { tGame += dt; updatePlayer(dt); } else if (state === 'spectate') spectateFollow(dt);
@@ -3163,6 +3267,7 @@ function frame(now) {
   postMat.uniforms.expo.value = 1.0 + zoneK * .25 + (floorDef.kind === 'house' ? .35 : 0);
   renderer.setRenderTarget(rt); renderer.render(scene, camera);
   renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+  recFrame();
 }
 // Start: Kulisse (für Menü, Lobby, Trailer) aufbauen
 GAME_SEED = randSeed(); DIFF = 1; buildFloor(0); placePlayerAtStart(); entity.visible = false;
@@ -3172,7 +3277,7 @@ if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state 
 window.__game = { get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
-  get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
+  get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CAMC, startRec, stopRec, toggleRec, get camZoom() { return camZoom; }, camGrp, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
 
 }, 40); }); });
 </script>
