@@ -53,7 +53,7 @@ canvas#view{display:block;position:fixed;inset:0;width:100%;height:100%}
   <div id="rec"><span id="dot"></span>REC <span id="rect">00:00:00</span></div>
   <div id="ts">2024-10-31 23:47:12</div>
   <div id="cam">CAM-07 // K. MARLOW<br>KLINIK ST. AURELIA — NACHTSCHICHT</div>
-  <div id="stats"><div>KASSETTEN <b id="tp">0/4</b></div><div>LAMPE <b id="bt">100%</b></div><div id="stam"><i></i></div></div>
+  <div id="stats"><div>KASSETTEN <b id="tp">0/4</b></div><div>LAMPE <b id="bt">100%</b></div><div>SPRAY <b id="pt">—</b></div><div id="stam"><i></i></div></div>
   <div id="obj">ZIEL: FINDE DIE 4 ÜBERWACHUNGSKASSETTEN</div>
   <div id="room"></div>
   <div id="roster"></div>
@@ -71,7 +71,7 @@ canvas#view{display:block;position:fixed;inset:0;width:100%;height:100%}
   <p>Finde die <b>4 Überwachungskassetten</b>, dann nichts wie raus durch den <b>Ostausgang</b>. Etwas patrouilliert in den Gängen.
      Es hört dich, und es sieht dein Licht.</p>
   <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; SHIFT – rennen (Ausdauer!) &nbsp;·&nbsp; C – ducken<br>
-     F – Taschenlampe &nbsp;·&nbsp; E – benutzen / aufnehmen / im Spind verstecken &nbsp;·&nbsp; ESC – Pause</p>
+     F – Taschenlampe &nbsp;·&nbsp; E – benutzen / aufnehmen / im Spind verstecken &nbsp;·&nbsp; ESC – Pause<br>LINKE MAUSTASTE – sprühen (Spraydosen einsammeln!) &nbsp;·&nbsp; Q – Farbe wechseln &nbsp;·&nbsp; T – Ego / Third-Person</p>
   <p class="k">CO-OP bis 4 Spieler: Einer erstellt einen Raum, die anderen geben den 4-stelligen Code ein. V – Mikrofon an/aus. Stimmen sind räumlich und werden von Wänden gedämpft.</p>
   <p class="k">Kopfhörer empfohlen. Dunkelheit, Schockmomente, flackernde Bilder.</p>
   <div id="modes">
@@ -145,6 +145,8 @@ for (let y = 0; y < MH; y++) {
   }
 }
 const startCell = { cx: 1, cy: 1 };
+// Spraydosen (Farbindex: 0 rot, 1 weiß, 2 blau, 3 grün, 4 gelb)
+[[7, 3, 0], [1, 10, 1], [16, 7, 2], [20, 17, 3], [4, 15, 4]].forEach(([cx, cy, col]) => items.push({ type: 'spray', cx, cy, col }));
 const TAPE_TOTAL = items.filter(i => i.type === 'tape').length;
 const cellOf = v => Math.floor(v / CELL + 0.5);
 const isSolidCell = (cx, cy) => cx < 0 || cy < 0 || cx >= MW || cy >= MH || solid[cy][cx];
@@ -304,6 +306,7 @@ const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: .9 
    WELT AUFBAUEN
 ==================================================================== */
 const colliders = []; // AABBs {x0,x1,z0,z1}
+const worldMeshes = []; // Ziele für Spray-/Kamera-Raycasts
 function addCollider(cx, cz, w, d) { colliders.push({ x0: cx - w / 2, x1: cx + w / 2, z0: cz - d / 2, z1: cz + d / 2 }); }
 
 // Boden/Decke
@@ -326,6 +329,7 @@ const wallInst = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL, WALLH, CELL
 const mtx = new THREE.Matrix4();
 wallCells.forEach(([x, y], i) => { mtx.setPosition(x * CELL, WALLH / 2, y * CELL); wallInst.setMatrixAt(i, mtx); });
 wallInst.castShadow = wallInst.receiveShadow = true; scene.add(wallInst);
+worldMeshes.push(wallInst, floorMesh, ceilMesh);
 
 // Türrahmen (schmale Durchgänge)
 doors.forEach(d => {
@@ -333,7 +337,7 @@ doors.forEach(d => {
   const wx = d.cx * CELL, wz = d.cy * CELL, jamb = 0.8;
   const mk = (w, h, dd, x, y, z) => {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd), wallMat);
-    m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; scene.add(m); return m;
+    m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; scene.add(m); worldMeshes.push(m); return m;
   };
   mk(CELL, 0.85, CELL, wx, WALLH - 0.425, wz);
   if (alongX) {
@@ -350,7 +354,7 @@ doors.forEach(d => {
 // Requisiten
 function addBox(w, h, d, x, y, z, mat, shadow) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-  m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; scene.add(m); return m;
+  m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; scene.add(m); worldMeshes.push(m); return m;
 }
 function bed(cx, cy, rot) {
   const x = cx * CELL, z = cy * CELL, g = new THREE.Group();
@@ -360,7 +364,7 @@ function bed(cx, cy, rot) {
   [[-.45, -1], [.45, -1], [-.45, 1], [.45, 1]].forEach(([lx, lz]) => {
     const l = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .55), bedMat); l.position.set(lx, .27, lz); g.add(l);
   });
-  g.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+  g.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; worldMeshes.push(o); } });
   g.position.set(x, 0, z); g.rotation.y = rot || 0; scene.add(g);
   const sw = (Math.abs(Math.sin(rot || 0)) > .5) ? 2.1 : 1.0, sd = (Math.abs(Math.sin(rot || 0)) > .5) ? 1.0 : 2.1;
   addCollider(x, z, sw, sd);
@@ -376,7 +380,7 @@ function table(cx, cy, ox, oy) {
   addCollider(x, z, 1.6, .8);
 }
 // Station 1 (Zimmer links oben)
-bed(1, 1.0, 0); bed(3, 1.0, 0);
+bed(3, 1.0, 0); bed(3, 3.5, 0);
 // Zimmer oben Mitte-links
 bed(6, 1, 0); bed(8, 1, 0); bed(6, 4, Math.PI); bed(8, 4, Math.PI);
 // obere Mitte
@@ -479,10 +483,20 @@ const bloodTex = (() => {
   g.fillStyle = '#04200c'; g.fillRect(0, 0, 256, 80); g.fillStyle = '#4cff82'; g.font = 'bold 52px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('AUSGANG', 128, 42);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .44), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) }));
   sign.position.set(x - .01, 2.7, z); sign.rotation.y = -Math.PI / 2; scene.add(sign);
-  const gl = new THREE.PointLight(0x33ff77, 0.9, 11, 2); gl.position.set(x + 1.0, 2.5, z); scene.add(gl);
-  exitCell.ix = x + 1.1; exitCell.iz = z;
+  const gl = new THREE.PointLight(0x33ff77, 0.9, 11, 2); gl.position.set(x - 1.0, 2.5, z); scene.add(gl);
+  exitCell.ix = x - 0.9; exitCell.iz = z;
 })();
 
+// Spraydosen-Modell
+const SPRAY_COLS = [0xff2a22, 0xffffff, 0x2f6bff, 0x30d058, 0xffd820];
+const SPRAY_NAMES = ['ROT', 'WEISS', 'BLAU', 'GRÜN', 'GELB'];
+function makeCan(col) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(.034, .034, .17, 12), new THREE.MeshStandardMaterial({ color: col, roughness: .35, metalness: .6 }));
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(.03, .034, .05, 12), new THREE.MeshStandardMaterial({ color: 0x222222, roughness: .6 }));
+  cap.position.y = .11; const nz = new THREE.Mesh(new THREE.CylinderGeometry(.008, .008, .02, 6), new THREE.MeshStandardMaterial({ color: 0xdddddd }));
+  nz.position.y = .15; g.add(body); g.add(cap); g.add(nz); g.userData.body = body; return g;
+}
 // Sammelobjekte
 const glowTex = (() => {
   const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
@@ -499,11 +513,15 @@ items.forEach((it, idx) => {
     label.position.z = .07; g.add(body); g.add(label);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xff3a2a, transparent: true, opacity: .55, depthWrite: false, blending: THREE.AdditiveBlending }));
     sp.scale.set(1.2, 1.2, 1); g.add(sp);
-  } else {
+  } else if (it.type === 'battery') {
     const b = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .34, 12), new THREE.MeshStandardMaterial({ color: 0x2a6a30, roughness: .4, metalness: .5 }));
     b.rotation.z = Math.PI / 2; g.add(b);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x66ff77, transparent: true, opacity: .45, depthWrite: false, blending: THREE.AdditiveBlending }));
     sp.scale.set(1, 1, 1); g.add(sp);
+  } else {
+    const can = makeCan(SPRAY_COLS[it.col]); can.scale.setScalar(2.2); g.add(can);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: SPRAY_COLS[it.col], transparent: true, opacity: .5, depthWrite: false, blending: THREE.AdditiveBlending }));
+    sp.scale.set(1.1, 1.1, 1); g.add(sp);
   }
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
   g.position.set(it.x, 0.9, it.z); scene.add(g); it.mesh = g;
@@ -559,6 +577,8 @@ const STATES = ['dormant', 'patrol', 'investigate', 'chase'];
 const SPAWN = [[0, 0], [1, 0], [0, 1], [1, 1]];
 const AV_COLORS = [0x2f4f6f, 0x7a2e2e, 0x2f6f3f, 0x7a652f];
 const r2 = v => Math.round(v * 100) / 100;
+let spraying = false, sprayAcc = 0, camBlend = 0, camDistNow = 0, decalTotal = 0, hiss = null;
+const dotLog = [], sprayOut = [];
 const isHost = () => net.mode !== 'client';
 
 function resetGame() {
@@ -572,6 +592,7 @@ function resetGame() {
   $('hideov').style.display = 'none'; $('sub').style.display = 'none';
   postMat.uniforms.fade.value = 1; postMat.uniforms.flash.value = 0;
   gameOver = null; deadShown = false; spectateId = null; $('spec').style.display = 'none';
+  P.paint = [0, 0, 0, 0, 0]; P.sel = -1; P.third = false; P.spraying = false; spraying = false; clearDots();
   E.focusId = null; E.synced = false; E.curSpeed = 0; E.near = false; E.prevState = 'dormant'; E.walk = 0; E.stepT = 0;
   $('dead').querySelector('h1').textContent = 'SIGNAL VERLOREN';
 }
@@ -745,6 +766,8 @@ window.addEventListener('keydown', e => {
     if (e.code === 'KeyC' && !P.hidden) P.crouch = !P.crouch;
     if (e.code === 'KeyE') interact();
     if (e.code === 'KeyV') toggleMic();
+    if (e.code === 'KeyT') togglePerspective();
+    if (e.code === 'KeyQ') cycleSpray();
   }
   if (state === 'spectate' && e.code === 'Space') cycleSpectate();
   if (e.code === 'KeyR' && (state === 'dead' || state === 'win' || (state === 'spectate' && gameOver))) restartRequest();
@@ -752,7 +775,8 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keysDown[e.code] = false; });
 document.addEventListener('mousemove', e => {
-  if (state !== 'play' || inputBlocked || document.pointerLockElement !== canvas) return;
+  if (state !== 'play' || inputBlocked) return;
+  if (document.pointerLockElement !== canvas && !(e.buttons & 2)) return; // Ersatz: rechte Maustaste ziehen
   const s = 0.0021;
   if (P.hidden) {
     P.yaw = Math.max(P.hidden.yaw - 0.6, Math.min(P.hidden.yaw + 0.6, P.yaw - e.movementX * s));
@@ -760,9 +784,16 @@ document.addEventListener('mousemove', e => {
   P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - e.movementY * s));
 });
 function lockPointer() { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('mousedown', e => {
+  if (e.button !== 0 || state !== 'play' || inputBlocked) return;
+  if (document.pointerLockElement !== canvas) lockPointer();
+  spraying = true;
+});
+document.addEventListener('mouseup', () => { spraying = false; });
 function pauseOverlay() {
   if (net.mode === 'solo') state = 'paused'; else inputBlocked = true;
-  Object.keys(keysDown).forEach(k => keysDown[k] = false);
+  Object.keys(keysDown).forEach(k => keysDown[k] = false); spraying = false;
   $('pause').classList.toggle('light', net.mode !== 'solo'); $('pause').style.display = 'flex';
   $('pauseinfo').textContent = net.mode !== 'solo' ? 'Raum-Code: ' + net.code + ' — das Spiel läuft für alle weiter!' : '';
 }
@@ -822,7 +853,7 @@ function interact() {
   const it = findInteractable(); if (!it) return;
   if (it.type === 'unhide') { leaveLocker(); return; }
   if (it.type === 'locker') { enterLocker(it.o); return; }
-  if (it.type === 'tape' || it.type === 'battery') {
+  if (it.type === 'tape' || it.type === 'battery' || it.type === 'spray') {
     if (isHost()) hostPick(net.id, it.o.id); else netSend(net.hostConn, { t: 'pick', i: it.o.id });
   } else if (it.type === 'exit') {
     if (P.tapes >= TAPE_TOTAL) { if (isHost()) hostExit(); else netSend(net.hostConn, { t: 'exit' }); }
@@ -835,6 +866,8 @@ function hostPick(pid, idx) {
   const r = remotes.get(pid), by = pid === net.id ? 0 : (r ? r.idx : -1);
   if (it.type === 'tape') {
     P.tapes++; broadcast({ t: 'tape', n: P.tapes, by }); showTape(P.tapes, by);
+  } else if (it.type === 'spray') {
+    if (pid === net.id) gotSpray(it.col); else netSend(net.conns.get(pid), { t: 'spray', c: it.col });
   } else if (pid === net.id) gotBattery();
   else netSend(net.conns.get(pid), { t: 'bat' });
 }
@@ -853,6 +886,10 @@ function showTape(n, by) {
     if (isHost()) { E.enraged = true; E.rageT = 0; }
     setTimeout(() => { if (state === 'play') { growl(); glitchKick = 1; say('Es weiß, dass wir gehen … RENN!', 4000); } }, 3500);
   }
+}
+function gotSpray(c) {
+  P.paint[c] = 100; if (P.sel < 0 || P.paint[P.sel] <= 0) P.sel = c; beep(900, .05, .04); setTimeout(() => beep(700, .05, .04), 70);
+  say('Spraydose (' + SPRAY_NAMES[c] + '): Linke Maustaste sprühen · Q Farbe wechseln · T Perspektive', 5000);
 }
 function gotBattery() { P.bat = Math.min(100, P.bat + 45); beep(700, .1); say('Batterien. Die Lampe hält wieder länger.', 3000); }
 function enterLocker(l) {
@@ -1058,6 +1095,7 @@ function updatePlayer(dt) {
   const sp = Math.hypot(P.vx, P.vz); P.moving = sp / 4.3; P.sprinting = sprint && sp > 2.5;
   P.noise = sp < 0.3 ? 1.2 : (P.sprinting ? 11 : (P.crouch ? 1.8 : 4.8));
   if (P.talk) P.noise = Math.max(P.noise, 9);
+  if (P.spraying) P.noise = Math.max(P.noise, 6);
   if (P.sprinting) { P.stamina -= dt * 0.2; P.sprintIdle = 0; if (P.stamina <= 0) { P.stamina = 0; P.exhausted = true; say('Keine Luft mehr …', 2000); } }
   else { P.sprintIdle += dt; if (P.sprintIdle > 1) P.stamina = Math.min(1, P.stamina + dt * 0.16); if (P.exhausted && P.stamina > 0.3) P.exhausted = false; }
   // Schritte
@@ -1078,16 +1116,36 @@ function updateCamera(dt) {
   const roll = Math.sin(P.bob) * 0.022 * m + Math.sin(t * .9) * 0.004;
   const jit = (P.sprinting ? 0.012 : 0.0025) + P.moving * 0.004;
   const shake = (state === 'dead' ? 0.05 * Math.max(0, 1 - deathT) : 0) + glitchKick * 0.008;
-  camera.position.set(P.x + Math.cos(P.vyaw) * bobX, P.camY + bobY, P.z - Math.sin(P.vyaw) * bobX);
-  camera.rotation.set(
-    P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m,
-    P.vyaw + Math.sin(t * 5.1) * jit + (Math.random() - .5) * shake,
-    roll, 'YXZ');
+  const hx = P.x + Math.cos(P.vyaw) * bobX, hy = P.camY + bobY, hz = P.z - Math.sin(P.vyaw) * bobX;
+  const pitch = P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m;
+  const yaw = P.vyaw + Math.sin(t * 5.1) * jit + (Math.random() - .5) * shake;
+  camera.rotation.set(pitch, yaw, roll, 'YXZ');
+  // Third-Person: Kamera hinter/rechts über der Schulter, Wände schieben sie heran
+  const wantTP = P.third && state === 'play' && !P.hidden;
+  camBlend += ((wantTP ? 1 : 0) - camBlend) * Math.min(1, dt * 7);
+  camDistNow = 0;
+  if (camBlend > 0.02) {
+    const cp = Math.cos(pitch); _fwd.set(-Math.sin(yaw) * cp, Math.sin(pitch), -Math.cos(yaw) * cp);
+    _d.set(-_fwd.x * 2.4 + Math.cos(yaw) * 0.55, -_fwd.y * 2.4 + 0.25, -_fwd.z * 2.4 - Math.sin(yaw) * 0.55).multiplyScalar(camBlend);
+    let len = _d.length(); _d.divideScalar(len || 1);
+    sprayRay.set(_org.set(hx, hy, hz), _d); sprayRay.far = len;
+    const h = sprayRay.intersectObjects(worldMeshes, false)[0]; if (h) len = Math.max(0.35, h.distance - 0.25);
+    camera.position.set(hx + _d.x * len, hy + _d.y * len, hz + _d.z * len); camDistNow = len;
+  } else camera.position.set(hx, hy, hz);
   // Lampe an der Hand (rechts unten), träge
   const fx = -Math.sin(P.lyaw) * Math.cos(P.lpitch), fy = Math.sin(P.lpitch), fz = -Math.cos(P.lyaw) * Math.cos(P.lpitch);
   const rx = Math.cos(P.lyaw), rz = -Math.sin(P.lyaw);
-  flashlight.position.set(camera.position.x + rx * 0.28, camera.position.y - 0.18, camera.position.z + rz * 0.28);
+  flashlight.position.set(hx + rx * 0.28, hy - 0.18, hz + rz * 0.28);
   flashlight.target.position.set(flashlight.position.x + fx * 10, flashlight.position.y + fy * 10, flashlight.position.z + fz * 10);
+  // Ego: Dose in der Hand / Third-Person: eigener Avatar
+  const fp = camBlend < 0.15;
+  heldCan.visible = fp && state === 'play' && P.sel >= 0;
+  if (heldCan.visible) {
+    heldCan.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
+    heldCan.position.set(0.3, -0.36 + (P.spraying ? Math.sin(t * 60) * 0.004 : 0) + bobY * 0.5, -0.55);
+    heldCan.rotation.set(P.spraying ? -0.5 : -0.2, 0.25, 0.12);
+  }
+  updateLocalAvatar(!fp && state === 'play');
 }
 function updateLights(dt) {
   // Flackern wenn das Wesen nah ist oder Akku schwach
@@ -1128,6 +1186,8 @@ function updateAudio(dt) {
 }
 function updateHUD(dt) {
   const el = $('sub'); if (subTimer > 0) { subTimer -= dt * 1000; if (subTimer <= 0) el.style.display = 'none'; }
+  $('pt').textContent = P.sel >= 0 ? SPRAY_NAMES[P.sel] + ' ' + Math.round(P.paint[P.sel]) + '%' : '—';
+  $('pt').style.color = P.sel >= 0 ? '#' + SPRAY_COLS[P.sel].toString(16).padStart(6, '0') : '';
   $('bt').textContent = Math.round(P.bat) + '%'; $('bt').style.color = P.bat < 15 ? '#f55' : '';
   $('stam').firstElementChild.style.width = (P.stamina * 100) + '%';
   $('stam').style.opacity = P.stamina > .98 ? .25 : .9;
@@ -1137,7 +1197,7 @@ function updateHUD(dt) {
   $('ts').textContent = d.getUTCFullYear() + '-' + p2(d.getUTCMonth() + 1) + '-' + p2(d.getUTCDate()) + ' ' + p2(d.getUTCHours()) + ':' + p2(d.getUTCMinutes()) + ':' + p2(d.getUTCSeconds());
   const pe = $('prompt'), it = (state === 'play' && !inputBlocked) ? findInteractable() : null;
   if (it) {
-    const t = { tape: '[E] Kassette aufnehmen', battery: '[E] Batterien nehmen', locker: '[E] Im Spind verstecken', unhide: '[E] Spind verlassen', exit: P.tapes >= TAPE_TOTAL ? '[E] Ausgang öffnen' : '[E] Tür (verschlossen)' }[it.type];
+    const t = { tape: '[E] Kassette aufnehmen', battery: '[E] Batterien nehmen', spray: '[E] Spraydose aufnehmen', locker: '[E] Im Spind verstecken', unhide: '[E] Spind verlassen', exit: P.tapes >= TAPE_TOTAL ? '[E] Ausgang öffnen' : '[E] Tür (verschlossen)' }[it.type];
     pe.textContent = t; pe.style.display = 'block';
   } else pe.style.display = 'none';
   rosterT -= dt;
@@ -1157,6 +1217,86 @@ function updateHUD(dt) {
 }
 
 /* ====================================================================
+   SPRAYEN (Ego & Third-Person)
+==================================================================== */
+const MAX_DOTS = 6000;
+const sprayTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.45, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  g.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(0,0,0,' + rnd(.1, .5) + ')'; g.fillRect(rnd(0, 64), rnd(0, 64), 1.5, 1.5); }
+  return new THREE.CanvasTexture(c);
+})();
+const decalMat = new THREE.MeshStandardMaterial({ map: sprayTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, roughness: .55, metalness: 0 });
+const decalInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), decalMat, MAX_DOTS);
+decalInst.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(MAX_DOTS * 3), 3);
+decalInst.count = 0; decalInst.frustumCulled = false; decalInst.receiveShadow = false; scene.add(decalInst);
+const _o = new THREE.Object3D(), _qz = new THREE.Quaternion(), _N = new THREE.Vector3(), _Z = new THREE.Vector3(0, 0, 1), _c = new THREE.Color();
+const _d = new THREE.Vector3(), _fwd = new THREE.Vector3(), _org = new THREE.Vector3();
+const sprayRay = new THREE.Raycaster();
+function addDot(d) { // [x,y,z,nx,ny,nz,größe,farbe,drehung]
+  const i = decalTotal % MAX_DOTS; decalTotal++;
+  _N.set(d[3], d[4], d[5]);
+  _o.position.set(d[0] + d[3] * 0.012, d[1] + d[4] * 0.012, d[2] + d[5] * 0.012);
+  _o.quaternion.setFromUnitVectors(_Z, _N); _o.quaternion.multiply(_qz.setFromAxisAngle(_Z, d[8]));
+  _o.scale.set(d[6], d[6], 1); _o.updateMatrix();
+  decalInst.setMatrixAt(i, _o.matrix); decalInst.setColorAt(i, _c.setHex(SPRAY_COLS[d[7]]));
+  decalInst.count = Math.min(decalTotal, MAX_DOTS);
+  decalInst.instanceMatrix.needsUpdate = true; decalInst.instanceColor.needsUpdate = true;
+  dotLog[i] = d;
+}
+function clearDots() { decalTotal = 0; decalInst.count = 0; dotLog.length = 0; sprayOut.length = 0; }
+function setHiss(on) {
+  if (!AC) return;
+  if (!hiss) {
+    const n = noiseSrc(), hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2800;
+    const g = AC.createGain(); g.gain.value = 0; n.connect(hp); hp.connect(g); g.connect(sfx); hiss = { g };
+  }
+  hiss.g.gain.setTargetAtTime(on ? 0.06 : 0, AC.currentTime, 0.03);
+}
+function updateSpray(dt) {
+  const ok = state === 'play' && !inputBlocked && !P.hidden && P.sel >= 0 && P.paint[P.sel] > 0;
+  const active = spraying && ok; P.spraying = active; setHiss(active);
+  if (!active) { sprayAcc = 0; return; }
+  camera.updateMatrixWorld(); sprayAcc += dt * 45; let n = 0;
+  while (sprayAcc >= 1 && n < 6) {
+    sprayAcc -= 1; n++;
+    _d.set((Math.random() - .5) * .05, (Math.random() - .5) * .05, -1).normalize().transformDirection(camera.matrixWorld);
+    sprayRay.set(camera.position, _d); sprayRay.far = camDistNow + 5.5;
+    const hit = sprayRay.intersectObjects(worldMeshes, false)[0]; if (!hit) continue;
+    const dp = Math.hypot(hit.point.x - P.x, hit.point.y - P.camY, hit.point.z - P.z); if (dp > 5.5) continue;
+    _N.copy(hit.face.normal).transformDirection(hit.object.matrixWorld); if (_N.dot(_d) > 0) _N.negate();
+    const d = [r2(hit.point.x), r2(hit.point.y), r2(hit.point.z), r2(_N.x), r2(_N.y), r2(_N.z), r2(0.1 + dp * 0.035 + Math.random() * .03), P.sel, r2(Math.random() * 6.28)];
+    addDot(d); if (net.mode !== 'solo') sprayOut.push(d);
+    P.paint[P.sel] = Math.max(0, P.paint[P.sel] - 0.11);
+    if (P.paint[P.sel] <= 0) {
+      say('Die ' + SPRAY_NAMES[P.sel] + 'e Dose ist leer.', 2500); const nx = [0, 1, 2, 3, 4].find(i => P.paint[i] > 0); P.sel = nx === undefined ? -1 : nx; break;
+    }
+  }
+}
+function cycleSpray() {
+  const have = [0, 1, 2, 3, 4].filter(i => P.paint[i] > 0);
+  if (!have.length) { say('Keine Spraydose. Sammle Dosen ein!', 2500); return; }
+  P.sel = have[(have.indexOf(P.sel) + 1) % have.length]; beep(500, .03, .03); say('Farbe: ' + SPRAY_NAMES[P.sel], 1200);
+}
+function togglePerspective() { if (P.hidden) return; P.third = !P.third; say(P.third ? 'Third-Person-Ansicht' : 'Ego-Ansicht', 1200); }
+
+let localAvatar = null;
+const heldCan = makeCan(0xd01818); camera.add(heldCan); heldCan.visible = false;
+function updateLocalAvatar(show) {
+  if (!localAvatar) { localAvatar = buildAvatar(net.idx); localAvatar.traverse(o => { if (o.isMesh) { o.castShadow = false; if (o.material.emissive) o.material.emissive.setHex(0x1c2630); } }); scene.add(localAvatar); }
+  localAvatar.visible = show; if (!show) return;
+  const u = localAvatar.userData;
+  localAvatar.position.set(P.x, 0, P.z); localAvatar.rotation.y = P.vyaw + Math.PI; localAvatar.scale.y = P.crouch ? 0.78 : 1;
+  const sw = Math.sin(P.bob) * 0.6 * Math.min(1, P.moving * 1.5);
+  u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.head.rotation.x = -P.vpitch * .6;
+  u.arms[0].rotation.x = P.spraying ? -1.4 : -sw * .7;
+  u.can.visible = P.sel >= 0; if (P.sel >= 0) u.can.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
+}
+
+/* ====================================================================
    MULTIPLAYER (WebRTC / PeerJS) – Host-autoritativ
 ==================================================================== */
 function buildAvatar(ci) {
@@ -1171,12 +1311,13 @@ function buildAvatar(ci) {
   const arms = [-.33, .33].map(x => { const a = new THREE.Group(); a.position.set(x, 1.45, 0); g.add(a); mk(new THREE.BoxGeometry(.1, .55, .1), vest, 0, -.27, 0, a); return a; });
   mk(new THREE.CylinderGeometry(.04, .035, .2, 8), dark, 0, -.58, 0, arms[1]);
   arms[1].rotation.x = -1.35;
+  const can = makeCan(0xd01818); can.position.set(0, -.6, 0); can.visible = false; arms[0].add(can);
   const head = new THREE.Group(); head.position.set(0, 1.62, 0); g.add(head);
   mk(new THREE.SphereGeometry(.14, 12, 10), skin, 0, 0, 0, head);
   mk(new THREE.SphereGeometry(.16, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), dark, 0, .02, 0, head);
   const led = new THREE.Mesh(new THREE.SphereGeometry(.022, 6, 6), new THREE.MeshBasicMaterial({ color: 0xff2020 })); led.position.set(0, 1.32, .14); g.add(led);
   const cam = new THREE.Mesh(new THREE.BoxGeometry(.09, .06, .05), dark); cam.position.set(0, 1.32, .14); g.add(cam); led.position.z = .17;
-  g.userData = { legs, arms, head, led };
+  g.userData = { legs, arms, head, led, can };
   return g;
 }
 function addRemote(id, idx) {
@@ -1196,7 +1337,7 @@ function remotePan(r) {
   if (!r.panner) { const p = AC.createPanner(); p.panningModel = 'HRTF'; p.refDistance = 2; p.rolloffFactor = 1.6; p.connect(master); r.panner = p; }
   setPanner(r.panner, r.x, .2, r.z); return r.panner;
 }
-function localFlags() { return (P.flash && P.bat > 0 ? 1 : 0) | (P.crouch ? 2 : 0) | (P.sprinting ? 4 : 0) | (P.talk ? 8 : 0); }
+function localFlags() { return (P.flash && P.bat > 0 ? 1 : 0) | (P.crouch ? 2 : 0) | (P.sprinting ? 4 : 0) | (P.talk ? 8 : 0) | (P.spraying ? 16 : 0); }
 function updateRemotes(dt) {
   updateTalk();
   const k = Math.min(1, dt * 12);
@@ -1213,7 +1354,7 @@ function updateRemotes(dt) {
       const u = r.g.userData;
       r.g.position.set(r.x, 0, r.z); r.g.rotation.y = r.yaw + Math.PI; r.g.scale.y = r.crouch ? 0.78 : 1;
       r.walk += mv * 3.2; const sw = Math.sin(r.walk) * 0.6 * Math.min(1, r.moving * 1.5);
-      u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw * .7; u.head.rotation.x = -r.pitch * .6;
+      u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = r.spray ? -1.4 : -sw * .7; u.can.visible = !!r.spray; u.head.rotation.x = -r.pitch * .6;
       u.led.visible = Math.sin(tNow * 3.5) > -0.2;
       const cy = r.crouch ? .85 : 1.38, fx = -Math.sin(r.yaw) * Math.cos(r.pitch), fy = Math.sin(r.pitch), fz = -Math.cos(r.yaw) * Math.cos(r.pitch);
       r.spot.position.set(r.x + Math.cos(r.yaw) * .28, cy - .18, r.z - Math.sin(r.yaw) * .28);
@@ -1302,6 +1443,7 @@ function onHostConn(c) {
     const others = [...remotes.keys()];
     addRemote(c.peer, idx); net.conns.set(c.peer, c);
     netSend(c, { t: 'welcome', idx, peers: others, hostId: net.id, tapes: P.tapes });
+    const dots = dotLog.filter(Boolean); for (let i = 0; i < dots.length; i += 150) netSend(c, { t: 'sp', d: dots.slice(i, i + 150) });
     if (net.stream) callPeer(c.peer);
     say('Spieler ' + (idx + 1) + ' ist beigetreten.', 3000);
   });
@@ -1318,10 +1460,16 @@ function onHostData(pid, m) {
   if (m.t === 'p') {
     if (!isFinite(m.x) || !isFinite(m.z)) return;
     r.rx = m.x; r.rz = m.z; r.ryaw = m.yaw; r.rpitch = m.pitch; const f = m.f | 0;
-    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.hidden = m.h; r.noise = Math.min(14, m.n || 1);
+    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.hidden = m.h; r.noise = Math.min(14, m.n || 1);
   } else if (m.t === 'pick') { if (r.alive && Math.hypot(r.rx - (items[m.i] ? items[m.i].x : 1e9), r.rz - (items[m.i] ? items[m.i].z : 1e9)) < 5) hostPick(pid, m.i); }
   else if (m.t === 'exit') { if (r.alive) hostExit(); }
+  else if (m.t === 'sp' && Array.isArray(m.d)) {
+    const ok = m.d.filter(validDot).slice(0, 80); if (!ok.length) return;
+    ok.forEach(addDot); const out = { t: 'sp', d: ok };
+    net.conns.forEach((c, id) => { if (id !== pid) netSend(c, out); });
+  }
 }
+function validDot(d) { return Array.isArray(d) && d.length === 9 && d.every(isFinite) && d[7] >= 0 && d[7] < SPRAY_COLS.length; }
 function onClientData(m) {
   if (!m) return;
   if (m.t === 'welcome') {
@@ -1331,6 +1479,8 @@ function onClientData(m) {
   } else if (m.t === 's') applySnapshot(m);
   else if (m.t === 'tape') showTape(m.n, m.by);
   else if (m.t === 'bat') gotBattery();
+  else if (m.t === 'spray') gotSpray(m.c);
+  else if (m.t === 'sp' && Array.isArray(m.d)) m.d.filter(validDot).forEach(addDot);
   else if (m.t === 'caught') die(m.how);
   else if (m.t === 'over') { gameOver = m.k; if (m.k === 'win') win(); }
   else if (m.t === 'reset') startGame();
@@ -1338,7 +1488,7 @@ function onClientData(m) {
 }
 function buildSnapshot() {
   const p = [[net.id, 0, r2(P.x), r2(P.z), r2(P.vyaw), r2(P.vpitch), localFlags(), P.hidden ? P.hidden.id : -1, state === 'play' ? 1 : 0]];
-  remotes.forEach(r => p.push([r.id, r.idx, r2(r.rx), r2(r.rz), r2(r.ryaw), r2(r.rpitch), (r.flash ? 1 : 0) | (r.crouch ? 2 : 0) | (r.sprint ? 4 : 0) | (r.talk ? 8 : 0), r.hidden, r.alive ? 1 : 0]));
+  remotes.forEach(r => p.push([r.id, r.idx, r2(r.rx), r2(r.rz), r2(r.ryaw), r2(r.rpitch), (r.flash ? 1 : 0) | (r.crouch ? 2 : 0) | (r.sprint ? 4 : 0) | (r.talk ? 8 : 0) | (r.spray ? 16 : 0), r.hidden, r.alive ? 1 : 0]));
   return { t: 's', g: r2(tGame), tp: P.tapes, i: items.map(i => i.active ? 1 : 0).join(''),
     e: [r2(E.x), r2(E.z), r2(entity.rotation.y), Math.max(0, STATES.indexOf(E.state)), r2(E.curSpeed || 0)], p };
 }
@@ -1353,13 +1503,14 @@ function applySnapshot(m) {
     if (a[0] === net.id) return;
     seen.add(a[0]); const r = addRemote(a[0], a[1]);
     r.idx = a[1]; r.rx = a[2]; r.rz = a[3]; r.ryaw = a[4]; r.rpitch = a[5]; const f = a[6];
-    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.hidden = a[7]; r.alive = !!a[8];
+    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.hidden = a[7]; r.alive = !!a[8];
   });
   [...remotes.keys()].forEach(id => { if (!seen.has(id)) { removeRemote(id); dropVoice(id); } });
 }
 function netTick(dt) {
   if (net.mode === 'solo') return;
   net.sendT -= dt; if (net.sendT > 0) return; net.sendT = 0.066;
+  if (sprayOut.length) { const d = sprayOut.splice(0, 80); if (net.mode === 'client') netSend(net.hostConn, { t: 'sp', d }); else broadcast({ t: 'sp', d }); }
   if (net.mode === 'client') {
     if (state === 'play') netSend(net.hostConn, { t: 'p', x: r2(P.x), z: r2(P.z), yaw: r2(P.vyaw), pitch: r2(P.vpitch), f: localFlags(), h: P.hidden ? P.hidden.id : -1, n: P.noise });
   } else if (net.conns.size) broadcast(buildSnapshot());
@@ -1429,6 +1580,7 @@ function frame(now) {
   }
   if (state === 'spectate' && gameOver === 'dead' && !deadShown) showDeadScreen();
   if (live) updateCamera(dt);
+  if (state === 'play') updateSpray(dt); else if (P.spraying) { P.spraying = false; setHiss(false); }
   else if (state === 'menu') { P.vyaw = Math.PI + Math.sin(tNow * .1) * .6; P.vpitch = 0; updateCamera(dt); }
 
   glitchKick = Math.max(0, glitchKick - dt * 1.4); flashKick = Math.max(0, flashKick - dt * 3);
@@ -1444,7 +1596,7 @@ resize();
 requestAnimationFrame(frame);
 
 // Debug-/Testzugriff
-window.__game = { P, E, net, remotes, items, lockers, exitCell, startGame, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, openCells, isSolidCell, startCell, set tGame(v) { tGame = v; }, get tGame() { return tGame; } };
+window.__game = { P, E, net, remotes, items, lockers, exitCell, startGame, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, openCells, isSolidCell, circleHit, addDot, startCell, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; } };
 })();
 </script>
 </body>
