@@ -1,0 +1,513 @@
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: '*' }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const rooms = {};
+
+function createRoom(roomId) {
+  return {
+    id: roomId,
+    players: {},
+    grannyPos: { x: 0, y: 0, z: 0 },
+    grannyAngle: 0,
+    grannyState: 'patrol',
+    grannyTarget: null,
+    items: getDefaultItems(),
+    doors: getDefaultDoors(),
+    noise: [],
+    bearTraps: [],          // Bärenfallen die Granny dropt
+    bearTrapCounter: 0,
+    grannyTrapTimer: 0,     // wann sie die nächste falle dropt
+    gameStarted: false,
+    gameOver: false,
+    escaped: false,
+    startTime: null,
+    difficulty: 'normal'
+  };
+}
+
+// Schwierigkeitsgrad-Einstellungen für Granny
+const DIFFICULTY = {
+  easy:      { chase: 0.038, patrol: 0.03, vision: 5,  visionAngle: 0.40, hearMul: 0.6, trapMul: 0.5,  hitRange: 1.3 },
+  normal:    { chase: 0.055, patrol: 0.05, vision: 8,  visionAngle: 0.52, hearMul: 1.0, trapMul: 1.0,  hitRange: 1.5 },
+  hard:      { chase: 0.075, patrol: 0.07, vision: 11, visionAngle: 0.65, hearMul: 1.4, trapMul: 1.6,  hitRange: 1.7 },
+  nightmare: { chase: 0.095, patrol: 0.09, vision: 14, visionAngle: 0.80, hearMul: 1.9, trapMul: 2.2,  hitRange: 1.9 },
+};
+function diffCfg(room) {
+  return DIFFICULTY[room.difficulty] || DIFFICULTY.normal;
+}
+
+// Mögliche Verstecke für Items, quer durchs ganze Haus verteilt
+const ITEM_SPAWNS = [
+  { x: 12,   z: -5,  room: 'kitchen'  },
+  { x: 4.5,  z: -9,  room: 'bathroom' },
+  { x: -8,   z: 8,   room: 'basement' },
+  { x: -12,  z: 11,  room: 'basement' },
+  { x: 15,   z: -2,  room: 'attic'    },
+  { x: 20,   z: -6,  room: 'attic'    },
+  { x: -11,  z: -9,  room: 'bedroom'  },
+  { x: -5,   z: -5,  room: 'bedroom'  },
+  { x: 5,    z: 3,   room: 'garage'   },
+  { x: 11,   z: 11,  room: 'garage'   },
+  { x: -12,  z: -1,  room: 'living'   },
+  { x: -6,   z: 4,   room: 'living'   },
+  { x: 11,   z: 4,   room: 'kitchen'  },
+  { x: 0,    z: 2,   room: 'hallway'  },
+];
+
+// Wählt n unterschiedliche, zufällige Spawn-Punkte
+function pickRandomSpawns(n) {
+  const pool = ITEM_SPAWNS.slice();
+  const picked = [];
+  for (let i = 0; i < n && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    picked.push(pool.splice(idx, 1)[0]);
+  }
+  return picked;
+}
+
+function getDefaultItems() {
+  // Hammer, Ausgangsschlüssel und Kellerschlüssel jedes Spiel woanders
+  const [hammerPos, exitKeyPos, basementKeyPos] = pickRandomSpawns(3);
+  return [
+    { id: 'hammer',       type: 'hammer',                    x: hammerPos.x,     z: hammerPos.z,     y: 0.5, pickedUp: false, room: hammerPos.room },
+    { id: 'key_exit',     type: 'key', color: 0xff0000,      x: exitKeyPos.x,    z: exitKeyPos.z,    y: 0.5, pickedUp: false, room: exitKeyPos.room },
+    { id: 'key_basement', type: 'key', color: 0xffaa00,      x: basementKeyPos.x, z: basementKeyPos.z, y: 0.5, pickedUp: false, room: basementKeyPos.room },
+    { id: 'screwdriver',  type: 'screwdriver',               x: -3, z: -12, y: 0.5, pickedUp: false, room: 'basement' },
+    { id: 'wirecutters',  type: 'wirecutters',               x: 5,  z: 3,   y: 0.5, pickedUp: false, room: 'garage' },
+    { id: 'padlock_key',  type: 'key', color: 0x00aaff,      x: -14, z: -2, y: 1.5, pickedUp: false, room: 'bathroom' }
+  ];
+}
+
+// Granny-Spawns: weit weg vom Spieler-Spawn (Flur um 0,0). Nie im Flur.
+const GRANNY_SPAWNS = [
+  { x: 18,  y: 0, z: -4 },   // Dachboden
+  { x: -10, y: 0, z: 10 },   // Keller
+  { x: 9,   y: 0, z: 11 },   // Garage
+  { x: -10, y: 0, z: -8 },   // Schlafzimmer
+  { x: 9,   y: 0, z: -8 },   // Bad
+  { x: 9,   y: 0, z: 1 },    // Küche
+];
+
+function pickGrannySpawn() {
+  return { ...GRANNY_SPAWNS[Math.floor(Math.random() * GRANNY_SPAWNS.length)] };
+}
+
+function getDefaultDoors() {
+  return {
+    basement: { open: false, locked: true, lockType: 'key', keyId: 'key_basement', hasPlank: false },
+    exit: { open: false, locked: true, lockType: 'key', keyId: 'key_exit', hasPlank: false },
+    attic: { open: false, locked: false, hasPlank: true, plankRemoved: false },
+    garage: { open: false, locked: true, lockType: 'padlock', keyId: 'padlock_key', hasPlank: false },
+    shed: { open: false, locked: false, hasPlank: true, plankRemoved: false }
+  };
+}
+
+io.on('connection', (socket) => {
+  console.log('Player connected:', socket.id);
+
+  socket.on('joinRoom', ({ roomId, playerName, difficulty }) => {
+    if (!rooms[roomId]) {
+      rooms[roomId] = createRoom(roomId);
+      if (difficulty && DIFFICULTY[difficulty]) {
+        rooms[roomId].difficulty = difficulty;
+      }
+    }
+    const room = rooms[roomId];
+    if (Object.keys(room.players).length >= 4) {
+      socket.emit('roomFull');
+      return;
+    }
+
+    const spawnPoints = [
+      { x: 2, z: 2 }, { x: -2, z: 2 }, { x: 2, z: -2 }, { x: -2, z: -2 }
+    ];
+    const idx = Object.keys(room.players).length;
+    const spawn = spawnPoints[idx % spawnPoints.length];
+
+    room.players[socket.id] = {
+      id: socket.id,
+      name: playerName || `Spieler ${idx + 1}`,
+      x: spawn.x, y: 0, z: spawn.z,
+      rotY: 0,
+      health: 100,
+      inventory: [],
+      hidden: false,
+      hidingSpot: null,
+      caught: false,
+      escaped: false,
+      alive: true
+    };
+
+    socket.join(roomId);
+    socket.roomId = roomId;
+    socket.emit('joinedRoom', {
+      playerId: socket.id,
+      roomState: room,
+      playerCount: Object.keys(room.players).length
+    });
+    socket.to(roomId).emit('playerJoined', room.players[socket.id]);
+
+    if (Object.keys(room.players).length >= 1 && !room.gameStarted) {
+      setTimeout(() => {
+        if (rooms[roomId] && !rooms[roomId].gameStarted) {
+          rooms[roomId].gameStarted = true;
+          rooms[roomId].startTime = Date.now();
+          // Granny startet in einem weit entfernten Raum (nicht im Flur)
+          rooms[roomId].grannyPos = pickGrannySpawn();
+          io.to(roomId).emit('gameStart');
+        }
+      }, 3000);
+    }
+  });
+
+  socket.on('playerMove', (data) => {
+    const room = rooms[socket.roomId];
+    if (!room || !room.players[socket.id]) return;
+    const p = room.players[socket.id];
+    p.x = data.x;
+    p.y = data.y;
+    p.z = data.z;
+    p.rotY = data.rotY;
+    socket.to(socket.roomId).emit('playerMoved', { id: socket.id, x: p.x, y: p.y, z: p.z, rotY: p.rotY });
+  });
+
+  socket.on('makeNoise', (data) => {
+    const room = rooms[socket.roomId];
+    if (!room) return;
+    room.noise.push({ x: data.x, z: data.z, volume: data.volume, time: Date.now() });
+  });
+
+  socket.on('pickupItem', ({ itemId }) => {
+    const room = rooms[socket.roomId];
+    if (!room) return;
+    const item = room.items.find(i => i.id === itemId && !i.pickedUp);
+    if (!item) return;
+    item.pickedUp = true;
+    room.players[socket.id].inventory.push(item.type);
+    socket.emit('itemPickedUp', { itemId, item });
+    socket.to(socket.roomId).emit('itemPickedUpByOther', { itemId, playerId: socket.id });
+  });
+
+  socket.on('useItem', ({ itemId, targetId }) => {
+    const room = rooms[socket.roomId];
+    if (!room) return;
+    const player = room.players[socket.id];
+    if (!player) return;
+
+    if (targetId.startsWith('door_') && itemId === 'hammer') {
+      const doorKey = targetId.replace('door_', '');
+      if (room.doors[doorKey] && room.doors[doorKey].hasPlank && !room.doors[doorKey].plankRemoved) {
+        room.doors[doorKey].plankRemoved = true;
+        io.to(socket.roomId).emit('plankRemoved', { door: doorKey });
+        room.noise.push({ x: player.x, z: player.z, volume: 8, time: Date.now() });
+      }
+    }
+
+    if (targetId.startsWith('door_') && itemId === 'key') {
+      const doorKey = targetId.replace('door_', '');
+      const door = room.doors[doorKey];
+      if (door && door.locked && door.keyId) {
+        const keyItem = room.items.find(i => i.id === door.keyId && i.pickedUp && player.inventory.includes(i.type));
+        if (keyItem || player.inventory.includes('key')) {
+          door.locked = false;
+          door.open = true;
+          io.to(socket.roomId).emit('doorOpened', { door: doorKey });
+        }
+      }
+    }
+
+    // Open any unlocked, non-planked door with E (regardless of held item)
+    if (targetId.startsWith('door_')) {
+      const doorKey = targetId.replace('door_', '');
+      const door = room.doors[doorKey];
+      const canOpen = !door                                           // not tracked = freely openable
+        || (!door.locked && !door.open && !(door.hasPlank && !door.plankRemoved));
+      if (canOpen) {
+        if (door) door.open = true;
+        else room.doors[doorKey] = { open: true, locked: false, hasPlank: false };
+        io.to(socket.roomId).emit('doorOpened', { door: doorKey });
+        room.noise.push({ x: player.x, z: player.z, volume: 5, time: Date.now() });
+      }
+    }
+  });
+
+  socket.on('hide', ({ spotId, hiding }) => {
+    const room = rooms[socket.roomId];
+    if (!room || !room.players[socket.id]) return;
+    const p = room.players[socket.id];
+    p.hidden = hiding;
+    p.hidingSpot = hiding ? spotId : null;
+    if (hiding) {
+      // Hat Granny gerade gesehen, wie/wo ich mich verstecke?
+      const seen = room.chaseMemory && room.chaseMemory.id === socket.id && Date.now() < room.chaseMemory.until;
+      p.hideSeen = !!seen;
+      p.hidePos = { x: p.x, z: p.z };
+    } else {
+      p.hideSeen = false;
+      p.hidePos = null;
+    }
+    socket.to(socket.roomId).emit('playerHiding', { id: socket.id, hiding, spotId });
+  });
+
+  socket.on('playerEscaped', () => {
+    const room = rooms[socket.roomId];
+    if (!room || !room.players[socket.id]) return;
+    room.players[socket.id].escaped = true;
+    io.to(socket.roomId).emit('playerEscaped', { id: socket.id, name: room.players[socket.id].name });
+    const allEscaped = Object.values(room.players).every(p => p.escaped || p.caught);
+    if (allEscaped) {
+      room.gameOver = true;
+      room.escaped = true;
+      io.to(socket.roomId).emit('gameOver', { won: true });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    const room = rooms[socket.roomId];
+    if (room) {
+      delete room.players[socket.id];
+      io.to(socket.roomId).emit('playerLeft', socket.id);
+      if (Object.keys(room.players).length === 0) {
+        delete rooms[socket.roomId];
+      }
+    }
+    console.log('Player disconnected:', socket.id);
+  });
+});
+
+// Granny AI loop - server-side authority
+setInterval(() => {
+  for (const roomId in rooms) {
+    const room = rooms[roomId];
+    if (!room.gameStarted || room.gameOver) continue;
+
+    updateGrannyAI(room, roomId);
+  }
+}, 100);
+
+// Spieler K.O. schlagen – 1 Leben: sofort Game Over
+function knockoutPlayer(room, roomId, p, cause) {
+  if (p.knockedOut) return;
+  p.lastHitTime = Date.now();
+  p.knockedOut = true;
+  p.hidden = false;
+  p.hideSeen = false;
+  p.alive = false;
+  const payload = { id: p.id, cause: cause || 'granny' };
+  io.to(roomId).emit('playerKnockedOut', payload);
+  // 1 Leben: nach Jumpscare-Zeit Game Over auslösen
+  setTimeout(() => {
+    if (room.players[p.id]) {
+      io.to(p.id).emit('gameOver', { won: false, cause: cause || 'granny' });
+    }
+  }, 3500);
+}
+
+function updateGrannyAI(room, roomId) {
+  const cfg = diffCfg(room);
+  const granny = { x: room.grannyPos.x, z: room.grannyPos.z, angle: room.grannyAngle };
+  const players = Object.values(room.players).filter(p => p.alive && !p.caught && !p.escaped);
+
+  // Decay noise
+  room.noise = room.noise.filter(n => Date.now() - n.time < 5000);
+
+  let targetPlayer = null;
+  let targetPos = null;       // Ziel-Position (kann ein bekanntes Versteck sein)
+  let minDist = Infinity;
+  let pullOutTarget = null;   // Spieler, der aus dem Versteck gezerrt werden soll
+
+  for (const p of players) {
+    // ── Versteckte Spieler ──
+    if (p.hidden) {
+      // Hat Granny gesehen, wie/wo er sich versteckt? Dann holt sie ihn raus.
+      if (p.hideSeen && p.hidePos && !p.knockedOut) {
+        const hdx = p.hidePos.x - granny.x;
+        const hdz = p.hidePos.z - granny.z;
+        const hdist = Math.sqrt(hdx * hdx + hdz * hdz);
+        if (hdist < cfg.hitRange + 0.5) {
+          // Aus dem Versteck zerren und abknallen
+          pullOutTarget = p;
+        } else if (hdist < minDist) {
+          // Zum bekannten Versteck laufen
+          minDist = hdist;
+          targetPlayer = p;
+          targetPos = p.hidePos;
+        }
+      }
+      continue; // unentdeckte Verstecke schützen weiterhin
+    }
+
+    const dx = p.x - granny.x;
+    const dz = p.z - granny.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+
+    // Sichtkegel (vom Schwierigkeitsgrad abhängig)
+    const angleToPlayer = Math.atan2(dx, dz);
+    const angleDiff = Math.abs(normalizeAngle(angleToPlayer - granny.angle));
+    const inVision = angleDiff < cfg.visionAngle && dist < cfg.vision;
+
+    // Gehör (Lautstärke-Reichweite je nach Schwierigkeitsgrad)
+    const heard = room.noise.some(n => {
+      const nd = Math.sqrt((n.x - granny.x) ** 2 + (n.z - granny.z) ** 2);
+      return nd < n.volume * cfg.hearMul;
+    });
+
+    // 1 Treffer = K.O. → neuer Tag beginnt
+    if (dist < cfg.hitRange && !p.knockedOut) {
+      const now = Date.now();
+      if (!p.lastHitTime || now - p.lastHitTime > 2000) {
+        knockoutPlayer(room, roomId, p);
+      }
+      continue;
+    }
+
+    // Sieht sie dich → merkt sie sich dich und jagt hartnäckig weiter
+    if (inVision || dist < 2) {
+      room.chaseMemory = { id: p.id, until: Date.now() + 6000 };
+    }
+
+    if ((inVision || heard || dist < 2) && dist < minDist) {
+      minDist = dist;
+      targetPlayer = p;
+      targetPos = { x: p.x, z: p.z };
+    }
+  }
+
+  // Aus dem Versteck zerren (hat sie gesehen, wo du dich versteckst)
+  if (pullOutTarget) {
+    io.to(roomId).emit('playerPulledOut', { id: pullOutTarget.id });
+    knockoutPlayer(room, roomId, pullOutTarget, 'pulled');
+  }
+
+  // Verfolgungs-Gedächtnis: auch ohne aktuelle Sicht weiterjagen
+  if (!targetPlayer && room.chaseMemory && Date.now() < room.chaseMemory.until) {
+    const remembered = players.find(p => p.id === room.chaseMemory.id);
+    if (remembered && !remembered.hidden) {
+      targetPlayer = remembered;
+      targetPos = { x: remembered.x, z: remembered.z };
+    } else if (remembered && remembered.hidden && remembered.hideSeen && remembered.hidePos) {
+      // Versteckt, aber sie hat es gesehen → zum Versteck gehen
+      targetPlayer = remembered;
+      targetPos = remembered.hidePos;
+    } else {
+      room.chaseMemory = null; // unentdeckt versteckt → Jagd abbrechen
+    }
+  }
+
+  // Noise-based investigation
+  if (!targetPlayer && room.noise.length > 0) {
+    const loudest = room.noise.reduce((a, b) => a.volume > b.volume ? a : b);
+    const dx = loudest.x - granny.x;
+    const dz = loudest.z - granny.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist > 0.5) {
+      const speed = 0.04;
+      room.grannyPos.x += (dx / dist) * speed;
+      room.grannyPos.z += (dz / dist) * speed;
+      room.grannyAngle = Math.atan2(dx, dz);
+      room.grannyState = 'investigate';
+    }
+  } else if (targetPlayer) {
+    room.grannyState = 'chase';
+    room.grannyTarget = targetPlayer.id;
+    const tp = targetPos || { x: targetPlayer.x, z: targetPlayer.z };
+    const dx = tp.x - granny.x;
+    const dz = tp.z - granny.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist > 0.5) {
+      // Grundtempo aus Schwierigkeitsgrad + pro Tag etwas schneller
+      const maxDay = Math.max(...Object.values(room.players).map(p => p.day || 1));
+      const speed = cfg.chase + (maxDay - 1) * 0.015;
+      room.grannyPos.x += (dx / dist) * speed;
+      room.grannyPos.z += (dz / dist) * speed;
+      room.grannyAngle = Math.atan2(dx, dz);
+    }
+  } else {
+    room.grannyState = 'patrol';
+    room.grannyTarget = null;
+    // Random patrol
+    if (Math.random() < 0.02) {
+      room.grannyAngle += (Math.random() - 0.5) * 0.5;
+    }
+    const maxDay2 = Math.max(...Object.values(room.players).map(p => p.day || 1));
+    const patrolSpeed = cfg.patrol + (maxDay2 - 1) * 0.008;
+    room.grannyPos.x += Math.sin(room.grannyAngle) * patrolSpeed;
+    room.grannyPos.z += Math.cos(room.grannyAngle) * patrolSpeed;
+
+    // An den Außenwänden abprallen, statt stehen zu bleiben
+    if (room.grannyPos.x <= -18 || room.grannyPos.x >= 18 ||
+        room.grannyPos.z <= -16 || room.grannyPos.z >= 16) {
+      room.grannyAngle += Math.PI + (Math.random() - 0.5) * 0.6;
+    }
+    // Keep granny in bounds
+    room.grannyPos.x = Math.max(-18, Math.min(18, room.grannyPos.x));
+    room.grannyPos.z = Math.max(-16, Math.min(16, room.grannyPos.z));
+  }
+
+  // ── Bärenfallen droppen ──
+  room.grannyTrapTimer = (room.grannyTrapTimer || 0) + 100; // +100ms pro tick
+  const maxDay3 = Math.max(...Object.values(room.players).map(p => p.day || 1));
+  // Fallen-Frequenz aus Schwierigkeitsgrad (höher = öfter)
+  const trapInterval = Math.max(3000, (12000 - (maxDay3 - 1) * 2000) / cfg.trapMul);
+  if (room.grannyTrapTimer >= trapInterval && room.bearTraps.length < 12) {
+    room.grannyTrapTimer = 0;
+    const trapId = 'trap_' + (++room.bearTrapCounter);
+    const trap = {
+      id: trapId,
+      x: room.grannyPos.x + (Math.random() - 0.5) * 2,
+      z: room.grannyPos.z + (Math.random() - 0.5) * 2,
+      armed: true,
+      droppedAt: Date.now()
+    };
+    room.bearTraps.push(trap);
+    io.to(roomId).emit('bearTrapDropped', trap);
+  }
+
+  // ── Bärenfallen prüfen ob Spieler drauftritt ──
+  for (const p of players) {
+    if (p.hidden || p.knockedOut) continue;
+    for (const trap of room.bearTraps) {
+      if (!trap.armed) continue;
+      const tdx = p.x - trap.x, tdz = p.z - trap.z;
+      if (Math.sqrt(tdx*tdx + tdz*tdz) < 0.45) {
+        trap.armed = false;
+        io.to(roomId).emit('bearTrapTriggered', { trapId: trap.id, playerId: p.id });
+        // K.O. durch Falle – 1 Leben
+        const now2 = Date.now();
+        if (!p.lastHitTime || now2 - p.lastHitTime > 2000) {
+          knockoutPlayer(room, roomId, p, 'trap');
+        }
+      }
+    }
+  }
+
+  io.to(roomId).emit('grannyUpdate', {
+    x: room.grannyPos.x,
+    y: room.grannyPos.y,
+    z: room.grannyPos.z,
+    angle: room.grannyAngle,
+    state: room.grannyState,
+    target: room.grannyTarget
+  });
+}
+
+function normalizeAngle(a) {
+  while (a > Math.PI) a -= 2 * Math.PI;
+  while (a < -Math.PI) a += 2 * Math.PI;
+  return a;
+}
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Granny Horror Game Server läuft auf Port ${PORT}`);
+});

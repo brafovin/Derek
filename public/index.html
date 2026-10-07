@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRANNY - Horror Game</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== INTRO SCREEN ===== -->
+<div id="intro-screen">
+  <div id="intro-overlay"></div>
+  <div id="intro-content">
+    <div id="intro-text-container">
+      <p class="intro-line" id="line1">Es ist Nacht...</p>
+      <p class="intro-line" id="line2">Du wachst auf in einem fremden Haus.</p>
+      <p class="intro-line" id="line3">Du bist nicht allein.</p>
+      <p class="intro-line" id="line4" style="color:#ff3333;">SIE ist hier.</p>
+    </div>
+    <div id="jumpscare-container">
+      <div id="jumpscare-face">👁️</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN MENU ===== -->
+<div id="main-menu" style="display:none;">
+  <div id="menu-bg-flicker"></div>
+  <div id="blood-drips">
+    <div class="drip"></div><div class="drip"></div><div class="drip"></div>
+    <div class="drip"></div><div class="drip"></div>
+  </div>
+  <div id="menu-container">
+    <div id="game-link-banner">
+      🔗 Spiel-Link: <span id="game-link-url">...</span>
+      <button id="btn-copy-game-link">KOPIEREN</button>
+    </div>
+    <h1 id="game-title">
+      <span class="title-letter g">G</span>
+      <span class="title-letter r">R</span>
+      <span class="title-letter a">A</span>
+      <span class="title-letter n1">N</span>
+      <span class="title-letter n2">N</span>
+      <span class="title-letter y">Y</span>
+    </h1>
+    <p id="subtitle">Sie wartet auf dich...</p>
+    <div id="menu-buttons">
+      <button class="menu-btn" id="btn-solo">SOLO SPIELEN</button>
+      <button class="menu-btn" id="btn-create">RAUM ERSTELLEN</button>
+      <button class="menu-btn" id="btn-join">RAUM BEITRETEN</button>
+    </div>
+    <div id="difficulty-select" style="display:none;">
+      <p id="difficulty-title">WÄHLE DEINEN SCHWIERIGKEITSGRAD</p>
+      <button class="diff-btn" data-diff="easy">
+        <span class="diff-name">😀 LEICHT</span>
+        <span class="diff-desc">Granny ist langsam &amp; halb blind. Wenige Fallen.</span>
+      </button>
+      <button class="diff-btn" data-diff="normal">
+        <span class="diff-name">😨 NORMAL</span>
+        <span class="diff-desc">Ausgewogenes Grauen. So ist Granny gedacht.</span>
+      </button>
+      <button class="diff-btn" data-diff="hard">
+        <span class="diff-name">😱 SCHWER</span>
+        <span class="diff-desc">Schnell, scharfe Augen, viele Bärenfallen.</span>
+      </button>
+      <button class="diff-btn" data-diff="nightmare">
+        <span class="diff-name">💀 ALBTRAUM</span>
+        <span class="diff-desc">Gnadenlos schnell. Sie hört jeden Atemzug.</span>
+      </button>
+    </div>
+    <div id="room-input" style="display:none;">
+      <input type="text" id="room-code-input" placeholder="Raum-Code eingeben..." maxlength="6">
+      <input type="text" id="player-name-input" placeholder="Dein Name..." maxlength="15">
+      <button class="menu-btn" id="btn-confirm-join">BEITRETEN</button>
+    </div>
+    <div id="create-room-info" style="display:none;">
+      <input type="text" id="create-name-input" placeholder="Dein Name..." maxlength="15">
+      <p id="room-code-display"></p>
+      <div id="invite-link-box">
+        <input type="text" id="invite-link-input" readonly>
+        <button class="menu-btn small" id="btn-copy-link">🔗 LINK KOPIEREN</button>
+      </div>
+      <p id="invite-hint">Schick den Link an deine Freunde – sie treten sofort bei.</p>
+      <button class="menu-btn" id="btn-start-created">SPIEL STARTEN</button>
+    </div>
+  </div>
+  <div id="granny-silhouette"></div>
+
+  <!-- Abgetrennter Kopf – bleibt bis ein Modus gewählt wird -->
+  <div id="severed-head">
+    <div class="sh-blood-pool"></div>
+    <div class="sh-neck">
+      <div class="sh-drip"></div>
+      <div class="sh-drip"></div>
+      <div class="sh-drip"></div>
+    </div>
+    <div class="sh-head">
+      <div class="sh-hair"></div>
+      <div class="sh-eye left"></div>
+      <div class="sh-eye right"></div>
+      <div class="sh-mouth"></div>
+    </div>
+  </div>
+
+  <div id="credit-tag">hergestellt von Derek</div>
+</div>
+
+<!-- ===== K.O. / TAG-ÜBERGANG SCREEN ===== -->
+<div id="knockout-screen" style="display:none;">
+  <div id="knockout-content">
+    <div id="ko-granny-icon">👵</div>
+    <h2 id="ko-title">K.O.!</h2>
+    <p id="ko-text">Granny hat dich erwischt...</p>
+    <div id="ko-day-badge">TAG <span id="ko-day-number">2</span></div>
+    <p id="ko-countdown">Du wachst auf in <span id="ko-sec">4</span>s...</p>
+  </div>
+</div>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loading-screen" style="display:none;">
+  <p id="loading-text">Betrete das Haus...</p>
+  <div id="loading-bar"><div id="loading-fill"></div></div>
+  <p id="loading-tip"></p>
+</div>
+
+<!-- ===== GAME HUD ===== -->
+<div id="game-hud" style="display:none;">
+  <div id="crosshair">+</div>
+
+  <!-- Inventory -->
+  <div id="inventory">
+    <div class="inv-slot" id="slot-0"></div>
+    <div class="inv-slot" id="slot-1"></div>
+    <div class="inv-slot" id="slot-2"></div>
+    <div class="inv-slot" id="slot-3"></div>
+    <div class="inv-slot" id="slot-4"></div>
+  </div>
+
+  <!-- Interact prompt -->
+  <div id="interact-prompt" style="display:none;">
+    <span id="interact-key">[E]</span>
+    <span id="interact-text">Aufheben</span>
+  </div>
+
+  <!-- Hide prompt -->
+  <div id="hide-prompt" style="display:none;">
+    <span id="hide-key">[H]</span>
+    <span id="hide-text">Verstecken</span>
+  </div>
+
+  <!-- Granny alert indicator -->
+  <div id="granny-alert" style="display:none;">
+    <div id="alert-icon">⚠️</div>
+    <span id="alert-text">GRANNY IST IN DER NÄHE!</span>
+  </div>
+
+  <!-- Players list -->
+  <div id="players-list"></div>
+
+  <!-- Messages -->
+  <div id="message-log"></div>
+
+  <!-- Day timer -->
+  <div id="timer-display">Tag 1 - Überlebe!</div>
+
+  <!-- Hidden indicator -->
+  <div id="hidden-indicator" style="display:none;">
+    <span>🙈 VERSTECKT</span>
+  </div>
+</div>
+
+<!-- ===== GAME CANVAS ===== -->
+<canvas id="game-canvas"></canvas>
+
+<!-- ===== GAME OVER SCREEN ===== -->
+<div id="gameover-screen" style="display:none;">
+  <div id="gameover-content">
+    <h2 id="gameover-title">ERWISCHT!</h2>
+    <p id="gameover-subtitle">Granny hat dich gefunden...</p>
+    <div id="gameover-granny">👴</div>
+    <button class="menu-btn" id="btn-retry">NOCHMAL VERSUCHEN</button>
+    <button class="menu-btn" id="btn-mainmenu">HAUPTMENÜ</button>
+  </div>
+</div>
+
+<!-- ===== WIN SCREEN ===== -->
+<div id="win-screen" style="display:none;">
+  <div id="win-content">
+    <h2 id="win-title">🎉 ENTKOMMEN! 🎉</h2>
+    <p id="win-subtitle">Ihr habt es geschafft!</p>
+    <div id="win-stats"></div>
+    <button class="menu-btn" id="btn-win-menu">HAUPTMENÜ</button>
+  </div>
+</div>
+
+<!-- ===== PAUSE MENU ===== -->
+<div id="pause-menu" style="display:none;">
+  <div id="pause-content">
+    <h2>PAUSE</h2>
+    <button class="menu-btn" id="btn-resume">WEITERSPIELEN</button>
+    <button class="menu-btn" id="btn-pause-menu">HAUPTMENÜ</button>
+  </div>
+</div>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Socket.io -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/local-server.js"></script>
+<!-- Game files -->
+<script src="js/audio.js"></script>
+<script src="js/house.js"></script>
+<script src="js/granny.js"></script>
+<script src="js/player.js"></script>
+<script src="js/network.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
