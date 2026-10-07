@@ -2044,8 +2044,8 @@ function updatePlayer(dt) {
   P.noise = sp < 0.3 ? 1.2 : (P.sprinting ? 11 : (P.crouch ? 1.8 : 4.8));
   if (P.talk) P.noise = Math.max(P.noise, 9);
   if (P.spraying) P.noise = Math.max(P.noise, 6);
-  if (P.sprinting) { P.stamina -= dt * 0.2 / D.stam; P.sprintIdle = 0; if (P.stamina <= 0) { P.stamina = 0; P.exhausted = true; say('Keine Luft mehr …', 2000); } }
-  else { P.sprintIdle += dt; if (P.sprintIdle > 1) P.stamina = Math.min(1, P.stamina + dt * 0.16 * D.stam); if (P.exhausted && P.stamina > 0.3) P.exhausted = false; }
+  if (P.sprinting) { P.stamina -= dt * 0.065 / D.stam; P.sprintIdle = 0; if (P.stamina <= 0) { P.stamina = 0; P.exhausted = true; say('Keine Luft mehr …', 2000); } }
+  else { P.sprintIdle += dt; if (P.sprintIdle > .6) P.stamina = Math.min(1, P.stamina + dt * 0.22 * D.stam); if (P.exhausted && P.stamina > 0.25) P.exhausted = false; }
   P.bob += sp * dt * (P.crouch ? 1.9 : 1.55);
   const stepPhase = Math.floor(P.bob / Math.PI);
   if (sp > 0.5 && stepPhase !== P.stepAcc) { P.stepAcc = stepPhase; thud(P.sprinting ? .42 : (P.crouch ? .08 : .2), 330 + rnd(-60, 60)); }
