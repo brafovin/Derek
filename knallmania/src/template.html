@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#05070f">
+<title>Knallmania</title>
+<style>
+:root{
+  --bg:#05070f; --panel:rgba(10,14,28,.82); --panel2:rgba(22,28,52,.9); --line:rgba(255,255,255,.12);
+  --fg:#f2f5ff; --dim:#9aa6c8; --hot:#ff7a1a; --gold:#ffc83d; --red:#ff3b3b; --cool:#47b8ff;
+  --glow:0 0 18px rgba(255,140,40,.55);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);overflow:hidden;
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
+.hidden{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;inset:0;pointer-events:none}
+#cross{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;
+  background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(0,0,0,.55),0 0 8px rgba(255,255,255,.4);transition:all .12s}
+#cross.act{width:22px;height:22px;margin:-11px 0 0 -11px;background:transparent;border:2px solid #ffd35a;box-shadow:0 0 12px #ff9c2a}
+#cross.del{width:22px;height:22px;margin:-11px 0 0 -11px;background:transparent;border:2px solid #ff4a4a;box-shadow:0 0 12px #ff2a2a}
+#cross.grab{width:18px;height:18px;margin:-9px 0 0 -9px;background:transparent;border:2px solid #6fd1ff}
+#toast{position:absolute;top:14%;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:999px;background:var(--panel);
+  border:1px solid var(--line);font-weight:600;letter-spacing:.3px;opacity:0;transition:opacity .25s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#toast.on{opacity:1}
+#topleft{position:absolute;left:14px;top:12px;font-size:13px;line-height:1.5;color:var(--dim);text-shadow:0 1px 3px #000}
+#topleft b{color:var(--fg);font-variant-numeric:tabular-nums}
+#score{font-size:22px;font-weight:800;color:var(--gold);text-shadow:var(--glow),0 2px 4px #000;font-variant-numeric:tabular-nums}
+#topright{position:absolute;right:14px;top:12px;text-align:right;font-size:13px;color:var(--dim);text-shadow:0 1px 3px #000;line-height:1.6}
+#slowbadge{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:6px;background:rgba(71,184,255,.2);border:1px solid var(--cool);color:#bfe6ff;font-weight:700}
+#hotwrap{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px}
+#itemname{font-weight:700;font-size:15px;padding:4px 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line);min-width:160px;text-align:center}
+#itemname small{display:block;font-weight:500;font-size:11px;color:var(--dim)}
+#hotbar{display:flex;gap:6px}
+.slot{position:relative;width:62px;height:62px;border-radius:10px;background:var(--panel);border:2px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;transition:transform .08s,border-color .08s}
+.slot .k{position:absolute;left:5px;top:2px;font-size:11px;color:var(--dim);font-weight:700}
+.slot .ic{font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px #000)}
+.slot .nm{font-size:9.5px;color:var(--dim);margin-top:3px;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot.sel{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 0 18px rgba(255,190,60,.45);background:var(--panel2)}
+.slot.sel .nm{color:var(--fg)}
+#keys{position:absolute;left:14px;bottom:14px;font-size:11.5px;line-height:1.65;color:var(--dim);text-shadow:0 1px 3px #000;background:rgba(5,7,15,.45);padding:8px 11px;border-radius:10px;border:1px solid var(--line)}
+#keys kbd{display:inline-block;min-width:18px;padding:0 5px;margin-right:4px;border-radius:5px;background:#1b2340;color:#fff;border:1px solid #38426b;text-align:center;font:600 11px/17px inherit}
+#fuse{position:absolute;left:50%;top:56%;width:90px;height:5px;margin-left:-45px;border-radius:3px;background:rgba(0,0,0,.5);overflow:hidden;opacity:0;transition:opacity .15s}
+#fuse i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff3b1a,#ffd23a)}
+#hurt{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 40%,rgba(255,40,10,.45));opacity:0}
+
+/* ---------- Overlays ---------- */
+.ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20}
+#start{background:radial-gradient(ellipse at 50% 120%,rgba(255,110,20,.28),transparent 60%),linear-gradient(#04060d,#0a1126 70%,#16101c);overflow-y:auto}
+#start .box{width:min(880px,94vw);max-height:100%;padding:22px 10px;text-align:center}
+.logo{font-family:Impact,"Arial Black",Haettenschweiler,sans-serif;font-size:clamp(46px,11vw,112px);line-height:.95;letter-spacing:2px;margin:0;
+  background:linear-gradient(180deg,#fff7c4 0%,#ffcb3a 38%,#ff6a12 70%,#d51a1a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 22px rgba(255,120,30,.55)) drop-shadow(0 4px 0 rgba(0,0,0,.6))}
+.sub{color:var(--dim);margin:8px 0 22px;font-size:clamp(13px,2.4vw,17px)}
+.btn{border:0;border-radius:12px;padding:12px 22px;font-weight:800;letter-spacing:.5px;background:#202a4d;border:1px solid #3a4880;transition:transform .08s,background .15s}
+.btn:hover{background:#2b3868}.btn:active{transform:scale(.97)}
+.btn.big{font-size:22px;padding:16px 46px;background:linear-gradient(#ffb62e,#ff5a14);border:0;color:#2b0900;box-shadow:0 0 30px rgba(255,120,20,.55),inset 0 2px 0 rgba(255,255,255,.5)}
+.btn.big:hover{background:linear-gradient(#ffc653,#ff6a24)}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.qrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.qrow .btn{padding:8px 14px;font-size:13px}
+.qrow .btn.on{background:#31507f;border-color:#6fb7ff;color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px;text-align:left;font-size:13.5px;margin:18px auto 0;max-width:640px;color:#cfd7f5}
+.grid2 div{white-space:nowrap}
+.grid2 kbd,.cat kbd{display:inline-block;min-width:22px;padding:1px 6px;margin-right:6px;border-radius:6px;background:#1b2340;border:1px solid #38426b;color:#fff;font:700 12px/18px inherit;text-align:center}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.tip{margin-top:18px;color:#7f8bb0;font-size:12px}
+#pause{background:rgba(3,5,12,.72);backdrop-filter:blur(5px)}
+.card{width:min(520px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 24px;max-height:92vh;overflow:auto}
+.card h2{margin:0 0 14px;font-size:24px;letter-spacing:1px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:11px 0;font-size:14px}
+.row input[type=range]{width:55%;accent-color:#ff8a1f}
+.row .seg{display:flex;gap:6px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.btns .btn{flex:1;min-width:130px}
+
+/* ---------- Katalog ---------- */
+#catalog{background:rgba(3,5,12,.78);backdrop-filter:blur(6px);align-items:stretch;justify-content:center;padding:3vh 2vw}
+.cat{width:min(1100px,100%);background:rgba(10,14,28,.92);border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
+.cat header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cat header h2{margin:0 10px 0 0;font-size:20px;letter-spacing:1px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.tab{padding:7px 13px;border-radius:999px;background:#151c37;border:1px solid #2a3560;font-weight:700;font-size:13px}
+.tab.on{background:linear-gradient(#ffb62e,#ff6a14);color:#2b0900;border-color:transparent}
+.cat .x{width:36px;height:36px;border-radius:50%;background:#1b2340;border:1px solid #38426b;font-size:18px}
+#items{flex:1;overflow:auto;padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;align-content:start}
+.it{background:linear-gradient(160deg,#151c3a,#0e1329);border:1px solid #29346a;border-radius:14px;padding:12px;cursor:pointer;transition:transform .1s,border-color .1s;position:relative}
+.it:hover{transform:translateY(-3px);border-color:#ffb43a;box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 14px rgba(255,150,40,.25)}
+.it .top{display:flex;gap:10px;align-items:center}
+.it .big{font-size:34px;filter:drop-shadow(0 2px 4px #000)}
+.it h3{margin:0;font-size:15px}
+.it p{margin:8px 0 8px;color:#a3aed0;font-size:12px;line-height:1.35;min-height:32px}
+.bars{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;font-size:10.5px;color:#8b97bd;align-items:center}
+.bar{height:5px;border-radius:3px;background:#0a0e1e;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff9a1f,#ff3b1a)}
+.cat footer{padding:9px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* ---------- Touch ---------- */
+#touch{position:fixed;inset:0;pointer-events:none;z-index:10}
+#joy{position:absolute;left:4vw;bottom:9vh;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.22);pointer-events:auto}
+#joy i{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;background:rgba(255,255,255,.28)}
+.tb{position:absolute;width:62px;height:62px;border-radius:50%;background:rgba(15,20,40,.7);border:2px solid rgba(255,255,255,.3);font-size:26px;pointer-events:auto;display:flex;align-items:center;justify-content:center}
+.tb:active{background:rgba(255,140,30,.6)}
+#tb-act{right:5vw;bottom:14vh;width:86px;height:86px;font-size:36px;background:rgba(255,110,20,.55)}
+#tb-jump{right:calc(5vw + 100px);bottom:8vh}
+#tb-throw{right:calc(5vw + 100px);bottom:calc(8vh + 70px)}
+#tb-all{right:5vw;bottom:calc(14vh + 98px)}
+#tb-menu{right:12px;top:10px;width:46px;height:46px;font-size:20px}
+#tb-cat{right:66px;top:10px;width:46px;height:46px;font-size:20px}
+#tb-prev,#tb-next{width:46px;height:46px;font-size:18px;bottom:calc(14px + 66px)}
+#tb-prev{left:calc(50% - 130px)}#tb-next{left:calc(50% + 84px)}
+.touchmode #keys,.touchmode #windinfo{display:none}
+.touchmode .slot{width:46px;height:46px}.touchmode .slot .nm,.touchmode .slot .k{display:none}.touchmode .slot .ic{font-size:21px}
+.touchmode #hotwrap{bottom:6px}
+#loadmsg{margin-top:10px;font-size:13px;color:var(--dim);min-height:18px}
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="0"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="cross"></div>
+  <div id="fuse"><i></i></div>
+  <div id="toast"></div>
+  <div id="topleft"><div id="score">0</div><div>Zerstörung · <b id="sc-d">0</b> &nbsp; Zünd-Items · <b id="sc-i">0</b></div><div id="fps"></div></div>
+  <div id="topright"><span id="clock"></span><span id="slowbadge" class="hidden">ZEITLUPE</span><br><span id="windinfo"></span></div>
+  <div id="hotwrap"><div id="itemname"></div><div id="hotbar"></div></div>
+  <div id="keys">
+    <div><kbd>WASD</kbd>Laufen <kbd>⇧</kbd>Rennen <kbd>␣</kbd>Springen</div>
+    <div><kbd>1-9</kbd>Slot <kbd>Rad</kbd>wechseln <kbd>B</kbd>Katalog</div>
+    <div><kbd>LMB</kbd>Benutzen <kbd>F</kbd>Anzünden+Werfen <kbd>R</kbd>Drehen</div>
+    <div><kbd>G</kbd>Alles zünden <kbd>Z</kbd>Zeitlupe <kbd>V</kbd>Fliegen</div>
+    <div><kbd>L</kbd>Lampe <kbd>P</kbd>Foto <kbd>H</kbd>HUD aus <kbd>Esc</kbd>Menü</div>
+  </div>
+</div>
+<div id="hurt"></div>
+
+<div id="touch" class="hidden">
+  <div id="joy"><i></i></div>
+  <button class="tb" id="tb-act">🔥</button>
+  <button class="tb" id="tb-jump">⤒</button>
+  <button class="tb" id="tb-throw">🧨</button>
+  <button class="tb" id="tb-all">💥</button>
+  <button class="tb" id="tb-cat">🎒</button>
+  <button class="tb" id="tb-menu">☰</button>
+  <button class="tb" id="tb-prev">◀</button>
+  <button class="tb" id="tb-next">▶</button>
+</div>
+
+<div id="start" class="ov">
+  <div class="box">
+    <h1 class="logo">KNALLMANIA</h1>
+    <div class="sub">Die Feuerwerks-Sandbox: Böller, Raketen, Batterien, Mörser – und alles, was dabei kaputtgeht.</div>
+    <button class="btn big" id="btn-play">▶ SPIELEN</button>
+    <div id="loadmsg"></div>
+    <div class="qrow" id="qrow">
+      <button class="btn" data-q="low">Grafik: Niedrig</button>
+      <button class="btn" data-q="mid">Mittel</button>
+      <button class="btn" data-q="high">Hoch</button>
+      <button class="btn" data-q="ultra">Ultra</button>
+    </div>
+    <div class="grid2">
+      <div><kbd>W A S D</kbd>Laufen · <kbd>⇧</kbd>Rennen</div>
+      <div><kbd>Maus</kbd>Umschauen · <kbd>LMB</kbd>Benutzen</div>
+      <div><kbd>B</kbd>Katalog (alle Feuerwerke)</div>
+      <div><kbd>1</kbd>Feuerzeug · <kbd>2</kbd>Greifer · <kbd>3</kbd>Löschen</div>
+      <div><kbd>4-9</kbd>Feuerwerk-Slots</div>
+      <div><kbd>F</kbd>Anzünden &amp; Werfen</div>
+      <div><kbd>G</kbd>Alles zünden (Show-Sequenz)</div>
+      <div><kbd>Z</kbd>Zeitlupe · <kbd>V</kbd>Fliegen</div>
+    </div>
+    <div class="tip">Tipp: Ton an &amp; Kopfhörer auf – die Böller sind laut. Pfeiltasten drehen die Kamera, falls die Maus nicht gesperrt werden kann.</div>
+  </div>
+</div>
+
+<div id="pause" class="ov hidden">
+  <div class="card">
+    <h2>⏸ Pause</h2>
+    <div class="row"><span>Lautstärke</span><input type="range" id="s-vol" min="0" max="100" value="80"></div>
+    <div class="row"><span>Maus-Empfindlichkeit</span><input type="range" id="s-sens" min="20" max="250" value="100"></div>
+    <div class="row"><span>Sichtfeld</span><input type="range" id="s-fov" min="55" max="100" value="72"></div>
+    <div class="row"><span>Wind</span><input type="range" id="s-wind" min="0" max="100" value="30"></div>
+    <div class="row"><span>Bloom (Leuchten)</span><input type="range" id="s-bloom" min="0" max="150" value="100"></div>
+    <div class="row"><span>Grafik</span><div class="seg" id="pq">
+      <button class="btn" data-q="low">Niedrig</button><button class="btn" data-q="mid">Mittel</button><button class="btn" data-q="high">Hoch</button><button class="btn" data-q="ultra">Ultra</button></div></div>
+    <div class="btns">
+      <button class="btn big" id="btn-resume" style="font-size:18px;padding:12px 20px">▶ Weiter</button>
+      <button class="btn" id="btn-clean">🧹 Alles aufräumen</button>
+      <button class="btn" id="btn-reset">↺ Neue Szene</button>
+    </div>
+  </div>
+</div>
+
+<div id="catalog" class="ov hidden">
+  <div class="cat">
+    <header><h2>🎆 KATALOG</h2><div class="tabs" id="tabs"></div><button class="x" id="cat-x">✕</button></header>
+    <div id="items"></div>
+    <footer><span>Klick = Feuerwerk in den gewählten Slot legen · <kbd>B</kbd> / <kbd>Esc</kbd> schließen</span><span id="cat-slot"></span></footer>
+  </div>
+</div>
+
+<!--SCRIPTS-->
+</body>
+</html>
