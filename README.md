@@ -4,7 +4,11 @@
 
 Beim Start läuft ein kurzer Lade-Albtraum und ein 17-Sekunden-Trailer (Klick zum Überspringen). Mit `?skip` an der URL wird beides übersprungen.
 
-## Kapitel 1 – Die alte Schule
+## Prolog – Lost Place
+
+Es beginnt friedlich: Du bist K. Marlow, filmst Lost Places und gehst bei Tageslicht in die verlassene **Grundschule St. Aurelia**. Sonne, Vogelgezwitscher, Wind. An der Wand hängt ein **Aushang mit der Steuerung** (E zum Lesen). Dann, aus dem Nichts, kommt etwas um die Ecke … der Schreck lässt dich zusammenbrechen. **Koma.** Irgendwo läutet eine Schulglocke – und du wachst in der Schule auf. Mitten in der Nacht. (Der Host kann den Prolog mit **Enter** überspringen.)
+
+## Kapitel 1 – Die alte Schule (bei Nacht)
 
 Die **Grundschule St. Aurelia** (3. OG Klassentrakt → 2. OG Fachräume → Erdgeschoss mit Eingangshalle): Klassenzimmer mit Schulbänken, Tafeln mit Kreideschrift, Schwarze Bretter, Klassenfotos, Spinde, Wanduhren, Pokalvitrine. Durch die **Fenster** (Regentropfen, Rollos, Heizkörper) siehst du nachts auf Schulhof, Zaun und Straße – **Autos fahren vorbei**, ihr Scheinwerferlicht fällt durch die Scheiben, Straßenlaternen leuchten, gegenüber brennt vereinzelt Licht. Je tiefer du kommst, desto tiefer liegt die Straße.
 
@@ -24,7 +28,7 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
 
-**Inventar:** **I** oder **Tab** zeigt, was du dabei hast – Lampenakku, Sicherungen, Schlüssel, Türcode, Spraydosen, Kamera – und alle gefundenen Notizen. Das Spiel läuft dabei weiter.
+**Inventar:** **I** oder **Tab** (steht auch rechts im HUD) zeigt, was du dabei hast – Lampenakku, Sicherungen, Schlüssel, Türcode, Spraydosen, Kamera – und alle gefundenen Notizen. Das Spiel läuft dabei weiter.
 
 **Videokamera:** Du hältst eine Camcorder in der Hand (Ego-Ansicht). **B** startet/stoppt die Aufnahme, **Mausrad** zoomt. Aufgenommen wird wirklich – Bild, Ton und Zeitstempel (WebM, bis 10 Minuten pro Clip). Nach dem Stoppen findest du die Videos im Pause-Menü (Esc) sowie auf Tod-/Ende-Bildschirm zum Herunterladen. Die Clips liegen nur im Browser-Speicher, bis du die Seite schließt.
 
