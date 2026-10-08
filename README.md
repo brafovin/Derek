@@ -56,20 +56,24 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
 
-## Shop – CritCandy (Gaming Candy)
+## Shop – CritCandy (Gaming Snacks, Candy & Drinks)
 
 Statischer Online-Shop unter **`/shop/`** (`public/shop/`) – ohne Build-Schritt, läuft direkt auf Vercel.
 
-- `products.js` – **alles Wichtige an einer Stelle**: Shop-Name, E-Mail für Bestellungen, Versandkosten, Zahlungsarten, Mix-&-Spar-Stufen, Willkommens-Code, FAQ und alle Produkte (Preise, Texte, Farben, Sets).
+- `products.js` – **alles Wichtige an einer Stelle**: Shop-Name, E-Mail für Bestellungen, Versandkosten, Zahlungsarten, Mix-&-Spar-Stufen, Willkommens-Code, FAQ und alle Produkte (Preise, Texte, Farben, Sets). Die Datei erklärt oben jedes Produktfeld.
+- `art.js` – zeichnet die Produktbilder als realistisch wirkende Verpackungen (Beutel, Chipstüte, Dose, Flasche, Nudelbecher, Riegel, Karton …) samt Inhalt davor. Sets zeigen die enthaltenen Produkte.
+- `img/` – **eigene Produktfotos** ablegen und in `products.js` mit `image: "img/datei.jpg"` eintragen; das Foto ersetzt dann die Zeichnung.
 - `app.js` / `style.css` / `index.html` – Logik, Design, Seitenstruktur.
 - `impressum.html`, `datenschutz.html`, `agb.html` – **Vorlagen mit Platzhaltern**, vor dem Verkauf ausfüllen (keine Rechtsberatung).
 
+Sortiment: rund 40 Einzelartikel in sieben Kategorien (Gummis, Sauer, Schoko & Riegel, Chips & Salziges, Instant & Essen, Getränke, Sets) plus Spar-Sets und Loot-Box. Alle Namen, Preise, Zutaten und Set-Inhalte sind Platzhalter.
+
 Verkaufsmechaniken (alle ehrlich: keine erfundenen Bewertungen, Zähler oder Countdowns):
 
-- **Spar-Sets** (`includes` in `products.js`): Der Shop rechnet die Ersparnis gegenüber dem Einzelkauf selbst aus Produktpreisen aus.
-- **Mix & Spar**: Rabatt auf einzelne Tüten, der mit der Menge steigt (`mix.tiers`), samt Level-Anzeige im Warenkorb.
+- **Spar-Sets** (`includes` in `products.js`): Der Shop rechnet die Ersparnis gegenüber dem Einzelkauf selbst aus den Produktpreisen aus.
+- **Mix & Spar**: Rabatt auf einzelne Artikel, der mit der Menge steigt (`mix.tiers`), samt Level-Anzeige im Warenkorb. Pfand wird nie rabattiert.
 - **Loot-Box**: Auf der Startseite öffnet der Besucher eine Box und schaltet den Willkommens-Code frei (`welcome`; auf `null` setzen zum Ausschalten). Code und Mix-Rabatt sind nicht kombinierbar – es gilt der höhere.
-- Gratis-Versand ab Schwelle, Grundpreise je 100 g, Cross-Selling im Produktdetail, Kassenleiste auf dem Handy.
+- Gratis-Versand ab Schwelle, Grundpreise je 100 g bzw. je Liter, Pfand (`pfand`) getrennt ausgewiesen, Cross-Selling im Produktdetail, Kassenleiste auf dem Handy.
 
 Checkout: Der Warenkorb wird im Browser gespeichert. Beim Bestellen öffnet sich eine vorbereitete E-Mail an die Adresse aus `products.js`. Es gibt noch keine Online-Zahlung; dafür müsste ein Zahlungsanbieter (z. B. Stripe, PayPal) angebunden werden.
 
