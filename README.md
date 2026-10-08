@@ -49,3 +49,15 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 **Steuerung:** WASD, Maus, Shift (rennen), C (ducken), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
+
+## Shop – CritCandy (Gaming Candy)
+
+Statischer Online-Shop unter **`/shop/`** (`public/shop/`) – ohne Build-Schritt, läuft direkt auf Vercel.
+
+- `products.js` – Shop-Name, **E-Mail für Bestellungen**, Versandkosten, Zahlungsarten und alle Produkte (hier änderst du Preise, Texte, Farben).
+- `app.js` / `style.css` / `index.html` – Logik, Design, Seitenstruktur.
+- `impressum.html`, `datenschutz.html`, `agb.html` – **Vorlagen mit Platzhaltern**, vor dem Verkauf ausfüllen (keine Rechtsberatung).
+
+Checkout: Der Warenkorb wird im Browser gespeichert. Beim Bestellen öffnet sich eine vorbereitete E-Mail an die Adresse aus `products.js`. Es gibt noch keine Online-Zahlung; dafür müsste ein Zahlungsanbieter (z. B. Stripe, PayPal) angebunden werden.
+
+Lokal testen: `cd public && python3 -m http.server 8000` und `http://localhost:8000/shop/` öffnen.
