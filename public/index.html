@@ -37,6 +37,11 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 #sheet .paper h2{margin:0 0 .7em;letter-spacing:.25em;font-size:1.25em;border-bottom:2px solid #1d1a12;padding-bottom:.35em}#sheet h3{margin:.8em 0 .15em;font-size:.82em;letter-spacing:.2em;color:#5a1a10}
 #sheet .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 2em}#sheet p{margin:.1em 0;line-height:1.55;font-size:.95em}#sheet .hand{margin-top:1.1em;color:#6a1410;font-family:"Comic Sans MS",cursive;transform:rotate(-1.4deg);font-size:1.02em}
 #sheet .tape{position:absolute;top:-14px;left:42%;width:90px;height:26px;background:rgba(220,214,170,.7);transform:rotate(3deg)}#sheet .sh{margin-top:1em;opacity:.6;font-size:.8em;letter-spacing:.2em}
+#crouchst{position:fixed;left:50%;bottom:10.5vh;transform:translateX(-50%);z-index:5;display:none;font-size:.72em;letter-spacing:.2em;color:#9fd8a8;opacity:.8}
+#hotbar{position:fixed;left:50%;bottom:1.8vh;transform:translateX(-50%);z-index:5;display:flex;gap:.5em}
+.hs{position:relative;min-width:64px;padding:.35em .5em .3em;text-align:center;background:rgba(6,10,8,.72);border:1px solid #3b4a40;color:#9fb8a8;font-size:.72em;letter-spacing:.08em}
+.hs i{position:absolute;left:4px;top:2px;font-style:normal;opacity:.55;font-size:.9em}.hs b{display:block;font-weight:normal}.hs small{display:block;opacity:.8;font-size:.9em;min-height:1.2em}
+.hs.off{opacity:.3}.hs.sel{border-color:#d8f0c0;color:#fff;background:rgba(40,60,44,.85);box-shadow:0 0 12px rgba(180,255,170,.35)}
 #photoimg{position:fixed;left:2.5vw;bottom:15vh;width:min(26vw,300px);z-index:9;display:none;border:6px solid #eee;border-bottom-width:22px;transform:rotate(-4deg);box-shadow:0 0 22px #000;transition:opacity .6s;pointer-events:none}
 #proskip{position:fixed;right:3vw;bottom:3vh;z-index:9;display:none;opacity:.55;font-size:.8em;letter-spacing:.2em}
 #look{z-index:14;overflow:auto;justify-content:flex-start;padding-top:2vh;background:rgba(4,8,6,.98)}#look h1{margin:.2em 0 .4em;font-size:1.6em}.lkwrap{display:flex;gap:2em;align-items:flex-start;justify-content:center;flex-wrap:nowrap;max-width:98vw;margin:0 auto}@media(max-width:820px){.lkwrap{flex-wrap:wrap}}.lkprev canvas{width:260px;height:364px;border:1px solid #3b4a40;background:radial-gradient(circle at 50% 40%,#2a3532,#0a0e0d)}
@@ -130,13 +135,15 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
   <div id="cross"></div>
   <div id="prompt"></div>
   <div id="sheet"><div class="paper"><div class="tape"></div><h2>AUSHANG · STEUERUNG</h2>
-    <div class="cols"><div><h3>BEWEGEN</h3><p><b>W A S D</b> — gehen<br><b>MAUS</b> — umsehen<br><b>SHIFT</b> — rennen (Ausdauer!)<br><b>C</b> — ducken</p>
+    <div class="cols"><div><h3>BEWEGEN</h3><p><b>W A S D</b> — gehen<br><b>MAUS</b> — umsehen<br><b>SHIFT</b> — rennen (Ausdauer!)<br><b>C</b> — ducken (geduckt wirst du kaum noch gesehen)</p>
     <h3>BENUTZEN</h3><p><b>E</b> — aufnehmen · benutzen · verstecken<br>(Spind, Schrank, Lehrertisch)<br><b>F</b> — Taschenlampe an/aus</p></div>
-    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen</p>
+    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen<br><b>1–5</b> — Gegenstand in die Hand nehmen (immer nur EINER!), Mausrad schaltet durch</p>
     <h3>KAMERA</h3><p><b>B</b> — Aufnahme starten/stoppen<br><b>G</b> — Foto mit Blitz (verscheucht das Wesen!)<br><b>MAUSRAD</b> — Zoom</p>
     <h3>SPRAY</h3><p><b>linke Maustaste</b> — sprühen<br><b>Q</b> — Farbe wechseln</p>
     <h3>SONSTIGES</h3><p><b>T</b> Ego/Third-Person · <b>V</b> Mikrofon<br><b>ESC</b> Pause</p></div></div>
     <p class="hand">Wenn es dich hört: nicht rennen.<br>Wenn es dich sieht: verstecken.<br>Und die Lampe aus, wenn es nah ist. — E. H.</p></div><div class="sh">[ beliebige Taste ] schließen</div></div>
+  <div id="hotbar"></div>
+  <div id="crouchst">GEDUCKT · SCHWER ZU SEHEN</div>
   <img id="photoimg" alt="">
   <div id="proskip">[ ENTER ] Prolog überspringen</div>
   <div id="inv"><div class="invbox"><h2>INVENTAR</h2><div id="invbody"></div><div class="invhint">[ I ] oder [ TAB ] schließen</div></div></div>
@@ -166,7 +173,7 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
      <b>Kapitel 1:</b> Das Schulgebäude hat 3 Etagen. Auf jeder musst du Rätsel lösen (Sicherungen, Schlüssel, Codes), um nach unten zu kommen – und am Ende zu fliehen.
      Etwas jagt dich. Es hört dich, und es sieht dein Licht. Such dir Verstecke: Spinde, Schränke, unter Lehrertischen. Und schau nicht zu lange in die Fernseher …
      <b>Kapitel 2:</b> Der Albtraum ist vorbei. Oder?</p>
-  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; SHIFT – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; B – Video &nbsp;·&nbsp; G – Foto mit Blitz &nbsp;·&nbsp; MAUSRAD – Zoom &nbsp;·&nbsp; I / TAB – Inventar &nbsp;·&nbsp; F – Lampe &nbsp;·&nbsp; E – benutzen / aufnehmen / verstecken<br>
+  <p class="k">W A S D – gehen &nbsp;·&nbsp; MAUS – umsehen &nbsp;·&nbsp; SHIFT – rennen &nbsp;·&nbsp; C – ducken &nbsp;·&nbsp; B – Video &nbsp;·&nbsp; G – Foto mit Blitz &nbsp;·&nbsp; MAUSRAD – Zoom &nbsp;·&nbsp; I / TAB – Inventar &nbsp;·&nbsp; 1–5 – Gegenstand in die Hand &nbsp;·&nbsp; F – Lampe &nbsp;·&nbsp; E – benutzen / aufnehmen / verstecken<br>
      LINKE MAUSTASTE – sprühen (Dosen liegen auf dem Boden) &nbsp;·&nbsp; Q – Farbe &nbsp;·&nbsp; T – Ego / Third-Person &nbsp;·&nbsp; V – Mikrofon &nbsp;·&nbsp; ESC – Pause</p>
   <div class="k" style="margin-top:.8em">SCHWIERIGKEIT</div>
   <div class="diffrow">
@@ -546,13 +553,13 @@ const FLOORS = [
     pool: [[2, 3], [8, 2], [6, 4], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [6, 10], [8, 12], [17, 7], [22, 8], [16, 11], [22, 13], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10]],
     canPool: [[2, 2], [7, 1], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [5, 11], [12, 9], [18, 7], [21, 11], [11, 15], [3, 16], [17, 16], [22, 17]],
     lockers: [0, 1, 2, 3, 4, 6, 8, 10, 13, 16], tv: [0, 3, 6], tvPool: ['marco', 'popel', 'marco'], label: '3', chapter: 1, torch: true },
-  { name: '2. OBERGESCHOSS — FACHRÄUME', short: '2. OG · FACHRÄUME', theme: 1, school: true, up: 1, stairEntry: 'S', spd: 1.12, sight: 1.1, scare: 1.7, amb: 0.4, fog: 0.07, blackout: 0.5,
+  { name: '2. OBERGESCHOSS — FACHRÄUME', short: '2. OG · FACHRÄUME', theme: 1, school: true, up: 1, stairEntry: 'S', gen: 'maze', genSeed: 4242, braid: .18, wantStairs: true, mazeRooms: [{ kind: 'start', i: 0, j: 0, w: 3, h: 2 }, { kind: 'class', i: 5, j: 1, w: 2, h: 2 }, { kind: 'class', i: 7, j: 4, w: 2, h: 2 }, { kind: 'class', i: 1, j: 7, w: 2, h: 2 }, { kind: 'archive', i: 3, j: 5, w: 2, h: 2 }, { kind: 'chair', i: 9, j: 6, w: 3, h: 2 }], spd: 1.12, sight: 1.1, scare: 1.7, amb: 0.4, fog: 0.07, blackout: 0.5,
     need: { fuses: 0, notes: 4, key: 1 }, lore: 1, batteries: 2, cans: 3, deadLamps: 0.45, flickLamps: 0.45, props: 0.3,
     S: [13, 16], V: [23, 1], F: null, K: [21, 1], H: [7, 2], X: null, Z: [10, 11], archive: [[4, 10], [8, 12]], rect: [5, 1, 9, 4],
     pool: [[2, 3], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [17, 7], [22, 8], [16, 11], [22, 13], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10]],
     canPool: [[2, 2], [12, 2], [16, 1], [22, 2], [3, 7], [1, 9], [12, 9], [18, 7], [21, 11], [11, 15], [3, 16], [17, 16], [22, 17]],
     lockers: [0, 2, 3, 6, 8, 10, 13, 14, 16], tv: [1, 5, 8], tvPool: ['popel', 'ring', 'marco'], label: '2', chapter: 1 },
-  { name: 'ERDGESCHOSS — EINGANGSHALLE', short: 'EG · EINGANGSHALLE', theme: 2, school: true, up: 0, spd: 1.25, sight: 1.25, scare: 2.5, amb: 0.3, fog: 0.078, blackout: 1.0,
+  { name: 'ERDGESCHOSS — EINGANGSHALLE', short: 'EG · EINGANGSHALLE', theme: 2, school: true, up: 0, gen: 'hall', genSeed: 9001, spd: 1.25, sight: 1.25, scare: 2.5, amb: 0.3, fog: 0.078, blackout: 1.0,
     need: { fuses: 3, notes: 4, key: 1 }, lore: 1, batteries: 2, cans: 3, deadLamps: 0.55, flickLamps: 0.5, props: 0.3,
     S: [1, 1], V: null, F: [23, 15], K: [23, 16], H: [19, 11], X: [24, 17], Z: [10, 11], archive: [[4, 10], [8, 12]], rect: [15, 10, 23, 13],
     pool: [[2, 3], [8, 2], [6, 4], [14, 2], [16, 3], [21, 2], [22, 4], [5, 6], [8, 7], [1, 11], [17, 7], [22, 8], [4, 15], [2, 17], [9, 14], [20, 16], [16, 17], [13, 10], [11, 3], [19, 3]],
@@ -884,11 +891,14 @@ function itemMesh(it) {
 /* ====================================================================
    buildFloor – baut eine Etage (deterministisch aus Seed)
 ==================================================================== */
+const lockerCellsOf = def => def.lockerCells || def.lockers.map(i => LOCKERS_ALL[i]);
+const tvCellsOf = def => def.tvCells || (def.tv || []).map(i => TV_ALL[i]);
 function registerHide(kind, x, z, fx, fz) {
   const l = { id: lockers.length, kind, cx: cellOf(x), cy: cellOf(z), x, z, fx, fz, yaw: Math.atan2(-fx, -fz) };
   lockers.push(l); return l;
 }
 function buildFloor(idx) {
+  ensureLayout(FLOORS[idx]);
   if (worldGroup) {
     scene.remove(worldGroup);
     worldGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []; ms.forEach(m => { if (m.map && m.map.disp) { m.map.dispose(); m.dispose(); } }); });
@@ -991,22 +1001,22 @@ function buildFloor(idx) {
   [def.V, def.F, def.K, def.H].forEach(p => { if (p) prot(p[0], p[1], 1); }); if (def.X) prot(def.X[0] - 1, def.X[1], 2);
   if (def.bed13) prot(def.bed13[0], def.bed13[1], 1);
   def.archive.forEach(p => prot(p[0], p[1], 1)); def.pool.forEach(p => prot(p[0], p[1], 0)); def.canPool.forEach(p => prot(p[0], p[1], 0));
-  def.lockers.forEach(li => { const p = LOCKERS_ALL[li]; prot(p[0], p[1], 1); });
-  (def.tv || []).forEach(ti => prot(TV_ALL[ti][0], TV_ALL[ti][1], 1));
+  lockerCellsOf(def).forEach(p => prot(p[0], p[1], 1));
+  tvCellsOf(def).forEach(p => prot(p[0], p[1], 1));
   if (def.school) schoolSetup(def, rows, wallCells, protect, faces, T);
 
   if (!house) {
     // Spinde
-    def.lockers.forEach(li => {
-      const [cx, cy] = LOCKERS_ALL[li]; const wd = wallDirOf(cx, cy), off = CELL / 2 - .5;
+    lockerCellsOf(def).forEach(([cx, cy]) => {
+      const wd = wallDirOf(cx, cy), off = CELL / 2 - .5;
       const x = cx * CELL + wd[0] * off, z = cy * CELL + wd[1] * off, w = wd[0] !== 0 ? .9 : 1.0, d = wd[0] !== 0 ? 1.0 : .9;
       const l = registerHide('locker', x, z, -wd[0], -wd[1]);
       const lm = new THREE.MeshStandardMaterial({ map: lockerTexture(), roughness: .65, metalness: .35 });
       l.mesh = addBoxM(w, 2.1, d, x, 1.05, z, lm); addCol(x, z, w, d);
     });
     // Fernseher
-    (def.tv || []).forEach((ti, k) => {
-      const [cx, cy] = TV_ALL[ti], wd = wallDirOf(cx, cy);
+    tvCellsOf(def).forEach(([cx, cy], k) => {
+      const wd = wallDirOf(cx, cy);
       buildTV(cx * CELL + wd[0] * .95, cy * CELL + wd[1] * .95, -wd[0], -wd[1], def.tvPool[k % def.tvPool.length], false);
     });
     // Requisiten verteilen (wandnah, nie in Durchgängen) – Schränke & Betten sind begehbare Verstecke (je max. 4)
@@ -1185,6 +1195,115 @@ function openDoorSlot(slot, instant) {
 }
 function updateDoorAnims(dt) {
   for (let i = doorAnims.length - 1; i >= 0; i--) { const d = doorAnims[i]; d.ang = Math.min(1, d.ang + dt * 1.1); d.piv.rotation.y = (d.alongX ? 1 : -1) * 1.7 * (1 - Math.pow(1 - d.ang, 2)); if (d.ang >= 1) doorAnims.splice(i, 1); }
+}
+
+/* ====================================================================
+   VERSCHIEDENE GRUNDRISSE: jede Etage sieht anders aus – manchmal ist die Flucht leichter (offene Halle
+   mit Pfeilern und Rundgängen), manchmal schwerer (Labyrinth aus engen Gängen mit Sackgassen)
+   – deterministisch aus festen Seeds, bei allen Spielern identisch
+==================================================================== */
+function ensureLayout(def) {
+  if (!def.gen || def._genDone) return; def._genDone = true;
+  const rng = mulberry32(def.genSeed || 777);
+  if (def.gen === 'maze') genMaze(def, rng); else if (def.gen === 'hall') genHall(def, rng);
+}
+const _nb4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+function autoLists(def, g, rng, bad) {
+  const H = g.length, W = g[0].length, open = [], doors = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const ch = g[y][x]; if (ch === 'D' || ch === 'Z') doors.push([x, y]); else if (ch === '.' && !bad(x, y)) open.push([x, y]); }
+  const near = (p, q, r) => Math.max(Math.abs(p[0] - q[0]), Math.abs(p[1] - q[1])) <= r;
+  const keep = [def.S, def.V, def.F, def.K, def.X, def.H].filter(Boolean);
+  const free = open.filter(c => !keep.some(k => near(c, k, 2)) && !doors.some(d => near(c, d, 1)));
+  for (let i = free.length - 1; i > 0; i--) { const j = (rng() * (i + 1)) | 0; [free[i], free[j]] = [free[j], free[i]]; }
+  const wallAdj = c => _nb4.some(([dx, dy]) => g[c[1] + dy] && g[c[1] + dy][c[0] + dx] === '#');
+  const pick = (n, minD, cands, avoid) => { const out = []; for (const c of cands) { if (out.length >= n) break; if (out.some(q => near(c, q, minD - 1)) || avoid.some(q => near(c, q, 1))) continue; out.push(c); } return out; };
+  const wl = free.filter(wallAdj);
+  const lockers = pick(def.lockers.length || 9, 4, wl, []), tvs = pick(def.tv.length || 3, 6, wl, lockers);
+  const pool = pick(24, 3, free, lockers.concat(tvs)), canPool = pick(16, 3, free.filter(c => !pool.some(q => near(c, q, 1))), lockers.concat(tvs));
+  def.lockerCells = lockers; def.tvCells = tvs; def.pool = pool; def.canPool = canPool;
+}
+function bfsGrid(g, sx, sy) {
+  const H = g.length, W = g[0].length, d = new Int16Array(W * H).fill(-1), q = [[sx, sy]]; d[sy * W + sx] = 0;
+  for (let i = 0; i < q.length; i++) { const [x, y] = q[i]; for (const [dx, dy] of _nb4) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue; const ch = g[ny][nx]; if (ch === '#' || d[ny * W + nx] >= 0) continue; d[ny * W + nx] = d[y * W + x] + 1; q.push([nx, ny]); } }
+  return d;
+}
+
+/* ---------- Labyrinth (enge 3-m-Gänge, Sackgassen, Schleifen, eingestreute Räume) ---------- */
+function genMaze(def, rng) {
+  const W = 25, H = 19, NI = 12, NJ = 9, g = []; for (let y = 0; y < H; y++) g.push(new Array(W).fill('#'));
+  const rooms = def.mazeRooms, roomAt = new Int8Array(NI * NJ).fill(-1);
+  rooms.forEach((r, ri) => {
+    for (let a = 0; a < r.w; a++) for (let b = 0; b < r.h; b++) roomAt[(r.j + b) * NI + r.i + a] = ri;
+    for (let x = 2 * r.i + 1; x <= 2 * (r.i + r.w - 1) + 1; x++) for (let y = 2 * r.j + 1; y <= 2 * (r.j + r.h - 1) + 1; y++) g[y][x] = '.';
+  });
+  const vis = new Uint8Array(NI * NJ); for (let n = 0; n < NI * NJ; n++) if (roomAt[n] >= 0) vis[n] = 2;
+  const cell = (i, j) => [2 * i + 1, 2 * j + 1];
+  let start = -1; for (let n = 0; n < NI * NJ && start < 0; n++) if (!vis[n] && ((n * 7) % 5 === 0)) start = n; if (start < 0) start = vis.indexOf(0);
+  const stack = [start]; vis[start] = 1; { const [x, y] = cell(start % NI, (start / NI) | 0); g[y][x] = '.'; }
+  while (stack.length) {
+    const n = stack[stack.length - 1], i = n % NI, j = (n / NI) | 0, opts = _nb4.filter(([dx, dy]) => { const a = i + dx, b = j + dy; return a >= 0 && b >= 0 && a < NI && b < NJ && !vis[b * NI + a]; });
+    if (!opts.length) { stack.pop(); continue; }
+    const [dx, dy] = opts[(rng() * opts.length) | 0], a = i + dx, b = j + dy, [cx, cy] = cell(i, j);
+    g[cy + dy][cx + dx] = '.'; const [nx, ny] = cell(a, b); g[ny][nx] = '.'; vis[b * NI + a] = 1; stack.push(b * NI + a);
+  }
+  // Schleifen: ein Teil der Sackgassen bekommt einen zweiten Ausgang
+  const braid = def.braid === undefined ? .2 : def.braid;
+  for (let j = 0; j < NJ; j++) for (let i = 0; i < NI; i++) {
+    if (roomAt[j * NI + i] >= 0) continue; const [cx, cy] = cell(i, j); const open = _nb4.filter(([dx, dy]) => g[cy + dy][cx + dx] !== '#');
+    if (open.length === 1 && rng() < braid) { const cl = _nb4.filter(([dx, dy]) => { const a = i + dx, b = j + dy; return a >= 0 && b >= 0 && a < NI && b < NJ && g[cy + dy][cx + dx] === '#' && roomAt[b * NI + a] < 0; }); if (cl.length) { const [dx, dy] = cl[(rng() * cl.length) | 0]; g[cy + dy][cx + dx] = '.'; } }
+  }
+  // Türen der Räume
+  rooms.forEach((r, ri) => {
+    const cand = [];
+    for (let a = 0; a < r.w; a++) for (let b = 0; b < r.h; b++) { const i = r.i + a, j = r.j + b, [cx, cy] = cell(i, j); _nb4.forEach(([dx, dy]) => { const ni = i + dx, nj = j + dy; if (ni < 0 || nj < 0 || ni >= NI || nj >= NJ) return; const rr = roomAt[nj * NI + ni]; if (rr === ri) return; if (rr >= 0 && rooms[rr].kind !== 'class') return; cand.push([cx + dx, cy + dy, rr < 0 ? 0 : 1]); }); }
+    const want = r.kind === 'start' || r.kind === 'class' ? 2 : 1, outside = cand.filter(c => !c[2]); const use = outside.length ? outside : cand;
+    for (let k = 0; k < want && use.length; k++) { const c = use.splice((rng() * use.length) | 0, 1)[0]; g[c[1]][c[0]] = r.kind === 'archive' ? 'Z' : 'D'; if (r.kind === 'archive') def.Z = [c[0], c[1]]; }
+  });
+  // Merkmale
+  const sr = rooms.find(r => r.kind === 'start'), cr = rooms.find(r => r.kind === 'chair'), ar = rooms.find(r => r.kind === 'archive');
+  const rx = r => [2 * r.i + 1, 2 * (r.i + r.w - 1) + 1], ry = r => [2 * r.j + 1, 2 * (r.j + r.h - 1) + 1];
+  def.S = [(rx(sr)[0] + rx(sr)[1]) >> 1, (ry(sr)[0] + ry(sr)[1]) >> 1];
+  if (cr) { const X = rx(cr), Y = ry(cr); def.rect = [X[0], Y[0], X[1], Y[1]]; def.H = [(X[0] + X[1]) >> 1, (Y[0] + Y[1]) >> 1]; }
+  if (ar) { const X = rx(ar), Y = ry(ar); def.archive = [[X[0], Y[1]], [X[1], Y[0]]]; def.archiveRect = [X[0], Y[0], X[1], Y[1]]; }
+  const dist = bfsGrid(g, def.S[0], def.S[1]); let maxD = 0; dist.forEach(v => { if (v > maxD) maxD = v; });
+  const inRoom = (x, y) => rooms.some(r => x >= rx(r)[0] && x <= rx(r)[1] && y >= ry(r)[0] && y <= ry(r)[1]);
+  // Treppenschacht: weitest entfernte Sackgasse
+  if (def.wantStairs) {
+    let best = null, bd = -1;
+    for (let j = 0; j < NJ; j++) for (let i = 0; i < NI; i++) { const [cx, cy] = cell(i, j); if (g[cy][cx] !== '.' || inRoom(cx, cy)) continue; const open = _nb4.filter(([dx, dy]) => g[cy + dy][cx + dx] !== '#'); const d = dist[cy * W + cx]; if (open.length === 1 && d > bd) { bd = d; best = [cx, cy, open[0]]; } }
+    if (best) { def.V = [best[0], best[1]]; const [dx, dy] = best[2]; def.stairEntry = dx === 1 ? 'E' : dx === -1 ? 'W' : dy === 1 ? 'S' : 'N'; }
+  }
+  // Tastenfeld: Gang etwa in der Mitte des Weges
+  { let best = null, bd = 1e9; const target = maxD * .55; for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { if (g[y][x] !== '.' || inRoom(x, y)) continue; const d = dist[y * W + x]; if (d < 6 || (def.V && Math.abs(x - def.V[0]) + Math.abs(y - def.V[1]) < 5)) continue; const diff = Math.abs(d - target); if (diff < bd) { bd = diff; best = [x, y]; } } if (best) def.K = best; }
+  def.base = g.map(r => r.join(''));
+  autoLists(def, g, rng, (x, y) => (def.archiveRect && x >= def.archiveRect[0] && x <= def.archiveRect[2] && y >= def.archiveRect[1] && y <= def.archiveRect[3]) || (def.rect && x >= def.rect[0] && x <= def.rect[2] && y >= def.rect[1] && y <= def.rect[3]));
+}
+
+/* ---------- Haupthalle: offenes Atrium mit Pfeilern, Räume ringsum, Haupteingang ---------- */
+function genHall(def, rng) {
+  const rows = [
+    '#########################',
+    '#.....#.....#.....#.....#',
+    '#.....#.....#.....#.....#',
+    '#.....#.....#.....#.....#',
+    '#.....#.....#.....#.....#',
+    '###D#####D#####D#####D###',
+    '#.......................#',
+    '#.......................#',
+    '#...#...#...#...#...#...#',
+    '#.......................#',
+    '#...#...#...#...#...#...#',
+    '#.......................#',
+    '#.......................#',
+    '#####Z#######D####.....##',
+    '#.........#.....#.......#',
+    '#.........#.....#.......#',
+    '#.........#.....#.......#',
+    '#.........#.....#.......#',
+    '#########################'
+  ];
+  def.base = rows; def.S = [2, 2]; def.F = [23, 7]; def.K = [23, 15]; def.X = [24, 16]; def.H = [13, 15]; def.rect = [11, 14, 15, 17]; def.Z = [5, 13]; def.archive = [[2, 15], [8, 16]]; def.V = null;
+  autoLists(def, rows.map(r => r.split('')), rng, (x, y) => (x >= 1 && x <= 9 && y >= 14 && y <= 17) || (x >= 11 && x <= 15 && y >= 14 && y <= 17));
 }
 
 /* ====================================================================
@@ -1903,6 +2022,10 @@ function schoolDecor(def, rows, faces, protect, T) {
     }
   });
   if (def === FLOORS[0] || def.kind === 'lost') buildSheet(faces);
+  if (def.gen === 'maze') {   // widersprüchliche Wegweiser: man verliert die Orientierung
+    const T2 = ['← AUSGANG', '→ AUSGANG', '↑ TREPPE', '↓ TREPPE', 'KEIN AUSGANG', 'NICHT STEHEN BLEIBEN', 'HIER WARST DU SCHON', '→ ER IST DA', 'GANG 7', 'GANG 7', 'GANG 7'];
+    for (let i = 0; i < 20; i++) { const fc = takeFace(f => freeOpen(f) && !isThinCell(f.x, f.y)); if (!fc) break; place(fc, noticeTex(wpick(T2), [wpick(['', 'Ihr seid nicht allein', 'Bitte leise', '']), ''], wpick(['#d8d4c0', '#c9d3c4', '#e0c8b8']), '#202020'), .95, .48, wrnd(1.55, 1.9), wrnd(-.8, .8)); }
+  }
   // EG: Vitrine mit Pokalen an einer Hallenwand
   if (th === 2) { const tf = takeFace(fc => freeOpen(fc) && !isThinCell(fc.x, fc.y)); if (tf) { const v = faceVec(tf.f), g = new THREE.Group(); g.position.set(tf.x * CELL + v[0] * (CELL / 2 + .22), 0, tf.y * CELL + v[1] * (CELL / 2 + .22)); g.rotation.y = Math.atan2(v[0], v[1]); worldGroup.add(g);
     part(g, new THREE.BoxGeometry(1.6, 1.9, .4), SMAT.bench, 0, .95, 0); part(g, new THREE.BoxGeometry(1.45, 1.7, .02), new THREE.MeshStandardMaterial({ color: 0x9fb0b0, transparent: true, opacity: .22, roughness: .1 }), 0, .98, .19);
@@ -2299,7 +2422,7 @@ function updateEntityHost(dt) {
   const nearest = a => a.reduce((m, t) => (!m || t.dist < m.dist) ? t : m, null);
   for (const t of T) {
     const dx = t.x - E.x, dz = t.z - E.z; t.dist = Math.hypot(dx, dz); t.los = hasLOS(E.x, E.z, t.x, t.z);
-    let sight = (t.flash ? 15 : 6.5) * floorDef.sight * D.sight; if (t.sprint) sight *= 1.35; if (t.crouch) sight *= 0.55; if (t.hidden) sight = 0;
+    let sight = (t.flash ? 15 : 6.5) * floorDef.sight * D.sight; if (t.sprint) sight *= 1.35; if (t.crouch) sight = Math.min(sight * 0.4, t.flash ? 4.0 : 1.6); if (t.hidden) sight = 0;
     t.seen = act && !(E.blind > 0) && t.los && t.dist < sight; t.heard = act && !t.hidden && t.dist < t.noise * D.hear * (.9 + FLN * .12);
   }
   let F = nearest(T.filter(t => t.seen));
@@ -2715,7 +2838,7 @@ let state = 'boot', tNow = 0, tGame = 0, deathT = 0, subTimer = 0, glitchKick = 
   spraying = false, camBlend = 0, camDistNow = 0, winT = 0, spectateId = null, gameOver = null, deadShown = false, rosterT = 0, taskT = 0, zoneK = 0, keypadOpen = false;
 const P = {
   x: 3, z: 3, yaw: Math.PI, pitch: 0, vyaw: Math.PI, vpitch: 0, lyaw: Math.PI, lpitch: 0, vx: 0, vz: 0, stamina: 1, exhausted: false, sprintIdle: 0,
-  crouch: false, flash: true, hasTorch: true, bat: 100, flashWas: true, hidden: null, bob: 0, moving: 0, sprinting: false, noise: 1, stepAcc: 0, camY: 1.45,
+  crouch: false, flash: true, hasTorch: true, held: 'cam', lampPref: true, bat: 100, flashWas: true, hidden: null, bob: 0, moving: 0, sprinting: false, noise: 1, stepAcc: 0, camY: 1.45,
   paint: [0, 0, 0, 0, 0], sel: -1, third: false, spraying: false, talk: false
 };
 function placePlayerAtStart() {
@@ -2732,7 +2855,8 @@ window.addEventListener('keydown', e => {
   if (e.repeat) return; keysDown[e.code] = true;
   if (inputBlocked) return;
   if (state === 'play') {
-    if (e.code === 'KeyF' && !P.hidden) { if (!P.hasTorch) say('Ich habe keine Taschenlampe. Ich muss eine finden …', 2500); else if (P.bat > 0) { P.flash = !P.flash; beep(P.flash ? 900 : 600, .04, .03); } }
+    if (e.code === 'KeyF' && !P.hidden) toggleLamp();
+    if (/^Digit[1-5]$/.test(e.code)) selectSlot(+e.code[5]);
     if (e.code === 'KeyC' && !P.hidden) P.crouch = !P.crouch;
     if (e.code === 'KeyB') toggleRec();
     if (e.code === 'KeyG') takePhoto();
@@ -2861,8 +2985,8 @@ function updateLocalAvatar(show) {
   const u = localAvatar.userData;
   localAvatar.position.set(P.x, 0, P.z); localAvatar.rotation.y = P.vyaw + Math.PI; localAvatar.scale.y = P.crouch ? 0.78 : 1;
   const sw = Math.sin(P.bob) * 0.6 * Math.min(1, P.moving * 1.5);
-  u.head.rotation.x = -P.vpitch * .6; poseAvatar(u, sw, tNow, P.spraying, P.hasTorch && P.flash);
-  u.torch.visible = P.hasTorch; u.can.visible = P.sel >= 0; if (P.sel >= 0) u.can.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
+  u.head.rotation.x = -P.vpitch * .6; poseAvatar(u, sw, tNow, P.spraying, P.held === 'torch');
+  u.torch.visible = P.held === 'torch'; u.can.visible = P.held === 'spray' && P.sel >= 0; if (P.sel >= 0) u.can.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
 }
 function updateCamera(dt) {
   const k = Math.min(1, dt * 11);
@@ -2895,7 +3019,7 @@ function updateCamera(dt) {
   flashlight.target.position.set(flashlight.position.x + fx * 10, flashlight.position.y + fy * 10, flashlight.position.z + fz * 10);
   beam.position.copy(flashlight.position); beam.lookAt(flashlight.target.position);
   const fp = camBlend < 0.15;
-  heldCan.visible = fp && state === 'play' && P.sel >= 0;
+  heldCan.visible = fp && state === 'play' && P.held === 'spray' && P.sel >= 0;
   if (heldCan.visible) {
     heldCan.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
     heldCan.position.set(0.3, -0.36 + (P.spraying ? Math.sin(t * 60) * 0.004 : 0) + bobY * 0.5, -0.55);
@@ -3289,7 +3413,7 @@ function restartRequest() {
 function startRun(seed, diff, floor) {
   initAudio(); GAME_SEED = seed; DIFF = diff; gameRunning = true; net.running = true;
   ['menu', 'lobby', 'pause', 'dead', 'win', 'end', 'boot', 'trailer'].forEach(id => $(id).style.display = 'none'); $('hud').style.display = 'block'; CHAPTER = 1; cinS.mode = null; houseSkipped = false;
-  INV.notes.length = 0; invToggle(false); P.paint = [0, 0, 0, 0, 0]; P.sel = -1; P.third = false; P.bat = 100; P.stamina = 1; P.hasTorch = floor !== undefined; P.flash = P.hasTorch; gameOver = null; deadShown = false; tGame = 0;
+  INV.notes.length = 0; invToggle(false); P.paint = [0, 0, 0, 0, 0]; P.sel = -1; P.third = false; P.bat = 100; P.stamina = 1; P.hasTorch = floor !== undefined; P.held = P.hasTorch ? 'torch' : 'cam'; P.lampPref = true; refreshLamp(); gameOver = null; deadShown = false; tGame = 0;
   postMat.uniforms.fade.value = 0;
   proReset(); const first = floor === undefined ? 5 : floor;
   enterFloor(first, false); lockPointer();
@@ -3302,7 +3426,7 @@ function enterFloor(n, retry) {
   $('dead').style.display = 'none'; $('win').style.display = 'none'; $('end').style.display = 'none'; $('hud').style.display = 'block'; endDeathScene(); $('hideov').style.display = 'none'; $('spec').style.display = 'none'; $('gore').getContext('2d').clearRect(0, 0, 9999, 9999);
   placePlayerAtStart(); spraying = false; P.spraying = false; state = 'play'; deadShown = false; gameOver = null; bleedK = 0; deathShake = deathDy = deathPitch = deathRoll = 0; E.attack = 0; FATHER.visible = false;
   entity.visible = !floorDef.noEntity; ghost.visible = false; SC.kind = null; SC.t = 30 / dcfg().scare; blackoutT = 0; flickerAll = 0; flashOut = 0;
-  $('camname').textContent = CHAPTER === 2 ? 'AUFNAHME // L. HALLIN' : 'CAM-07 // K. MARLOW'; postMat.uniforms.warm.value = floorDef.kind === 'house' ? 1 : floorDef.day ? .55 : 0; if (floorDef.day || !P.hasTorch) P.flash = false;
+  $('camname').textContent = CHAPTER === 2 ? 'AUFNAHME // L. HALLIN' : 'CAM-07 // K. MARLOW'; postMat.uniforms.warm.value = floorDef.kind === 'house' ? 1 : floorDef.day ? .55 : 0; refreshLamp();
   remotes.forEach(r => { const sp = SPAWN[r.idx % 4]; r.rx = r.x = startCell.cx * CELL + sp[0]; r.rz = r.z = startCell.cy * CELL + sp[1]; r.alive = true; r.hidden = -1; });
   if (isHost()) { respawnEntity(); if (FLN === 4 && !retry) E.grace += 12; } else { E.state = 'dormant'; E.synced = false; }
   updateFeatureStates(); showBanner(); if (!retry) P.bat = Math.min(100, P.bat + 25);
@@ -3411,14 +3535,14 @@ function chairScare() {
   setTimeout(() => { if (state === 'play') { const s = ghostSpot(2.2, 4); if (s) { ghost.position.set(s.x, 0, s.z); ghost.rotation.y = Math.atan2(P.x - s.x, P.z - s.z); ghost.visible = true; SC.kind = 'flashghost'; SC.k = 0; sting(.9); glitchKick = 1; } } }, 2700);
   if (isHost() && chairInfo) { E.state = 'investigate'; E.target = { x: chairInfo.x, z: chairInfo.z }; E.path = []; E.grace = 0; }
 }
-function gotSpray(c) { P.paint[c] = 100; if (P.sel < 0 || P.paint[P.sel] <= 0) P.sel = c; beep(900, .05, .04); setTimeout(() => beep(700, .05, .04), 70); say('Spraydose (' + SPRAY_NAMES[c] + '): Linke Maustaste sprühen · Q Farbe · T Perspektive', 5000); }
-function gotTorch() { P.hasTorch = true; P.flash = true; P.bat = Math.max(P.bat, 60); beep(1100, .08); setTimeout(() => beep(1500, .1), 90); say('Eine Taschenlampe! Mit F an- und ausschalten – die Batterie hält nicht ewig.', 6000); }
+function gotSpray(c) { const first = P.sel < 0; P.paint[c] = 100; if (P.sel < 0 || P.paint[P.sel] <= 0) P.sel = c; if (first) setHeld('spray'); beep(900, .05, .04); setTimeout(() => beep(700, .05, .04), 70); say('Spraydose (' + SPRAY_NAMES[c] + '): Spray ist in der Hand: Linke Maustaste sprühen · Q Farbe · Taste 3 weglegen', 5000); }
+function gotTorch() { P.hasTorch = true; P.lampPref = true; setHeld('torch'); P.bat = Math.max(P.bat, 60); beep(1100, .08); setTimeout(() => beep(1500, .1), 90); say('Eine Taschenlampe! Mit F an/aus, Taste 2 nehmen/weglegen. In der Hand hast du immer nur EINE Sache.', 6000); }
 function gotBattery() { P.bat = Math.min(100, P.bat + 45); beep(700, .1); say('Batterien. Die Lampe hält wieder länger.', 3000); }
 function enterLocker(l) {
   P.hidden = l; P.x = l.x; P.z = l.z; P.yaw = l.yaw; P.pitch = 0; P.vx = P.vz = 0; P.flashWas = P.flash; P.flash = false; P.crouch = false;
   $('hideov').className = 'hid-' + (l.kind || 'locker'); $('hideov').style.display = 'block'; thud(.5, 200); say(l.kind === 'bed' ? 'Unter dem Tisch. Nicht bewegen. Nicht atmen.' : 'Nicht bewegen. Nicht atmen.', 2500);
 }
-function leaveLocker() { const l = P.hidden; P.hidden = null; P.flash = P.flashWas && P.bat > 0; const off = l.kind === 'bed' ? 1.08 : .95; P.x = l.x + l.fx * off; P.z = l.z + l.fz * off; $('hideov').style.display = 'none'; thud(.4, 200); }
+function leaveLocker() { const l = P.hidden; P.hidden = null; refreshLamp(); const off = l.kind === 'bed' ? 1.08 : .95; P.x = l.x + l.fx * off; P.z = l.z + l.fz * off; $('hideov').style.display = 'none'; thud(.4, 200); }
 
 /* ---------- Tastenfeld ---------- */
 let kpBuf = '';
@@ -3567,7 +3691,7 @@ function updateHUD(dt) {
   const el = $('sub'); if (subTimer > 0) { subTimer -= dt * 1000; if (subTimer <= 0) el.style.display = 'none'; }
   $('pt').textContent = P.sel >= 0 ? SPRAY_NAMES[P.sel] + ' ' + Math.round(P.paint[P.sel]) + '%' : '—';
   $('pt').style.color = P.sel >= 0 ? '#' + SPRAY_COLS[P.sel].toString(16).padStart(6, '0') : '';
-  $('bt').textContent = P.hasTorch ? Math.round(P.bat) + '%' : '—'; $('bt').style.color = P.bat < 15 ? '#f55' : '';
+  hotbarRender(); $('crouchst').style.display = P.crouch && state === 'play' ? 'block' : 'none'; $('bt').textContent = P.hasTorch ? Math.round(P.bat) + '%' : '—'; $('bt').style.color = P.bat < 15 ? '#f55' : '';
   $('stam').firstElementChild.style.width = (P.stamina * 100) + '%'; $('stam').style.opacity = P.stamina > .98 ? .25 : .9;
   const e = Math.floor(tGame), p2 = n => String(n).padStart(2, '0');
   $('rect').textContent = p2(Math.floor(e / 3600)) + ':' + p2(Math.floor(e / 60) % 60) + ':' + p2(e % 60);
@@ -3634,7 +3758,7 @@ function startWake() {
   P.x = 6; P.z = 2.75; P.yaw = P.vyaw = P.lyaw = Math.PI; P.pitch = P.vpitch = 0; deathDy = -.78; deathPitch = 1.15; setLids(0); $('hud').style.display = 'block';
 }
 function startAbductWake() {
-  cinS.mode = 'abduct'; cinS.t = 0; cinS.f = {}; inputBlocked = true; P.flash = P.hasTorch; drowsy = 1;
+  cinS.mode = 'abduct'; cinS.t = 0; cinS.f = {}; inputBlocked = true; refreshLamp(); drowsy = 1;
   P.x = 57.0; P.z = 33.15; P.yaw = P.vyaw = P.lyaw = Math.PI; P.pitch = P.vpitch = 0; deathDy = -.16; deathPitch = -.45; setLids(0);
 }
 function startCollapse() { cinS.mode = 'collapse'; cinS.t = 0; cinS.f = {}; inputBlocked = true; spraying = false; eatSound(); }
@@ -3885,7 +4009,7 @@ function updateWake0(dt, t) {
   once('b', 5.6, () => say('Die Schule. Der Lost Place. Aber draußen ist es dunkel … und alles sieht so anders aus.', 6000));
   const k = smooth01((t - 6.6) / 2.4); if (t >= 6.6) { deathDy = -.78 * (1 - k); deathPitch = 1.15 * (1 - k); }
   once('c', 10.2, () => say('Meine Taschenlampe ist weg … ich muss eine finden. Und an der Wand hängt ein Zettel.', 6500));
-  if (t >= 9.2) { cinS.mode = null; inputBlocked = false; deathDy = deathPitch = 0; setLids(1); P.flash = P.hasTorch; }
+  if (t >= 9.2) { cinS.mode = null; inputBlocked = false; deathDy = deathPitch = 0; setLids(1); refreshLamp(); }
 }
 
 /* ====================================================================
@@ -3969,15 +4093,16 @@ const CAMC = { photos: [], photoCool: 0, photoReq: false, bulbT: 0, rec: false, 
 let camZoom = 1, recDest = null;
 CAMC.cx = CAMC.cv.getContext('2d');
 const camGrp = new THREE.Group(); camera.add(camGrp); camGrp.position.set(.2, -.155, -.43); camGrp.rotation.set(.04, -.16, 0);
+const camBody = new THREE.Group(); camGrp.add(camBody); const itemG = new THREE.Group(); camGrp.add(itemG);
 let camOrd = 900;
 const cMat = c => new THREE.MeshBasicMaterial({ color: c, depthTest: false, fog: false });
-function cBox(w, h, d, c, x, y, z, rx) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cMat(c)); m.position.set(x, y, z); if (rx) m.rotation.x = rx; m.renderOrder = camOrd++; camGrp.add(m); return m; }
+function cBox(w, h, d, c, x, y, z, rx, par) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cMat(c)); m.position.set(x, y, z); if (rx) m.rotation.x = rx; m.renderOrder = camOrd++; (par || camBody).add(m); return m; }
 cBox(.13, .115, .27, 0x1d1d20, 0, 0, 0); cBox(.131, .012, .27, 0x2c2c31, 0, .06, 0); cBox(.04, .05, .06, 0x151517, 0, .085, .1); cBox(.05, .05, .09, 0x101012, 0, .0, -.17);
-{ const m = new THREE.Mesh(new THREE.CylinderGeometry(.043, .047, .08, 18), cMat(0x0b0b0d)); m.rotation.x = Math.PI / 2; m.position.set(0, 0, -.22); m.renderOrder = camOrd++; camGrp.add(m);
-  const g = new THREE.Mesh(new THREE.CircleGeometry(.036, 18), cMat(0x0c1a26)); g.position.set(0, 0, -.262); g.renderOrder = camOrd++; camGrp.add(g); }
+{ const m = new THREE.Mesh(new THREE.CylinderGeometry(.043, .047, .08, 18), cMat(0x0b0b0d)); m.rotation.x = Math.PI / 2; m.position.set(0, 0, -.22); m.renderOrder = camOrd++; camBody.add(m);
+  const g = new THREE.Mesh(new THREE.CircleGeometry(.036, 18), cMat(0x0c1a26)); g.position.set(0, 0, -.262); g.renderOrder = camOrd++; camBody.add(g); }
 cBox(.015, .02, .03, 0x3a3a40, .045, .07, -.09);                       // Mikro-Halter
-const camHand = [cBox(.075, .065, .13, 0x3a2a25, .0, -.095, .03), cBox(.04, .045, .1, 0x3a2a25, -.055, -.07, .0, .2)], camArm = cBox(.09, .09, .5, 0x161616, .06, -.15, .38, -.35);   // Hand / Arm
-const camWatch = cBox(.098, .05, .06, 0x1c1f22, .058, -.135, .3, -.35), camBrace = new THREE.Mesh(new THREE.TorusGeometry(.058, .012, 6, 14), cMat(0x4a2e18)); camBrace.position.set(.058, -.125, .2); camBrace.rotation.x = -.35; camBrace.renderOrder = camOrd++; camGrp.add(camBrace);
+const camHand = [cBox(.075, .065, .13, 0x3a2a25, .0, -.095, .03, 0, camGrp), cBox(.04, .045, .1, 0x3a2a25, -.055, -.07, .0, .2, camGrp)], camArm = cBox(.09, .09, .5, 0x161616, .06, -.15, .38, -.35, camGrp);   // Hand / Arm
+const camWatch = cBox(.098, .05, .06, 0x1c1f22, .058, -.135, .3, -.35, camGrp), camBrace = new THREE.Mesh(new THREE.TorusGeometry(.058, .012, 6, 14), cMat(0x4a2e18)); camBrace.position.set(.058, -.125, .2); camBrace.rotation.x = -.35; camBrace.renderOrder = camOrd++; camGrp.add(camBrace);
 function applyLookToViewmodel() {
   const sk = LOOK_SKIN[LOOK.skin]; camHand.forEach(m => m.material.color.set(sk));
   camArm.material.color.set(LOOK.top === 0 ? sk : LOOK.top === 3 ? '#cfcfc8' : LOOK_PAL[LOOK.topc]);
@@ -3986,10 +4111,19 @@ function applyLookToViewmodel() {
 applyLookToViewmodel();
 const scrCv = document.createElement('canvas'); scrCv.width = 128; scrCv.height = 96; const scx = scrCv.getContext('2d');
 const scrTex = new THREE.CanvasTexture(scrCv); scrTex.minFilter = THREE.LinearFilter;
-const scrM = new THREE.Mesh(new THREE.PlaneGeometry(.105, .078), new THREE.MeshBasicMaterial({ map: scrTex, depthTest: false, fog: false })); scrM.position.set(0, .004, .1365); scrM.renderOrder = camOrd++; camGrp.add(scrM);
-const ledM = new THREE.Mesh(new THREE.SphereGeometry(.007, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2010, depthTest: false, fog: false })); ledM.position.set(.05, .05, .139); ledM.renderOrder = camOrd++; camGrp.add(ledM);
+const scrM = new THREE.Mesh(new THREE.PlaneGeometry(.105, .078), new THREE.MeshBasicMaterial({ map: scrTex, depthTest: false, fog: false })); scrM.position.set(0, .004, .1365); scrM.renderOrder = camOrd++; camBody.add(scrM);
+const ledM = new THREE.Mesh(new THREE.SphereGeometry(.007, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2010, depthTest: false, fog: false })); ledM.position.set(.05, .05, .139); ledM.renderOrder = camOrd++; camBody.add(ledM);
 camGrp.visible = false;
-const camBulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, fog: false })); camBulb.position.set(0, .085, -.06); camBulb.renderOrder = camOrd++; camBulb.visible = false; camGrp.add(camBulb);
+const camBulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, fog: false })); camBulb.position.set(0, .085, -.06); camBulb.renderOrder = camOrd++; camBulb.visible = false; camBody.add(camBulb);
+// Gegenstände in der Hand
+const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group();
+{ const bm = cMat(0x2a3036), hm = cMat(0x6a6e70), lm = cMat(0xfff2c0);
+  const b = new THREE.Mesh(new THREE.CylinderGeometry(.034, .04, .24, 12), bm); b.rotation.x = Math.PI / 2; b.position.set(0, .0, -.03); b.renderOrder = camOrd++; torchM.add(b);
+  const h = new THREE.Mesh(new THREE.CylinderGeometry(.062, .042, .08, 14), hm); h.rotation.x = Math.PI / 2; h.position.set(0, 0, -.185); h.renderOrder = camOrd++; torchM.add(h);
+  const l = new THREE.Mesh(new THREE.CircleGeometry(.054, 14), lm); l.rotation.y = Math.PI; l.position.set(0, 0, -.226); l.renderOrder = camOrd++; torchM.add(l);
+  const f = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .22, 10), cMat(0xcfc6a8)); f.rotation.z = Math.PI / 2; f.renderOrder = camOrd++; fuseM.add(f); [-.12, .12].forEach(x => { const cp = new THREE.Mesh(new THREE.CylinderGeometry(.046, .046, .04, 10), cMat(0x808488)); cp.rotation.z = Math.PI / 2; cp.position.x = x; cp.renderOrder = camOrd++; fuseM.add(cp); });
+  const km = cMat(0x9a8a50); const kr = new THREE.Mesh(new THREE.TorusGeometry(.06, .014, 6, 14), km); kr.position.set(-.1, 0, 0); kr.renderOrder = camOrd++; keyM.add(kr); const ks = new THREE.Mesh(new THREE.BoxGeometry(.2, .02, .02), km); ks.position.set(.06, 0, 0); ks.renderOrder = camOrd++; keyM.add(ks); const kt = new THREE.Mesh(new THREE.BoxGeometry(.04, .02, .06), km); kt.position.set(.14, 0, .02); kt.renderOrder = camOrd++; keyM.add(kt);
+  torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.8); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM].forEach(m => { m.visible = false; itemG.add(m); }); }
 
 function fmtT(s) { s = Math.floor(s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
 function drawScreen() {
@@ -4020,7 +4154,7 @@ function stopRec() {
   if (!CAMC.rec) return; CAMC.rec = false; $('vrec').style.display = 'none'; beep(900, .06, .05);
   try { CAMC.mr.stop(); } catch (e) {} CAMC.mr = null;
 }
-function toggleRec() { if (CAMC.rec) { stopRec(); say('Aufnahme gespeichert – Esc (Pause) → Videos herunterladen.', 4500); } else startRec(); }
+function toggleRec() { if (!CAMC.rec && P.held !== 'cam') { say('Ich muss die Kamera in die Hand nehmen (Taste 1).', 2500); return; } if (CAMC.rec) { stopRec(); say('Aufnahme gespeichert – Esc (Pause) → Videos herunterladen.', 4500); } else startRec(); }
 let lastRecNum = 0;
 function saveClip(chunks, mime, dur, n) {
   if (!chunks.length) return;
@@ -4035,6 +4169,7 @@ function renderClips() {
   document.querySelectorAll('.clips').forEach(d => { d.innerHTML = html; });
 }
 function takePhoto() {
+  if (P.held !== 'cam' && state === 'play' && !inputBlocked) { say('Ich muss die Kamera in die Hand nehmen (Taste 1).', 2500); return; }
   if (CAMC.photoCool > 0 || P.hidden || state !== 'play' || inputBlocked) return;
   CAMC.photoCool = 3.6; CAMC.photoReq = true; camShutter();
 }
@@ -4057,17 +4192,19 @@ function recFrame() {   // wird direkt nach dem Rendern aufgerufen: Bild + Bodyc
   const sub = $('sub'); if (sub.style.display !== 'none' && sub.textContent) { c.textAlign = 'center'; c.fillText(sub.textContent.slice(0, 90), W / 2, H * .82); c.textAlign = 'left'; }
   c.shadowBlur = 0;
 }
-window.addEventListener('wheel', e => { if (state === 'play' && !inputBlocked && !keypadOpen && !P.hidden) camZoomT_set(e.deltaY < 0 ? 1.2 : 1 / 1.2); }, { passive: true });
+window.addEventListener('wheel', e => { if (state === 'play' && !inputBlocked && !keypadOpen && !P.hidden) { if (P.held === 'cam') camZoomT_set(e.deltaY < 0 ? 1.2 : 1 / 1.2); else cycleHeld(e.deltaY > 0 ? 1 : -1); } }, { passive: true });
 function camZoomT_set(k) { CAMC.zoomT = Math.max(1, Math.min(3.4, CAMC.zoomT * k)); }
 function updateCamcorder(dt) {
   CAMC.photoCool = Math.max(0, CAMC.photoCool - dt); CAMC.bulbT = Math.max(0, CAMC.bulbT - dt); camBulb.visible = CAMC.bulbT > 0 && camGrp.visible; const fs = $('flashst'); if (fs) { fs.textContent = CAMC.photoCool > 0 ? 'lädt' : '[G]'; fs.style.opacity = CAMC.photoCool > 0 ? .45 : 1; }
-  const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy;
+  const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key';
+  const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy && hv;
+  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; HELDS.swap = Math.max(0, HELDS.swap - dt);
   CAMC.vis += ((show ? 1 : 0) - CAMC.vis) * Math.min(1, dt * 8); camGrp.visible = CAMC.vis > .05;
-  if (!show || P.hidden) CAMC.zoomT = 1;
+  if (!show || P.hidden || P.held !== 'cam') CAMC.zoomT = 1;
   camZoom += (CAMC.zoomT - camZoom) * Math.min(1, dt * 7);
   if (camGrp.visible) {
     const mv = P.moving ? Math.min(1, Math.hypot(P.vx || 0, P.vz || 0) / 3) : 0, sp = P.sprinting ? 1 : 0;
-    camGrp.position.x = .2 - (1 - CAMC.vis) * .1 + Math.sin(P.bob) * .006 * mv; camGrp.position.y = -.155 - (1 - CAMC.vis) * .15 - sp * .02 + Math.abs(Math.sin(P.bob)) * .008 * mv - (camZoom - 1) * .01;
+    camGrp.position.x = .2 - (1 - CAMC.vis) * .1 + Math.sin(P.bob) * .006 * mv; camGrp.position.y = -.155 - Math.pow(HELDS.swap / .3, 1.5) * .24 - (1 - CAMC.vis) * .15 - sp * .02 + Math.abs(Math.sin(P.bob)) * .008 * mv - (camZoom - 1) * .01;
     camGrp.rotation.x += ((.04 + sp * .1) - camGrp.rotation.x) * Math.min(1, dt * 6);
     CAMC.scrT -= dt; if (CAMC.scrT <= 0) { CAMC.scrT = .2; drawScreen(); }
     ledM.visible = CAMC.rec ? Math.floor(tNow * 1.6) % 2 === 0 : false;
@@ -4115,6 +4252,41 @@ function updateInventory(dt) {
 }
 
 /* ====================================================================
+   HOTBAR: Gegenstände auswählen – in der Hand hältst du immer nur EINE Sache
+   1 Kamera · 2 Taschenlampe · 3 Spraydose · 4 Sicherung · 5 Schlüssel   (Mausrad schaltet durch, wenn die Kamera nicht in der Hand ist)
+==================================================================== */
+const HELDS = { swap: 0, sig: '' };
+const HSLOTS = [['cam', 'KAMERA'], ['torch', 'LAMPE'], ['spray', 'SPRAY'], ['fuse', 'SICHERUNG'], ['key', 'SCHLÜSSEL']];
+function slotOwned(k) { return k === 'cam' ? true : k === 'torch' ? P.hasTorch : k === 'spray' ? P.sel >= 0 : k === 'fuse' ? team.fuses > 0 : k === 'key' ? team.key > 0 : false; }
+function refreshLamp() { P.flash = !!(P.hasTorch && P.held === 'torch' && P.lampPref && P.bat > 0 && !P.hidden && !floorDef.day); }
+function setHeld(k) {
+  if (k && !slotOwned(k)) { say(k === 'torch' ? 'Ich habe keine Taschenlampe. Ich muss eine finden …' : k === 'spray' ? 'Keine Spraydose. Sie liegen auf dem Boden – such sie!' : k === 'fuse' ? 'Ich habe keine Sicherung dabei.' : 'Ich habe keinen Schlüssel.', 2500); return; }
+  if (P.held === 'cam' && k !== 'cam' && CAMC.rec) { stopRec(); say('Aufnahme gespeichert – Esc (Pause) → Videos herunterladen.', 3500); }
+  if (k === 'torch') P.lampPref = true;
+  if (P.held !== k) { HELDS.swap = .3; beep(k ? 640 : 480, .03, .03); }
+  P.held = k; refreshLamp(); hotbarRender(true);
+}
+function selectSlot(n) { const k = HSLOTS[n - 1][0]; if (state !== 'play' || inputBlocked || P.hidden) return; if (P.held === k) setHeld(null); else setHeld(k); }
+function cycleHeld(d) {
+  const own = HSLOTS.map(s => s[0]).filter(slotOwned); if (!own.length) return;
+  let i = own.indexOf(P.held); i = i < 0 ? (d > 0 ? 0 : own.length - 1) : (i + d + own.length) % own.length; setHeld(own[i]);
+}
+function toggleLamp() {
+  if (!P.hasTorch) { say('Ich habe keine Taschenlampe. Ich muss eine finden …', 2500); return; }
+  if (P.held !== 'torch') { setHeld('torch'); return; }
+  if (P.bat <= 0) { say('Die Batterie ist leer …', 2000); return; }
+  P.lampPref = !P.lampPref; refreshLamp(); beep(P.flash ? 900 : 600, .04, .03); hotbarRender(true);
+}
+function hotbarRender(force) {
+  const owned = HSLOTS.map(s => slotOwned(s[0]) ? 1 : 0);
+  if (P.held && !owned[HSLOTS.findIndex(s => s[0] === P.held)]) { P.held = null; refreshLamp(); }   // z. B. Sicherung eingesetzt → Hand leer
+  const sub = { cam: CAMC.rec ? '● REC' : '', torch: P.hasTorch ? (P.flash ? 'AN' : 'AUS') : '', spray: P.sel >= 0 ? SPRAY_NAMES[P.sel] : '', fuse: team.fuses > 0 ? '×' + team.fuses : '', key: '' };
+  const sig = HSLOTS.map((s, i) => s[0] + owned[i] + (P.held === s[0] ? 'H' : '') + sub[s[0]]).join('|');
+  if (!force && sig === HELDS.sig) return; HELDS.sig = sig;
+  $('hotbar').innerHTML = HSLOTS.map((s, i) => '<div class="hs' + (owned[i] ? '' : ' off') + (P.held === s[0] ? ' sel' : '') + '"><i>' + (i + 1) + '</i><b>' + s[1] + '</b><small>' + (sub[s[0]] || '&nbsp;') + '</small></div>').join('');
+}
+
+/* ====================================================================
    SPRAYEN (Ego & Third-Person)
 ==================================================================== */
 const MAX_DOTS = 6000;
@@ -4149,7 +4321,7 @@ function setHiss(on) {
   hiss.g.gain.setTargetAtTime(on ? 0.06 : 0, AC.currentTime, 0.03);
 }
 function updateSpray(dt) {
-  const ok = state === 'play' && !inputBlocked && !keypadOpen && !P.hidden && !fadeBusy && P.sel >= 0 && P.paint[P.sel] > 0;
+  const ok = state === 'play' && !inputBlocked && !keypadOpen && !P.hidden && !fadeBusy && P.held === 'spray' && P.sel >= 0 && P.paint[P.sel] > 0;
   const active = spraying && ok; P.spraying = active; setHiss(active);
   if (!active) { sprayAcc = 0; return; }
   camera.updateMatrixWorld(); sprayAcc += dt * 45; let n = 0;
@@ -4169,6 +4341,7 @@ function updateSpray(dt) {
 function cycleSpray() {
   const have = [0, 1, 2, 3, 4].filter(i => P.paint[i] > 0);
   if (!have.length) { say('Keine Spraydose. Sie liegen auf dem Boden – such sie!', 2500); return; }
+  if (P.held !== 'spray') { setHeld('spray'); return; }
   P.sel = have[(have.indexOf(P.sel) + 1) % have.length]; beep(500, .03, .03); say('Farbe: ' + SPRAY_NAMES[P.sel], 1200);
 }
 function togglePerspective() { if (P.hidden) return; P.third = !P.third; say(P.third ? 'Third-Person-Ansicht' : 'Ego-Ansicht', 1200); }

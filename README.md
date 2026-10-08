@@ -12,6 +12,8 @@ Es beginnt friedlich: Du bist K. Marlow, filmst Lost Places und gehst bei Tagesl
 
 Die **Grundschule St. Aurelia** (3. OG Klassentrakt → 2. OG Fachräume → Erdgeschoss mit Eingangshalle): Klassenzimmer mit Schulbänken, Tafeln mit Kreideschrift, Schwarze Bretter, Klassenfotos, Spinde, Wanduhren, Pokalvitrine. Durch die **Fenster** (Regentropfen, Rollos, Heizkörper) siehst du nachts auf Schulhof, Zaun und Straße – **Autos fahren vorbei**, ihr Scheinwerferlicht fällt durch die Scheiben, Straßenlaternen leuchten, gegenüber brennt vereinzelt Licht. Je tiefer du kommst, desto tiefer liegt die Straße.
 
+**Jede Etage ist anders gebaut:** Das **3. OG** hat klassische Klassenzimmer-Flure, das **2. OG** ist ein **Labyrinth** aus engen Gängen mit Sackgassen, Schleifen und widersprüchlichen Wegweisern („← AUSGANG“, „→ AUSGANG“ …), das **Erdgeschoss** ist eine große **Halle mit Pfeilern** und Rundgängen (leichter wegzulaufen, aber das Wesen sieht dich von weitem). Das Gebäude in Kapitel 2 ist wieder der Klassentrakt.
+
 Statt einer Tür führt nur ein **Treppenschacht mit Geländer** nach unten (abgesperrt mit Flatterband, bis die Aufgabe gelöst ist). Auf jeder Etage musst du Rätsel lösen – im Erdgeschoss gibt es zum Schluss den Haupteingang mit Glastür. Je tiefer, desto schlimmer: schnelleres Wesen, mehr Schocks, mehr Dunkelheit.
 
 - **3. OG:** Sicherungen finden und im Sicherungskasten einsetzen.
@@ -27,6 +29,10 @@ Statt einer Tür führt nur ein **Treppenschacht mit Geländer** nach unten (abg
 Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimmen Traum. Ein paar Stunden später bestellst du dir Pizza … danach wird alles noch schlimmer. Hör genau hin. Wenn du wieder einschläfst, ist da jemand im Zimmer.
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
+
+**Hotbar (Tasten 1–5, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
+
+**Ducken (C):** Wer geduckt ist, wird vom Wesen kaum noch gesehen (ohne Lampe erst aus ~1,5 m, mit Lampe aus ~4 m) – langsamer, aber unauffällig.
 
 **Taschenlampe suchen:** Nach dem Aufwachen hast du keine Lampe mehr. Im 3. OG liegen vier Taschenlampen verteilt (eine pro Spieler) – such sie, leuchtend am Boden. Ohne Lampe sieht man kaum etwas, ist aber auch schwerer zu entdecken. Mit F schaltest du sie an/aus.
 
@@ -46,7 +52,7 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Solo oder Online-Co-op (bis 4 Spieler):** Einer klickt „Raum erstellen“, die anderen geben den 4-stelligen Code ein; in der Lobby startet der Host. Läuft per WebRTC ohne eigenen Server (auch auf Vercel); für den Verbindungsaufbau wird der öffentliche PeerJS-Broker genutzt. Proximity-Voice (Mikrofon im Menü anhaken): Stimmen sind räumlich, Wände dämpfen – aber Reden lockt das Wesen an. Wer stirbt, schaut zu; auf der nächsten Etage sind alle wieder dabei.
 
-**Steuerung:** WASD, Maus, Shift (rennen), C (ducken), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
+**Steuerung:** WASD, Maus, Shift (rennen), C (ducken – kaum sichtbar), 1–5 (Gegenstand in die Hand), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
 
