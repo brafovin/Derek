@@ -5,19 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0716">
 <title>CritCandy – Gaming Candy</title>
-<meta name="description" content="Gaming Candy für lange Sessions: sauer, süß, scharf. Gummis, Lollis, Schoko und Loot-Boxen für Zocker.">
+<meta name="description" content="Gaming Candy für lange Sessions: sauer, süß, scharf. Gummis, Lollis, Schoko, Spar-Sets und Loot-Boxen für Zocker – ab 1,99 €.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230b0716%27/%3E%3Cpath d=%27M16 4l9 12-9 12-9-12z%27 fill=%27%23ff2fb3%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <a class="skip" href="#produkte">Zu den Produkten springen</a>
 
+<a class="announce" id="announce" href="#loot" hidden></a>
+
 <header class="top">
   <div class="wrap top-in">
     <a class="logo" href="#" aria-label="Zum Seitenanfang"><span class="logo-mark" aria-hidden="true">◆</span><span id="logoName">CritCandy</span></a>
     <nav aria-label="Hauptnavigation">
+      <a href="#sets">Spar-Sets</a>
       <a href="#produkte">Sortiment</a>
-      <a href="#vorteile">Versand</a>
+      <a href="#faq">Fragen</a>
       <button class="cart-btn" id="cartBtn" type="button" aria-controls="drawer" aria-expanded="false">
         <span aria-hidden="true">🛒</span><span class="cart-label">Warenkorb</span>
         <span class="cart-count" id="cartCount" aria-live="polite">0</span>
@@ -26,28 +29,58 @@
   </div>
 </header>
 
-<main>
+<main id="main">
   <section class="hero">
     <div class="wrap hero-in">
       <div class="hero-text">
         <p class="eyebrow">Neue Season · jetzt im Shop</p>
         <h1>Level up<br>deinen <span class="grad">Snack.</span></h1>
         <p class="lead" id="tagline">Gaming Candy für lange Sessions.</p>
-        <p class="lead sub">Sauer, süß, scharf: Gummis, Lollis, Schoko und Loot-Boxen – gepackt für Zocker.</p>
+        <p class="lead sub">Sauer, süß, scharf – Snacks für deine nächste Session. Stell dir deinen Mix zusammen und spar mit jeder Tüte mehr.</p>
+        <ul class="hero-chips" id="heroChips"></ul>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="#produkte">Zum Sortiment</a>
-          <button class="btn btn-ghost" type="button" id="heroLoot">Loot-Box ansehen</button>
+          <a class="btn btn-primary" href="#produkte">Jetzt zocken &amp; snacken</a>
+          <a class="btn btn-ghost" href="#sets">Spar-Sets ansehen</a>
         </div>
       </div>
       <div class="hero-art" id="heroArt" aria-hidden="true"></div>
     </div>
   </section>
 
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <section class="wrap loot" id="loot" aria-labelledby="lootTitle" hidden>
+    <div class="loot-card">
+      <div class="loot-stage"><div class="loot-box" id="lootBox" aria-hidden="true"></div></div>
+      <div class="loot-text">
+        <p class="eyebrow">Willkommens-Loot</p>
+        <h2 id="lootTitle">Öffne deine Loot-Box</h2>
+        <p class="loot-sub" id="lootSub"></p>
+        <button class="btn btn-lime btn-big" type="button" id="lootOpen">Loot-Box öffnen</button>
+        <div class="loot-reveal" id="lootReveal" hidden>
+          <p class="loot-win">🎉 Treffer!</p>
+          <p id="lootWinText"></p>
+          <div class="code-chip" id="lootCode"></div>
+          <a class="btn btn-primary" href="#produkte">Jetzt shoppen</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap deals" id="sets" aria-labelledby="dealsTitle">
+    <div class="shop-head">
+      <h2 id="dealsTitle">Spar-Sets &amp; Loot-Boxen</h2>
+      <p class="count">Fertig gepackt – und günstiger als einzeln</p>
+    </div>
+    <div class="grid deal-grid" id="dealGrid"></div>
+  </section>
+
   <section class="wrap shop" id="produkte" aria-labelledby="shopTitle">
     <div class="shop-head">
-      <h2 id="shopTitle">Sortiment</h2>
+      <h2 id="shopTitle">Alle Snacks</h2>
       <p class="count" id="resultCount" aria-live="polite"></p>
     </div>
+    <div class="mixbanner" id="mixBanner"></div>
     <div class="toolbar">
       <div class="chips" id="chips" role="group" aria-label="Kategorie filtern"></div>
       <div class="tools">
@@ -67,6 +100,11 @@
   </section>
 
   <section class="wrap perks" id="vorteile" aria-label="Vorteile"></section>
+
+  <section class="wrap faq" id="faq" aria-labelledby="faqTitle">
+    <h2 id="faqTitle">Häufige Fragen</h2>
+    <div id="faqList"></div>
+  </section>
 </main>
 
 <footer class="foot">
@@ -77,9 +115,15 @@
       <a href="datenschutz.html">Datenschutz</a>
       <a href="agb.html">AGB &amp; Widerruf</a>
     </p>
-    <p class="fine">Alle Preise in Euro inkl. gesetzlicher MwSt., zzgl. Versand.</p>
+    <p class="fine">Alle Preise in Euro inkl. gesetzlicher MwSt., zzgl. Versand. Grundpreise je 100 g.</p>
   </div>
 </footer>
+
+<!-- Kassenleiste (nur Handy) -->
+<div class="cartbar" id="cartBar" hidden>
+  <div class="cartbar-text" id="cartBarText"></div>
+  <button class="btn btn-primary" type="button" id="cartBarBtn">Warenkorb</button>
+</div>
 
 <!-- Warenkorb -->
 <div class="scrim" id="scrim" hidden></div>
@@ -105,6 +149,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
 
 <script src="products.js"></script>
 <script src="app.js"></script>
