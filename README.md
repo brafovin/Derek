@@ -30,9 +30,11 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Taschenlampe suchen:** Nach dem Aufwachen hast du keine Lampe mehr. Im 3. OG liegen vier Taschenlampen verteilt (eine pro Spieler) – such sie, leuchtend am Boden. Ohne Lampe sieht man kaum etwas, ist aber auch schwerer zu entdecken. Mit F schaltest du sie an/aus.
 
-**Figur-Editor (Menü → [ AUSSEHEN ], auch in der Lobby):** Stell dein Aussehen frei zusammen – Hautton, Frisur und Haarfarbe, Kopfbedeckung (Baseballcap, Beanie, Eimerhut, Kapuze, Cowboyhut, Stirnband), Brille, Mundschutz/Bandana, Oberteil (T-Shirt, Hoodie, Jacke, Weste) und Hose mit eigenen Farben, Schuhe, Rucksack/Umhängetasche und Schmuck (Kette, Ohrringe, Uhr, Armband). 3D-Vorschau zum Drehen. Wird im Browser gespeichert; im Co-op sehen alle dein Aussehen. Deine Hand in der Ego-Ansicht passt sich an.
+**Figur-Editor (Menü → [ AUSSEHEN ], auch in der Lobby):** Die Figuren sind realistischer proportioniert (geformter Kopf mit Augen, Brauen und Lippen, Hände mit Fingern, Stoffkleidung mit Jeansmuster, Sneaker, Knie und Ellbogen beim Gehen). Stell dein Aussehen frei zusammen – Augenfarbe, Bart, Hautton, Frisur und Haarfarbe, Kopfbedeckung (Baseballcap, Beanie, Eimerhut, Kapuze, Cowboyhut, Stirnband), Brille, Mundschutz/Bandana, Oberteil (T-Shirt, Hoodie, Jacke, Weste) und Hose mit eigenen Farben, Schuhe, Rucksack/Umhängetasche und Schmuck (Kette, Ohrringe, Uhr, Armband). 3D-Vorschau zum Drehen. Wird im Browser gespeichert; im Co-op sehen alle dein Aussehen. Deine Hand in der Ego-Ansicht passt sich an.
 
 **Inventar:** **I** oder **Tab** (steht auch rechts im HUD) zeigt, was du dabei hast – Lampenakku, Sicherungen, Schlüssel, Türcode, Spraydosen, Kamera – und alle gefundenen Notizen. Das Spiel läuft dabei weiter.
+
+**Foto mit Blitz (G):** Richte die Kamera auf das Wesen und drück **G** – der Blitz blendet es: es erstarrt kurz, kreischt panisch und **rennt davon**, erst nach einer Weile kommt es wieder (und der Blitz lädt ca. 4 Sekunden nach). Die Fotos werden gespeichert und sind im Pause-Menü herunterladbar. Im Co-op wirkt der Blitz für alle.
 
 **Videokamera:** Du hältst eine Camcorder in der Hand (Ego-Ansicht). **B** startet/stoppt die Aufnahme, **Mausrad** zoomt. Aufgenommen wird wirklich – Bild, Ton und Zeitstempel (WebM, bis 10 Minuten pro Clip). Nach dem Stoppen findest du die Videos im Pause-Menü (Esc) sowie auf Tod-/Ende-Bildschirm zum Herunterladen. Die Clips liegen nur im Browser-Speicher, bis du die Seite schließt.
 
@@ -44,6 +46,6 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Solo oder Online-Co-op (bis 4 Spieler):** Einer klickt „Raum erstellen“, die anderen geben den 4-stelligen Code ein; in der Lobby startet der Host. Läuft per WebRTC ohne eigenen Server (auch auf Vercel); für den Verbindungsaufbau wird der öffentliche PeerJS-Broker genutzt. Proximity-Voice (Mikrofon im Menü anhaken): Stimmen sind räumlich, Wände dämpfen – aber Reden lockt das Wesen an. Wer stirbt, schaut zu; auf der nächsten Etage sind alle wieder dabei.
 
-**Steuerung:** WASD, Maus, Shift (rennen), C (ducken), I / Tab (Inventar), B (Videokamera aufnehmen), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
+**Steuerung:** WASD, Maus, Shift (rennen), C (ducken), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
