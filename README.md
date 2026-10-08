@@ -2,7 +2,20 @@
 
 **LETZTE AUFNAHME** – Bodycam-Horrorspiel (eine einzige Datei: `public/index.html`, Three.js und PeerJS eingebettet).
 
-Beim Start läuft ein kurzer Lade-Albtraum und ein 17-Sekunden-Trailer (Klick zum Überspringen). Mit `?skip` an der URL wird beides übersprungen.
+Beim Start läuft ein Lade-Albtraum, bei dem **Blut aus den Buchstaben und von oben über den Bildschirm läuft**, sich unten sammelt und bei 100 % in großen Spritzern explodiert, und ein 17-Sekunden-Trailer (Klick zum Überspringen). Mit `?skip` an der URL wird beides übersprungen.
+
+## Grafik & Design (Update)
+
+- **Blut-Ladebildschirm:** Tropfen wachsen an den Buchstaben des Titels, laufen ruckelnd herunter (mit Glanzlichtern), fallen in die Blutpfütze am unteren Rand und erzeugen Wellen. Dazu Sucherrahmen, pulsierender Herzschlag-Rand, VHS-Störstreifen, Kratzer, Beweisstück-Daten und Bildfehler bei 38 %/77 %. Dasselbe Blut läuft über Menü, Lobby, Pause, Tod- und Ende-Bildschirm (Tod: richtig viel) und über den Titel am Trailer-Ende.
+- **Neues Menü-Design:** kantige Blut-Schrift mit rauen Rändern, Tasten-Chips für die Steuerung, rote Schaltflächen, Grafikstufe wählbar (**NIEDRIG / MITTEL / HOCH / ULTRA**, wird gespeichert; unter 24 FPS schaltet das Spiel automatisch eine Stufe runter).
+- **Bild-Pipeline:** HDR-Rendering, mehrstufiges Bloom (Lampen und Fenster strahlen), Umgebungsverdunkelung aus dem Tiefenpuffer (Ecken, unter Möbeln), Schärfen, Linsenschmutz, Filmkratzer und Staub, Farbkorrektur (kühle Schatten, warme Lichter) und ein **Angst-Effekt**: Je näher das Wesen kommt, desto stärker pulsiert ein roter Rand mit Adern im Herzschlag-Takt.
+- **Neue Texturen:** Wände mit abblätternder Farbe, Schimmel, Wasserrändern und Rissen (Klassentrakt: grüner Ölsockel; Fachräume: Fliesen mit Schmutzfugen, fehlende Fliesen; Halle: Holzpaneele), Böden mit Linoleumfliesen, Terrazzo bzw. Marmor-Schachbrett samt Rissen, eingetrocknetem Blut und **nassen, glänzenden Stellen**, Rasterdecken mit Wasserflecken. Das Haus (Kapitel 2) hat Eichendielen und Raufaser-Putz. Eigene Höhenkarten geben Putz, Fugen und Risse Tiefe im Licht der Taschenlampe.
+- **Licht-Effekte:** Halos um Deckenlampen, Staubflocken, die nur im Lichtkegel der Taschenlampe aufglimmen, bodennaher Nebel in zwei Schichten.
+- **Abgefahrene Einrichtung:** Blut-Handabdrücke entlang der Wände (immer verschmierter), lange **Schleifspuren** mit Blutlache, **Fußspuren** barfuß, Kratzspuren von Krallen, **Schriften in Blut mit Laufspuren** („ER SIEHT DICH“, „HINTER DIR“ …), Spinnweben in den Ecken, verstreute Papiere, heruntergefallene Deckenplatten, **abgedeckte Leichen** unter Tüchern (je tiefer, desto mehr) und tropfende Decken mit Pfützen, Wellen und Tropfgeräusch.
+- **Wesen:** leuchtende Augen, Adern, die bei der Jagd aufglühen, und Geifer, der aus dem Maul tropft.
+- **Hand & Gegenstände:** Taschenlampe mit Rippen und Kopf, Hand mit Fingern, Ärmel in der Farbe deines Oberteils; wird im Dunkeln dunkel.
+- **HUD:** Sucherecken, Karten-Optik für Aufgaben und Untertitel, Hotbar mit roter Auswahl.
+
 
 ## Prolog – Lost Place
 
@@ -30,7 +43,9 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
 
-**Hotbar (Tasten 1–5, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
+**Hotbar (Tasten 1–6, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel, 6 Zigarette. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
+
+**Zigarette (Taste 6):** Solo oder zu zweit (bzw. zu viert) im Co-op. Linksklick zündet an (Feuerzeug-Klick), danach zieht jeder Klick: Hand wandert zum Mund, Glut leuchtet auf, dann bläst du eine Rauchwolke aus, die im Raum hängen bleibt. Die Zigarette brennt nach ~13 Zügen ab. **Vorsicht:** Mit 7 % Wahrscheinlichkeit musst du husten – das ist laut und lockt das Wesen an. Im Co-op sehen und hören alle Mitspieler deinen Rauch.
 
 **Ducken (C):** Wer geduckt ist, wird vom Wesen kaum noch gesehen (ohne Lampe erst aus ~1,5 m, mit Lampe aus ~4 m) – langsamer, aber unauffällig.
 
@@ -52,7 +67,7 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Solo oder Online-Co-op (bis 4 Spieler):** Einer klickt „Raum erstellen“, die anderen geben den 4-stelligen Code ein; in der Lobby startet der Host. Läuft per WebRTC ohne eigenen Server (auch auf Vercel); für den Verbindungsaufbau wird der öffentliche PeerJS-Broker genutzt. Proximity-Voice (Mikrofon im Menü anhaken): Stimmen sind räumlich, Wände dämpfen – aber Reden lockt das Wesen an. Wer stirbt, schaut zu; auf der nächsten Etage sind alle wieder dabei.
 
-**Steuerung:** WASD, Maus, Shift (rennen), C (ducken – kaum sichtbar), 1–5 (Gegenstand in die Hand), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
+**Steuerung:** WASD, Maus, Shift (rennen), C (ducken – kaum sichtbar), 1–6 (Gegenstand in die Hand), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
 
