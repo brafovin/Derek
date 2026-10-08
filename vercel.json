@@ -1,4 +1,12 @@
 {
   "framework": null,
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "derek-shop.*" }],
+      "destination": "/shop/",
+      "permanent": false
+    }
+  ]
 }
