@@ -378,3 +378,29 @@ a.announce:hover{filter:brightness(1.1)}
 .add{white-space:nowrap}
 .card.deal .buy{flex-direction:column;align-items:stretch;gap:12px}
 .card.deal .add{width:100%;padding:12px 16px}
+
+/* ---------- Produktfotos, Hinweise, Mehr anzeigen ---------- */
+.media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.card:hover .media img{transform:scale(1.05)}
+.detail .media img{min-height:320px}
+.note{margin:0;font-size:.84rem;color:var(--yellow);background:rgba(255,210,63,.08);border:1px solid rgba(255,210,63,.3);border-radius:10px;padding:8px 12px}
+.more{display:flex;justify-content:center;padding:28px 0 4px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(235px,1fr))}
+.media svg{filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.card:hover .media svg{transform:scale(1.04)}
+.unit br{display:block;content:""}
+
+.card .unit>span{display:block}
+.grid.deal-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+@media (min-width:561px){.card .buy{align-items:flex-end}}
+/* Handy: Sortiment zweispaltig, Sets einspaltig (große Packshots) */
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr 1fr;gap:12px}
+  .grid.deal-grid{grid-template-columns:1fr}
+  .card h3{font-size:.95rem}
+  .price{font-size:1.15rem}
+  .add{padding:10px 8px;font-size:.92rem}
+  .card:not(.deal) .unit{font-size:.7rem}
+}
+@media (max-width:360px){.grid{grid-template-columns:1fr}}
+.card .buy{margin-top:auto}

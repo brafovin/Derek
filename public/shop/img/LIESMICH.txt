@@ -1,0 +1,8 @@
+Hier kannst du deine eigenen Produktfotos ablegen.
+
+Beispiel: Lege die Datei  xp-boost.jpg  in diesen Ordner und trag in products.js beim Produkt ein:
+
+    image: "img/xp-boost.jpg",
+
+Dann zeigt der Shop dein Foto statt der gezeichneten Verpackung.
+Tipp: Fotos im Format 5:4 (z. B. 1000 x 800 Pixel), JPG oder WebP, möglichst unter 200 KB.
