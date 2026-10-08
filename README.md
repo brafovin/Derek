@@ -28,6 +28,10 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
 
+**Taschenlampe suchen:** Nach dem Aufwachen hast du keine Lampe mehr. Im 3. OG liegen vier Taschenlampen verteilt (eine pro Spieler) – such sie, leuchtend am Boden. Ohne Lampe sieht man kaum etwas, ist aber auch schwerer zu entdecken. Mit F schaltest du sie an/aus.
+
+**Figur-Editor (Menü → [ AUSSEHEN ], auch in der Lobby):** Stell dein Aussehen frei zusammen – Hautton, Frisur und Haarfarbe, Kopfbedeckung (Baseballcap, Beanie, Eimerhut, Kapuze, Cowboyhut, Stirnband), Brille, Mundschutz/Bandana, Oberteil (T-Shirt, Hoodie, Jacke, Weste) und Hose mit eigenen Farben, Schuhe, Rucksack/Umhängetasche und Schmuck (Kette, Ohrringe, Uhr, Armband). 3D-Vorschau zum Drehen. Wird im Browser gespeichert; im Co-op sehen alle dein Aussehen. Deine Hand in der Ego-Ansicht passt sich an.
+
 **Inventar:** **I** oder **Tab** (steht auch rechts im HUD) zeigt, was du dabei hast – Lampenakku, Sicherungen, Schlüssel, Türcode, Spraydosen, Kamera – und alle gefundenen Notizen. Das Spiel läuft dabei weiter.
 
 **Videokamera:** Du hältst eine Camcorder in der Hand (Ego-Ansicht). **B** startet/stoppt die Aufnahme, **Mausrad** zoomt. Aufgenommen wird wirklich – Bild, Ton und Zeitstempel (WebM, bis 10 Minuten pro Clip). Nach dem Stoppen findest du die Videos im Pause-Menü (Esc) sowie auf Tod-/Ende-Bildschirm zum Herunterladen. Die Clips liegen nur im Browser-Speicher, bis du die Seite schließt.
