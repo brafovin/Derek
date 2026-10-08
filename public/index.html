@@ -1609,6 +1609,23 @@ function aiTargets() {
   remotes.forEach(r => { if (r.alive) T.push({ id: r.id, r, x: r.rx, z: r.rz, flash: r.flash, hidden: r.hidden >= 0, sprint: r.sprint, crouch: r.crouch, noise: r.noise }); });
   return T;
 }
+const ER = .42;
+function entWallHit(px, pz, r, props) {   // Wandzellen; mit props=true auch Möbel/Requisiten
+  const cx = cellOf(px), cy = cellOf(pz);
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+    if (!isSolidCell(cx + dx, cy + dy)) continue;
+    const x0 = (cx + dx) * CELL - CELL / 2, x1 = x0 + CELL, z0 = (cy + dy) * CELL - CELL / 2, z1 = z0 + CELL;
+    const qx = Math.max(x0, Math.min(px, x1)), qz = Math.max(z0, Math.min(pz, z1));
+    if ((px - qx) ** 2 + (pz - qz) ** 2 < r * r) return true;
+  }
+  if (props) for (const c of colliders) { const qx = Math.max(c.x0, Math.min(px, c.x1)), qz = Math.max(c.z0, Math.min(pz, c.z1)); if ((px - qx) ** 2 + (pz - qz) ** 2 < .09) return true; }
+  return false;
+}
+function entUnstick() {
+  const cx = cellOf(E.x), cy = cellOf(E.z); let best = null, bd = 1e9;
+  for (let r = 0; r <= 3 && !best; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r || isSolidCell(cx + dx, cy + dy)) continue; const d = Math.hypot((cx + dx) * CELL - E.x, (cy + dy) * CELL - E.z); if (d < bd) { bd = d; best = [cx + dx, cy + dy]; } }
+  if (best) { E.x = best[0] * CELL; E.z = best[1] * CELL; E.path = []; E.pathT = 0; }
+}
 function updateEntityHost(dt) {
   if (net.mode === 'solo' && state === 'dead') return;
   if (state === 'win' || state === 'menu' || state === 'lobby' || state === 'lost' || fadeBusy) return;
@@ -1671,7 +1688,8 @@ function updateEntityHost(dt) {
   } else if (E.state === 'chase' && F) {
     speed = chaseSpd;
     const tgt = F.hidden ? E.lastSeen : { x: F.x, z: F.z };
-    if (tgt && F.los && fdist < 7 && !F.hidden) moveTo = tgt;
+    E.noDirect = Math.max(0, (E.noDirect || 0) - dt);
+    if (tgt && F.los && fdist < 7 && !F.hidden && !E.noDirect && hasLOS(E.x + Math.cos(Math.atan2(tgt.x - E.x, tgt.z - E.z)) * .45, E.z - Math.sin(Math.atan2(tgt.x - E.x, tgt.z - E.z)) * .45, tgt.x, tgt.z) && hasLOS(E.x - Math.cos(Math.atan2(tgt.x - E.x, tgt.z - E.z)) * .45, E.z + Math.sin(Math.atan2(tgt.x - E.x, tgt.z - E.z)) * .45, tgt.x, tgt.z)) moveTo = tgt;
     else if (tgt) {
       E.pathT -= dt;
       if (E.pathT <= 0 || !E.path.length) { E.path = bfs(cellOf(E.x), cellOf(E.z), cellOf(tgt.x), cellOf(tgt.z)); E.pathT = .35; }
@@ -1690,8 +1708,19 @@ function updateEntityHost(dt) {
     } else E.near = false;
   }
   if (moveTo && speed > 0) {
+    if (entWallHit(E.x, E.z, ER, false)) entUnstick();
+    E.ghostT = Math.max(0, (E.ghostT || 0) - dt); const pr = E.ghostT <= 0;   // steckt in einer Wand (z. B. nach Teleport) → in die nächste freie Zelle
     const mx = moveTo.x - E.x, mz = moveTo.z - E.z, md = Math.hypot(mx, mz);
-    if (md > .01) { const st = Math.min(md, speed * dt); E.x += mx / md * st; E.z += mz / md * st; const ty = Math.atan2(mx, mz); let dy = ty - entity.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); entity.rotation.y += dy * Math.min(1, dt * 8); }
+    if (md > .01) {
+      const st = Math.min(md, speed * dt), sx = mx / md * st, sz = mz / md * st, ox = E.x, oz = E.z;
+      if (!entWallHit(E.x + sx, E.z + sz, ER, pr)) { E.x += sx; E.z += sz; }
+      else if (!entWallHit(E.x + sx, E.z, ER, pr)) E.x += sx;
+      else if (!entWallHit(E.x, E.z + sz, ER, pr)) E.z += sz;
+      // hängt an einer Ecke fest → Weg über die Zellen statt Luftlinie
+      E.stuckRecent = Math.max(0, (E.stuckRecent || 0) - dt);
+      if (Math.hypot(E.x - ox, E.z - oz) < st * .3) { E.stuckT = (E.stuckT || 0) + dt; if (E.stuckT > .25) { E.stuckT = 0; E.noDirect = 1.2; E.path = []; E.pathT = 0; if (E.stuckRecent > 0) E.ghostT = 1.2; E.stuckRecent = 2.5; } } else E.stuckT = 0;   // 1. Mal festgehangen: neuer Weg; 2. Mal: kurz durch das Möbelstück
+      const ty = Math.atan2(mx, mz); let dy = ty - entity.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); entity.rotation.y += dy * Math.min(1, dt * 8);
+    }
     E.curSpeed = speed;
   } else {
     E.curSpeed = 0;
