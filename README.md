@@ -54,9 +54,16 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 Statischer Online-Shop unter **`/shop/`** (`public/shop/`) – ohne Build-Schritt, läuft direkt auf Vercel.
 
-- `products.js` – Shop-Name, **E-Mail für Bestellungen**, Versandkosten, Zahlungsarten und alle Produkte (hier änderst du Preise, Texte, Farben).
+- `products.js` – **alles Wichtige an einer Stelle**: Shop-Name, E-Mail für Bestellungen, Versandkosten, Zahlungsarten, Mix-&-Spar-Stufen, Willkommens-Code, FAQ und alle Produkte (Preise, Texte, Farben, Sets).
 - `app.js` / `style.css` / `index.html` – Logik, Design, Seitenstruktur.
 - `impressum.html`, `datenschutz.html`, `agb.html` – **Vorlagen mit Platzhaltern**, vor dem Verkauf ausfüllen (keine Rechtsberatung).
+
+Verkaufsmechaniken (alle ehrlich: keine erfundenen Bewertungen, Zähler oder Countdowns):
+
+- **Spar-Sets** (`includes` in `products.js`): Der Shop rechnet die Ersparnis gegenüber dem Einzelkauf selbst aus Produktpreisen aus.
+- **Mix & Spar**: Rabatt auf einzelne Tüten, der mit der Menge steigt (`mix.tiers`), samt Level-Anzeige im Warenkorb.
+- **Loot-Box**: Auf der Startseite öffnet der Besucher eine Box und schaltet den Willkommens-Code frei (`welcome`; auf `null` setzen zum Ausschalten). Code und Mix-Rabatt sind nicht kombinierbar – es gilt der höhere.
+- Gratis-Versand ab Schwelle, Grundpreise je 100 g, Cross-Selling im Produktdetail, Kassenleiste auf dem Handy.
 
 Checkout: Der Warenkorb wird im Browser gespeichert. Beim Bestellen öffnet sich eine vorbereitete E-Mail an die Adresse aus `products.js`. Es gibt noch keine Online-Zahlung; dafür müsste ein Zahlungsanbieter (z. B. Stripe, PayPal) angebunden werden.
 
