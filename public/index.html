@@ -4737,7 +4737,7 @@ function updateCreep(dt) {
 const CAMC = { photos: [], photoCool: 0, photoReq: false, bulbT: 0, rec: false, t: 0, clips: [], zoomT: 1, mr: null, chunks: [], cv: document.createElement('canvas'), mime: '', hinted: false, endT: 0, ledT: 0, scrT: 0, vis: 0 };
 let camZoom = 1, recDest = null;
 CAMC.cx = CAMC.cv.getContext('2d');
-const camGrp = new THREE.Group(); camera.add(camGrp); camGrp.position.set(.2, -.155, -.43); camGrp.rotation.set(.04, -.16, 0);
+const camGrp = new THREE.Group(); camera.add(camGrp); camGrp.position.set(.23, -.18, -.58); camGrp.rotation.set(.04, -.16, 0); camGrp.scale.setScalar(.86);
 const camBody = new THREE.Group(); camGrp.add(camBody); const itemG = new THREE.Group(); camGrp.add(itemG);
 let camOrd = 900;
 const vmList = [];   // alle Materialien des Handmodells (werden je nach Umgebungslicht abgedunkelt)
@@ -4781,9 +4781,17 @@ function vapeTex() {   // "Bang Box"-Einweg-Vape: Verlauf rosa→türkis, Krone,
   g.fillStyle = '#bff6ff'; g.font = 'bold 26px "Courier New", monospace'; g.fillText('100%', 84, H * .93);
   const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
 }
+function jointTex() {   // gerollter Joint: krümeliges Kraut in Papier, Drehfalten
+  const c = document.createElement('canvas'); c.width = 64; c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#b9b08f'; g.fillRect(0, 0, 64, 256);
+  for (let i = 0; i < 700; i++) { const r = Math.random(); g.fillStyle = r < .34 ? 'rgba(104,120,70,.75)' : r < .6 ? 'rgba(86,70,46,.6)' : r < .85 ? 'rgba(222,214,184,.6)' : 'rgba(150,130,96,.6)'; g.fillRect(Math.random() * 64, Math.random() * 256, 1 + Math.random() * 3, 1 + Math.random() * 3); }
+  g.strokeStyle = 'rgba(70,60,40,.45)'; g.lineWidth = 1.4; for (let i = 0; i < 6; i++) { const y = 20 + i * 42 + Math.random() * 10; g.beginPath(); g.moveTo(0, y); g.lineTo(64, y + 22); g.stroke(); }
+  g.strokeStyle = 'rgba(240,236,214,.35)'; for (let i = 0; i < 6; i++) { const y = 23 + i * 42; g.beginPath(); g.moveTo(0, y); g.lineTo(64, y + 22); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
+}
 // Gegenstände in der Hand
-const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group(), cigM = new THREE.Group(), vapeM = new THREE.Group();
-let cigBody, cigEmber, cigTip, vapeLed;
+const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group(), cigM = new THREE.Group(), jointM = new THREE.Group(), vapeM = new THREE.Group();
+let cigBody, cigEmber, cigTip, jointBody, jointEmber, jointTip, vapeLed;
 {
   cMesh(new THREE.CylinderGeometry(.03, .034, .21, 20), 0x3a4048, 0, 0, -.02, torchM, Math.PI / 2);
   for (let k = 0; k < 7; k++) cMesh(new THREE.TorusGeometry(.0345, .0042, 6, 20), 0x181b1e, 0, 0, .05 - k * .017, torchM);
@@ -4799,6 +4807,14 @@ let cigBody, cigEmber, cigTip, vapeLed;
     cMesh(new THREE.CylinderGeometry(.0047, .0047, .006, 8), 0x585650, 0, 0, -.087, cigBody, Math.PI / 2);
     cigEmber = new THREE.Mesh(new THREE.SphereGeometry(.0052, 8, 6), new THREE.MeshBasicMaterial({ color: 0x8a2a0a, depthTest: false, fog: false })); cigEmber.position.set(0, 0, -.09); cigEmber.renderOrder = camOrd++; cigBody.add(cigEmber);
     cigTip = new THREE.Object3D(); cigTip.position.set(0, 0, -.095); cigBody.add(cigTip); }
+  jointBody = new THREE.Group(); jointM.add(jointBody);
+  { const jm = new THREE.MeshBasicMaterial({ map: jointTex(), vertexColors: true, depthTest: false, fog: false }); jm.userData.base = new THREE.Color(0xffffff); vmList.push(jm);
+    cMesh(new THREE.CylinderGeometry(.0034, .0074, .115, 14), jm, 0, 0, -.0575, jointBody, Math.PI / 2);   // Kegel: dünn am Mundstück, breit an der Spitze
+    cMesh(new THREE.CylinderGeometry(.0037, .0037, .034, 10), 0xf6f4ec, 0, 0, .017, jointM, Math.PI / 2);   // weißer Filter (Crutch)
+    cMesh(new THREE.TorusGeometry(.0074, .0016, 6, 14), 0xcfc6a2, 0, 0, -.115, jointBody);                     // eingedrehte Spitze
+    jointEmber = new THREE.Mesh(new THREE.SphereGeometry(.0066, 8, 6), new THREE.MeshBasicMaterial({ color: 0x8a2a0a, depthTest: false, fog: false })); jointEmber.position.set(0, 0, -.118); jointEmber.renderOrder = camOrd++; jointBody.add(jointEmber);
+    jointTip = new THREE.Object3D(); jointTip.position.set(0, 0, -.125); jointBody.add(jointTip); }
+  jointM.position.set(-.04, .012, .0); jointM.rotation.set(0, .32, 0); jointM.scale.setScalar(2.7);
   { const W = .042, Lh = .13, T = .022;
     cBox(W, Lh, T, 0x48c6da, 0, 0, 0, 0, vapeM); cBox(W + .0008, .05, T + .0008, 0xf59ac0, 0, .04, 0, 0, vapeM);
     const fm = new THREE.MeshBasicMaterial({ map: vapeTex(), depthTest: false, fog: false }); fm.userData.base = new THREE.Color(0xffffff); vmList.push(fm);
@@ -4807,7 +4823,7 @@ let cigBody, cigEmber, cigTip, vapeLed;
     vapeLed = new THREE.Mesh(new THREE.PlaneGeometry(W * .8, .03), new THREE.MeshBasicMaterial({ color: 0x9ff4ff, transparent: true, opacity: .12, depthTest: false, fog: false })); vapeLed.position.set(0, -.04, T / 2 + .0012); vapeLed.renderOrder = camOrd++; vapeM.add(vapeLed); }
   vapeM.position.set(-.03, .05, 0); vapeM.rotation.set(-.4, .22, 0); vapeM.scale.setScalar(2.0);
   cigM.position.set(-.04, .012, .0); cigM.rotation.set(0, .32, 0); cigM.scale.setScalar(2.0);
-  torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM, vapeM].forEach(m => { m.visible = false; itemG.add(m); });
+  torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM, jointM, vapeM].forEach(m => { m.visible = false; itemG.add(m); });
 }
 // Hand & Arm (zuletzt gezeichnet = liegt über Kamera/Gegenstand; Farben folgen dem Aussehen aus dem Figur-Editor)
 const skinM = cMat(0xd9a07a), skinD = cMat(0xc08a68), nailM = cMat(0xecc9bc), veinM = cMat(0xa08c8c), sleeveM = cMat(0x2a2d30), cuffM = cMat(0x1c1e20), handG = new THREE.Group(); camGrp.add(handG);
@@ -4927,14 +4943,14 @@ function updateCamcorder(dt) {
   CAMC.photoCool = Math.max(0, CAMC.photoCool - dt); CAMC.bulbT = Math.max(0, CAMC.bulbT - dt); camBulb.visible = CAMC.bulbT > 0 && camGrp.visible; const fs = $('flashst'); if (fs) { fs.textContent = CAMC.photoCool > 0 ? 'lädt' : '[G]'; fs.style.opacity = CAMC.photoCool > 0 ? .45 : 1; }
   const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key' || P.held === 'cig' || P.held === 'joint' || P.held === 'vape';
   const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy && hv;
-  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig' || P.held === 'joint'; vapeM.visible = P.held === 'vape'; HELDS.swap = Math.max(0, HELDS.swap - dt);
+  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig'; jointM.visible = P.held === 'joint'; vapeM.visible = P.held === 'vape'; HELDS.swap = Math.max(0, HELDS.swap - dt);
   CAMC.vis += ((show ? 1 : 0) - CAMC.vis) * Math.min(1, dt * 8); camGrp.visible = CAMC.vis > .05;
   if (!show || P.hidden || P.held !== 'cam') CAMC.zoomT = 1;
   camZoom += (CAMC.zoomT - camZoom) * Math.min(1, dt * 7);
   if (camGrp.visible) {
     vmLight(dt);
     const mv = P.moving ? Math.min(1, Math.hypot(P.vx || 0, P.vz || 0) / 3) : 0, sp = P.sprinting ? 1 : 0;
-    camGrp.position.x = .2 - (1 - CAMC.vis) * .1 + Math.sin(P.bob) * .006 * mv - SMK.drag * .16; camGrp.position.z = -.43 + SMK.drag * .2; camGrp.rotation.z = SMK.drag * .55; camGrp.position.y = -.155 + SMK.drag * .1 - Math.pow(HELDS.swap / .3, 1.5) * .24 - (1 - CAMC.vis) * .15 - sp * .02 + Math.abs(Math.sin(P.bob)) * .008 * mv - (camZoom - 1) * .01;
+    camGrp.position.x = .23 - (1 - CAMC.vis) * .1 + Math.sin(P.bob) * .006 * mv - SMK.drag * .13; camGrp.position.z = -.58 + SMK.drag * .22; camGrp.rotation.z = SMK.drag * .55; camGrp.position.y = -.18 + SMK.drag * .1 - Math.pow(HELDS.swap / .3, 1.5) * .24 - (1 - CAMC.vis) * .15 - sp * .02 + Math.abs(Math.sin(P.bob)) * .008 * mv - (camZoom - 1) * .01;
     camGrp.rotation.x += ((.04 + sp * .1 + SMK.drag * .5) - camGrp.rotation.x) * Math.min(1, dt * 6);
     CAMC.scrT -= dt; if (CAMC.scrT <= 0) { CAMC.scrT = .2; drawScreen(); }
     ledM.visible = CAMC.rec ? Math.floor(tNow * 1.6) % 2 === 0 : false;
@@ -5191,14 +5207,14 @@ function updateSmoke(dt) {
   } else SMK.drag += (0 - SMK.drag) * Math.min(1, dt * 8);
   if (P.smoking && !P.hidden) {
     if (!vape && (SMK.drag < .05 || P.third)) SMK.wispT -= dt;
-    if (SMK.wispT <= 0) { SMK.wispT = .14; if (P.third || !camGrp.visible) mouthPos(_smv); else { cigTip.getWorldPosition(_smv); } smokeSpawn(_smv.x, _smv.y, _smv.z, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .32); }
+    if (SMK.wispT <= 0) { SMK.wispT = .14; if (P.third || !camGrp.visible) mouthPos(_smv); else { (joint ? jointTip : cigTip).getWorldPosition(_smv); } smokeSpawn(_smv.x, _smv.y, _smv.z, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .32); }
     if (P.noise < 1.6) P.noise = 1.6;
   }
   if (SMK.puffQ > 0) { const n = Math.min(SMK.puffQ, 2); SMK.puffQ -= n; const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw); mouthPos(_smv); if (!P.third) _smv.y = camera.position.y - .12; puffBurst(_smv.x + fx * .15, _smv.y, _smv.z + fz * .15, fx * .8, fz * .8, n, P.held === 'vape' ? 1.7 : 1); }
   // Glut an der Zigarette
-  cigEmber.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); cigEmber.visible = true;
   vapeLed.material.opacity = .06 + SMK.drag * .28;
-  cigBody.scale.z = Math.max(.15, (joint ? SMK.leftJ : SMK.left) * .95 + .05); if (joint) cigM.scale.set(2.8, 2.8, 2.3); else cigM.scale.set(2.0, 2.0, 2.0);
+  { const em = joint ? jointEmber : cigEmber, bd = joint ? jointBody : cigBody, lf = joint ? SMK.leftJ : SMK.left;
+    em.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); bd.scale.z = Math.max(.15, lf * .95 + .05); }
   // --- Mitspieler ---
   remotes.forEach(r => {
     const on = !!(r.smoke && r.alive !== false && !r.hidden);
@@ -5248,7 +5264,7 @@ function highAnomaly(h) {
 }
 function updateHigh(dt) {
   const u = postMat.uniforms.high;
-  if (P.high > 0) { P.highT = (P.highT || 0) + dt; P.high = Math.max(0, P.high - dt * (P.highT > 25 ? .0075 : .002)); }
+  if (P.high > 0) { P.highT = (P.highT || 0) + dt; P.high = Math.max(0, P.high - dt * (P.highT > 8 ? .05 : .012)); }
   const h = Math.min(1.6, P.high), live = state === 'play';
   u.value += (h - u.value) * Math.min(1, dt * 1.6); const hv = u.value;
   // Raumlicht wechselt langsam die Farbe
