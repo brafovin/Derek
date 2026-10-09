@@ -172,7 +172,7 @@ input[type=checkbox]{accent-color:#c0120f}
   <div id="sheet"><div class="paper"><div class="tape"></div><h2>AUSHANG · STEUERUNG</h2>
     <div class="cols"><div><h3>BEWEGEN</h3><p><b>W A S D</b> — gehen<br><b>MAUS</b> — umsehen<br><b>SHIFT</b> — rennen (Ausdauer!)<br><b>C</b> — ducken (geduckt wirst du kaum noch gesehen)</p>
     <h3>BENUTZEN</h3><p><b>E</b> — aufnehmen · benutzen · verstecken<br>(Spind, Schrank, Lehrertisch)<br><b>F</b> — Taschenlampe an/aus</p></div>
-    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen<br><b>1–7</b> — Gegenstand in die Hand nehmen (immer nur EINER!), Mausrad schaltet durch<br><b>6</b> — Zigarette · <b>7</b> — Joint: Linksklick anzünden / ziehen (Husten ist laut, Joints machen high!)</p>
+    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen<br><b>1–8</b> — Gegenstand in die Hand nehmen (immer nur EINER!), Mausrad schaltet durch<br><b>6</b> — Zigarette · <b>7</b> — Joint: Linksklick anzünden / ziehen · <b>8</b> — Vape (Husten ist laut, Joints machen high!)<br><b>Rechtsklick</b> — Rauchring · <b>X</b> — Rauch-Qualle (mit Zigarette, Joint, Vape)</p>
     <h3>KAMERA</h3><p><b>B</b> — Aufnahme starten/stoppen<br><b>G</b> — Foto mit Blitz (verscheucht das Wesen!)<br><b>MAUSRAD</b> — Zoom</p>
     <h3>SPRAY</h3><p><b>linke Maustaste</b> — sprühen<br><b>Q</b> — Farbe wechseln</p>
     <h3>SONSTIGES</h3><p><b>T</b> Ego/Third-Person · <b>V</b> Mikrofon<br><b>ESC</b> Pause</p></div></div>
@@ -214,7 +214,7 @@ input[type=checkbox]{accent-color:#c0120f}
   <p class="story">Du bist K. Marlow und filmst Lost Places – heute die verlassene <b>Grundschule St. Aurelia</b>. Bei Tag ist alles ruhig. Dann kommt etwas um die Ecke … und du wachst nachts im selben Gebäude auf. Es hört dich, und es sieht dein Licht. Löse die Rätsel, versteck dich, komm raus. Und schau nicht zu lange in die Fernseher …</p>
   <div class="keys">
     <span><kbd>W A S D</kbd> gehen</span><span><kbd>MAUS</kbd> umsehen</span><span><kbd>SHIFT</kbd> rennen</span><span><kbd>C</kbd> ducken</span><span><kbd>E</kbd> benutzen / verstecken</span><span><kbd>F</kbd> Lampe</span>
-    <span><kbd>1–7</kbd> Gegenstand</span><span><kbd>I</kbd> Inventar</span><span><kbd>B</kbd> Video</span><span><kbd>G</kbd> Blitzfoto</span><span><kbd>LMT</kbd> sprühen</span><span><kbd>Q</kbd> Farbe</span><span><kbd>T</kbd> Ego/3rd</span><span><kbd>V</kbd> Mikro</span><span><kbd>ESC</kbd> Pause</span>
+    <span><kbd>1–8</kbd> Gegenstand</span><span><kbd>I</kbd> Inventar</span><span><kbd>B</kbd> Video</span><span><kbd>G</kbd> Blitzfoto</span><span><kbd>LMT</kbd> sprühen</span><span><kbd>Q</kbd> Farbe</span><span><kbd>T</kbd> Ego/3rd</span><span><kbd>V</kbd> Mikro</span><span><kbd>ESC</kbd> Pause</span>
   </div>
   <div class="k lbl">SCHWIERIGKEIT</div>
   <div class="diffrow">
@@ -3500,7 +3500,7 @@ window.addEventListener('keydown', e => {
   if (inputBlocked) return;
   if (state === 'play') {
     if (e.code === 'KeyF' && !P.hidden) toggleLamp();
-    if (/^Digit[1-7]$/.test(e.code)) selectSlot(+e.code[5]);
+    if (/^Digit[1-8]$/.test(e.code)) selectSlot(+e.code[5]);
     if (e.code === 'KeyC' && !P.hidden) P.crouch = !P.crouch;
     if (e.code === 'KeyB') toggleRec();
     if (e.code === 'KeyG') takePhoto();
@@ -4764,8 +4764,8 @@ const ledM = new THREE.Mesh(new THREE.SphereGeometry(.007, 8, 6), new THREE.Mesh
 camGrp.visible = false;
 const camBulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, fog: false })); camBulb.position.set(0, .085, -.06); camBulb.renderOrder = camOrd++; camBulb.visible = false; camBody.add(camBulb);
 // Gegenstände in der Hand
-const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group(), cigM = new THREE.Group();
-let cigBody, cigEmber, cigTip;
+const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group(), cigM = new THREE.Group(), vapeM = new THREE.Group();
+let cigBody, cigEmber, cigTip, vapeLed;
 {
   cMesh(new THREE.CylinderGeometry(.03, .034, .21, 20), 0x3a4048, 0, 0, -.02, torchM, Math.PI / 2);
   for (let k = 0; k < 7; k++) cMesh(new THREE.TorusGeometry(.0345, .0042, 6, 20), 0x181b1e, 0, 0, .05 - k * .017, torchM);
@@ -4781,8 +4781,12 @@ let cigBody, cigEmber, cigTip;
     cMesh(new THREE.CylinderGeometry(.0047, .0047, .006, 8), 0x585650, 0, 0, -.087, cigBody, Math.PI / 2);
     cigEmber = new THREE.Mesh(new THREE.SphereGeometry(.0052, 8, 6), new THREE.MeshBasicMaterial({ color: 0x8a2a0a, depthTest: false, fog: false })); cigEmber.position.set(0, 0, -.09); cigEmber.renderOrder = camOrd++; cigBody.add(cigEmber);
     cigTip = new THREE.Object3D(); cigTip.position.set(0, 0, -.095); cigBody.add(cigTip); }
+  cBox(.03, .042, .1, 0x20242b, 0, 0, 0, 0, vapeM); cBox(.0305, .008, .1, 0x3a404a, 0, .02, 0, 0, vapeM); cMesh(new THREE.CylinderGeometry(.0135, .0135, .05, 12), 0xa9c4d2, 0, .004, -.073, vapeM, Math.PI / 2);
+  cMesh(new THREE.CylinderGeometry(.0085, .011, .02, 10), 0x0c0d10, 0, .004, .06, vapeM, Math.PI / 2); cMesh(new THREE.CylinderGeometry(.007, .0085, .012, 10), 0x15171a, 0, .004, .076, vapeM, Math.PI / 2);
+  vapeLed = new THREE.Mesh(new THREE.SphereGeometry(.0052, 8, 6), new THREE.MeshBasicMaterial({ color: 0x1a5a80, depthTest: false, fog: false })); vapeLed.position.set(0, .0225, -.03); vapeLed.renderOrder = camOrd++; vapeM.add(vapeLed);
+  vapeM.position.set(-.035, .0, -.0); vapeM.rotation.set(0, .32, 0); vapeM.scale.setScalar(2.1);
   cigM.position.set(-.04, .012, .0); cigM.rotation.set(0, .32, 0); cigM.scale.setScalar(2.0);
-  torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM].forEach(m => { m.visible = false; itemG.add(m); });
+  torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM, vapeM].forEach(m => { m.visible = false; itemG.add(m); });
 }
 // Hand & Arm (zuletzt gezeichnet = liegt über Kamera/Gegenstand; Farben folgen dem Aussehen aus dem Figur-Editor)
 const skinM = cMat(0xd9a07a), skinD = cMat(0xc08a68), nailM = cMat(0xecc9bc), veinM = cMat(0xa08c8c), sleeveM = cMat(0x2a2d30), cuffM = cMat(0x1c1e20), handG = new THREE.Group(); camGrp.add(handG);
@@ -4820,7 +4824,7 @@ function applyLookToViewmodel() {
 }
 applyLookToViewmodel();
 let vmK = .6;
-const GRIP = { cam: .004, torch: .034, fuse: .03, key: .034, cig: .03, joint: .034 };
+const GRIP = { cam: .004, torch: .034, fuse: .03, key: .034, cig: .03, joint: .034, vape: .034 };
 function vmLight(dt) {   // das Handmodell wird im Dunkeln dunkel, in Lampennähe heller
   let k = .22 + Math.min(.55, ambientL.intensity * .5 + hemiL.intensity * .6); if (P.flash) k += .2;
   let nl = 0; for (const l of lamps) { if (l.lv < .2) continue; const d = Math.hypot(l.x - P.x, l.z - P.z); if (d < 6) nl = Math.max(nl, (1 - d / 6) * l.lv); } k += nl * .4;
@@ -4900,9 +4904,9 @@ window.addEventListener('wheel', e => { if (state === 'play' && !inputBlocked &&
 function camZoomT_set(k) { CAMC.zoomT = Math.max(1, Math.min(3.4, CAMC.zoomT * k)); }
 function updateCamcorder(dt) {
   CAMC.photoCool = Math.max(0, CAMC.photoCool - dt); CAMC.bulbT = Math.max(0, CAMC.bulbT - dt); camBulb.visible = CAMC.bulbT > 0 && camGrp.visible; const fs = $('flashst'); if (fs) { fs.textContent = CAMC.photoCool > 0 ? 'lädt' : '[G]'; fs.style.opacity = CAMC.photoCool > 0 ? .45 : 1; }
-  const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key' || P.held === 'cig' || P.held === 'joint';
+  const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key' || P.held === 'cig' || P.held === 'joint' || P.held === 'vape';
   const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy && hv;
-  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig' || P.held === 'joint'; HELDS.swap = Math.max(0, HELDS.swap - dt);
+  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig' || P.held === 'joint'; vapeM.visible = P.held === 'vape'; HELDS.swap = Math.max(0, HELDS.swap - dt);
   CAMC.vis += ((show ? 1 : 0) - CAMC.vis) * Math.min(1, dt * 8); camGrp.visible = CAMC.vis > .05;
   if (!show || P.hidden || P.held !== 'cam') CAMC.zoomT = 1;
   camZoom += (CAMC.zoomT - camZoom) * Math.min(1, dt * 7);
@@ -4961,8 +4965,8 @@ function updateInventory(dt) {
    1 Kamera · 2 Taschenlampe · 3 Spraydose · 4 Sicherung · 5 Schlüssel · 6 Zigarette   (Mausrad schaltet durch, wenn die Kamera nicht in der Hand ist)
 ==================================================================== */
 const HELDS = { swap: 0, sig: '' };
-const HSLOTS = [['cam', 'KAMERA'], ['torch', 'LAMPE'], ['spray', 'SPRAY'], ['fuse', 'SICHERUNG'], ['key', 'SCHLÜSSEL'], ['cig', 'ZIGARETTE'], ['joint', 'JOINT']];
-function slotOwned(k) { return k === 'cam' ? true : k === 'torch' ? P.hasTorch : k === 'spray' ? P.sel >= 0 : k === 'fuse' ? team.fuses > 0 : k === 'key' ? team.key > 0 : k === 'cig' || k === 'joint'; }
+const HSLOTS = [['cam', 'KAMERA'], ['torch', 'LAMPE'], ['spray', 'SPRAY'], ['fuse', 'SICHERUNG'], ['key', 'SCHLÜSSEL'], ['cig', 'ZIGARETTE'], ['joint', 'JOINT'], ['vape', 'VAPE']];
+function slotOwned(k) { return k === 'cam' ? true : k === 'torch' ? P.hasTorch : k === 'spray' ? P.sel >= 0 : k === 'fuse' ? team.fuses > 0 : k === 'key' ? team.key > 0 : k === 'cig' || k === 'joint' || k === 'vape'; }
 function refreshLamp() { P.flash = !!(P.hasTorch && P.held === 'torch' && P.lampPref && P.bat > 0 && !P.hidden && !floorDef.day); }
 function setHeld(k) {
   if (k && !slotOwned(k)) { say(k === 'torch' ? 'Ich habe keine Taschenlampe. Ich muss eine finden …' : k === 'spray' ? 'Keine Spraydose. Sie liegen auf dem Boden – such sie!' : k === 'fuse' ? 'Ich habe keine Sicherung dabei.' : 'Ich habe keinen Schlüssel.', 2500); return; }
@@ -4985,7 +4989,7 @@ function toggleLamp() {
 function hotbarRender(force) {
   const owned = HSLOTS.map(s => slotOwned(s[0]) ? 1 : 0);
   if (P.held && !owned[HSLOTS.findIndex(s => s[0] === P.held)]) { P.held = null; refreshLamp(); }   // z. B. Sicherung eingesetzt → Hand leer
-  const sub = { cam: CAMC.rec ? '● REC' : '', torch: P.hasTorch ? (P.flash ? 'AN' : 'AUS') : '', spray: P.sel >= 0 ? SPRAY_NAMES[P.sel] : '', fuse: team.fuses > 0 ? '×' + team.fuses : '', key: '', cig: SMK.lit && P.held === 'cig' ? 'GLIMMT' : '', joint: SMK.lit && P.held === 'joint' ? 'GLIMMT' : (P.joints ? '×' + P.joints : '') };
+  const sub = { cam: CAMC.rec ? '● REC' : '', torch: P.hasTorch ? (P.flash ? 'AN' : 'AUS') : '', spray: P.sel >= 0 ? SPRAY_NAMES[P.sel] : '', fuse: team.fuses > 0 ? '×' + team.fuses : '', key: '', cig: SMK.lit && P.held === 'cig' ? 'GLIMMT' : '', joint: SMK.lit && P.held === 'joint' ? 'GLIMMT' : (P.joints ? '×' + P.joints : ''), vape: '' };
   const sig = HSLOTS.map((s, i) => s[0] + owned[i] + (P.held === s[0] ? 'H' : '') + sub[s[0]]).join('|');
   if (!force && sig === HELDS.sig) return; HELDS.sig = sig;
   $('hotbar').innerHTML = HSLOTS.map((s, i) => '<div class="hs' + (owned[i] ? '' : ' off') + (P.held === s[0] ? ' sel' : '') + '"><i>' + (i + 1) + '</i><b>' + s[1] + '</b><small>' + (sub[s[0]] || '&nbsp;') + '</small></div>').join('');
@@ -5055,13 +5059,13 @@ function togglePerspective() { if (P.hidden) return; P.third = !P.third; say(P.t
    ZIGARETTEN: Taste 6 = Zigarette in die Hand, Linksklick = anzünden / ziehen. Rauchwolken, Glut, Husten
    (das Husten ist laut!). Im Co-op sehen und hören alle Mitspieler den Rauch (Flag 32 im Spielerstatus).
 ==================================================================== */
-const SMK = { N: 360, k: 0, lit: false, left: 1, leftJ: 1, dragT: -1, drag: 0, puffQ: 0, wispT: 0, hint: false, thirdPuff: 0 };
+const SMK = { N: 560, k: 0, lit: false, left: 1, leftJ: 1, dragT: -1, drag: 0, puffQ: 0, wispT: 0, hint: false, thirdPuff: 0 };
 P.smoking = false; P.high = 0; P.joints = 0;
-const isSm = k => k === 'cig' || k === 'joint';
+const isSm = k => k === 'cig' || k === 'joint' || k === 'vape';
 {
   const N = SMK.N; SMK.pos = new Float32Array(N * 3).fill(0); SMK.aA = new Float32Array(N); SMK.aS = new Float32Array(N);
   for (let i = 0; i < N; i++) SMK.pos[i * 3 + 1] = -50;
-  SMK.vel = new Float32Array(N * 3); SMK.age = new Float32Array(N).fill(99); SMK.life = new Float32Array(N).fill(1); SMK.s0 = new Float32Array(N); SMK.a0 = new Float32Array(N);
+  SMK.vel = new Float32Array(N * 3); SMK.calm = new Float32Array(N); SMK.age = new Float32Array(N).fill(99); SMK.life = new Float32Array(N).fill(1); SMK.s0 = new Float32Array(N); SMK.a0 = new Float32Array(N);
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(SMK.pos, 3).setUsage(THREE.DynamicDrawUsage)); geo.setAttribute('aA', new THREE.BufferAttribute(SMK.aA, 1).setUsage(THREE.DynamicDrawUsage)); geo.setAttribute('aS', new THREE.BufferAttribute(SMK.aS, 1).setUsage(THREE.DynamicDrawUsage));
   SMK.u = { uScale: FX.u.uScale, uCol: { value: new THREE.Vector3(.5, .52, .54) } };
   const mat = new THREE.ShaderMaterial({
@@ -5071,8 +5075,8 @@ const isSm = k => k === 'cig' || k === 'joint';
   });
   SMK.pts = new THREE.Points(geo, mat); SMK.pts.frustumCulled = false; SMK.pts.renderOrder = 7; scene.add(SMK.pts); SMK.geo = geo;
 }
-function smokeSpawn(x, y, z, vx, vy, vz, life, size, alpha) {
-  const i = SMK.k; SMK.k = (SMK.k + 1) % SMK.N; const j = i * 3;
+function smokeSpawn(x, y, z, vx, vy, vz, life, size, alpha, calm) {
+  const i = SMK.k; SMK.calm[i] = calm ? 1 : 0; SMK.k = (SMK.k + 1) % SMK.N; const j = i * 3;
   SMK.pos[j] = x; SMK.pos[j + 1] = y; SMK.pos[j + 2] = z; SMK.vel[j] = vx; SMK.vel[j + 1] = vy; SMK.vel[j + 2] = vz; SMK.age[i] = 0; SMK.life[i] = life; SMK.s0[i] = size; SMK.a0[i] = alpha;
 }
 // ---------- Geräusche ----------
@@ -5094,16 +5098,44 @@ function coughSound(dest) {
 function smokeClick() {
   if (state !== 'play' || inputBlocked || !isSm(P.held) || P.hidden || fadeBusy) return;
   if (!SMK.lit) { SMK.lit = true; SMK.dragT = -1; lighterSound(); say(P.held === 'joint' ? (P.joints ? 'Noch ein Joint … die Wände wissen es schon.' : 'Joint angezündet. Linksklick = ziehen. Danach sieht man Dinge …') : (SMK.hint ? 'Zigarette angezündet.' : 'Angezündet. Linksklick = ziehen – aber Husten ist laut!'), 3200); SMK.hint = true; hotbarRender(true); }
-  else if (SMK.dragT < 0) { SMK.dragT = 0; smokeInhale(); }
+  else if (SMK.dragT < 0) { SMK.dragT = 0; SMK.trick = 0; smokeInhale(); }
 }
 document.addEventListener('mousedown', e => { if (e.button === 0) smokeClick(); });
+
+// ---------- Tricks: Rauchring und Qualle ----------
+function trickBurst(kind, ox, oy, oz, fx, fy, fz) {
+  const fl = Math.hypot(fx, fy, fz) || 1; fx /= fl; fy /= fl; fz /= fl;
+  let rx = -fz, rz = fx; const rl = Math.hypot(rx, rz) || 1; rx /= rl; rz /= rl;
+  const ux = -rz * fy, uy = rz * fx - rx * fz, uz = rx * fy;   // up2 = right × forward
+  if (kind === 1) {   // Ring
+    const R = .06, n = 44; for (let i = 0; i < n; i++) {
+      const th = i / n * 6.283, cx = Math.cos(th), sy = Math.sin(th), dx = rx * cx + ux * sy, dy = uy * sy, dz = rz * cx + uz * sy;
+      smokeSpawn(ox + dx * R, oy + dy * R, oz + dz * R, fx * .9 + dx * .06, fy * .9 + dy * .06 + .01, fz * .9 + dz * .06, 6, .042, .62, true);
+    }
+  } else {   // Qualle: runde Kappe mit nachziehenden Fangarmen
+    const R = .1; for (let i = 0; i < 64; i++) {
+      const ph = Math.random() * 1.5, th = Math.random() * 6.283, sr = Math.sin(ph) * R * 1.15, cx = Math.cos(th) * sr, sy = Math.sin(th) * sr, cf = Math.cos(ph) * R;
+      const dx = rx * cx + ux * sy, dy = uy * sy, dz = rz * cx + uz * sy;
+      smokeSpawn(ox + fx * cf + dx, oy + fy * cf + dy, oz + fz * cf + dz, fx * .55 + dx * .3, fy * .55 + dy * .3 + .05, fz * .55 + dz * .3, 6.5, .06, .55, true);
+    }
+    for (let t = 0; t < 6; t++) { const th = t / 6 * 6.283, cx = Math.cos(th) * .05, sy = Math.sin(th) * .05;
+      for (let m = 0; m < 8; m++) smokeSpawn(ox - fx * m * .035 + rx * cx + ux * sy, oy - fy * m * .035 + uy * sy - m * .012, oz - fz * m * .035 + rz * cx + uz * sy, fx * (.45 - m * .015), fy * .45 - .01, fz * (.45 - m * .015), 5.5, .04, .45, true); }
+  }
+}
+function tryTrick(kind) {
+  if (state !== 'play' || inputBlocked || !isSm(P.held) || P.hidden || fadeBusy) return;
+  if (!SMK.lit || SMK.dragT >= 0) return; SMK.trick = kind; SMK.dragT = 0; smokeInhale();
+}
+document.addEventListener('mousedown', e => { if (e.button === 2) tryTrick(1); });
+window.addEventListener('keydown', e => { if (e.code === 'KeyX' && !e.repeat) tryTrick(2); });
 function smokeStub(msg) { SMK.lit = false; SMK.dragT = -1; if (msg) say(msg, 2200); hotbarRender(true); }
 const _smv = new THREE.Vector3(), _smd = new THREE.Vector3();
 function mouthPos(out) { return out.set(P.x - Math.sin(P.vyaw) * .12, P.crouch ? 1.0 : 1.5, P.z - Math.cos(P.vyaw) * .12); }
-function puffBurst(x, y, z, dx, dz, n) { for (let i = 0; i < n; i++) smokeSpawn(x + rnd(-.03, .03), y + rnd(-.03, .03), z + rnd(-.03, .03), dx * rnd(.45, 1.0) + rnd(-.12, .12), rnd(.04, .22), dz * rnd(.45, 1.0) + rnd(-.12, .12), rnd(3.2, 5.5), rnd(.07, .13), rnd(.35, .55)); }
+function puffBurst(x, y, z, dx, dz, n, big) { big = big || 1; for (let i = 0; i < n; i++) smokeSpawn(x + rnd(-.03, .03), y + rnd(-.03, .03), z + rnd(-.03, .03), dx * rnd(.45, 1.0) + rnd(-.12, .12), rnd(.04, .22), dz * rnd(.45, 1.0) + rnd(-.12, .12), rnd(3.2, 5.5) * big, rnd(.07, .13) * big, rnd(.35, .55)); }
 function updateSmoke(dt) {
   // --- eigene Zigarette ---
-  const holding = isSm(P.held) && state === 'play', joint = P.held === 'joint';
+  const holding = isSm(P.held) && state === 'play', joint = P.held === 'joint', vape = P.held === 'vape';
+  if (vape && holding && !SMK.lit) { SMK.lit = true; hotbarRender(true); if (!SMK.vhint) { SMK.vhint = true; say('Vape: Linksklick = Zug · Rechtsklick = Ring · X = Qualle', 4200); } }
   if (SMK.lit && !holding && state === 'play') smokeStub();
   if (state !== 'play' && SMK.lit) { SMK.dragT = -1; SMK.drag = 0; }
   P.smoking = !!(SMK.lit && holding && !P.hidden);
@@ -5111,21 +5143,27 @@ function updateSmoke(dt) {
     SMK.dragT += dt; const t = SMK.dragT;
     SMK.drag = t < .55 ? t / .55 : t < .95 ? 1 : Math.max(0, 1 - (t - .95) / .55);
     if (!SMK._ex && t >= .95) {
-      SMK._ex = true; if (joint) SMK.leftJ -= .125; else SMK.left -= .075; P.noise = Math.max(P.noise, joint ? 4 : 3);
+      SMK._ex = true; if (joint) SMK.leftJ -= .125; else if (!vape) SMK.left -= .075; P.noise = Math.max(P.noise, joint ? 4 : 2.5);
       if (joint) { P.high = Math.min(2.2, P.high + .15 + P.joints * .03); P.highT = 0; }
-      if (Math.random() < (joint ? .14 : .07)) { coughSound(); P.noise = Math.max(P.noise, 10); glitchKick = Math.max(glitchKick, .3); say('*hust hust*', 1500); SMK.puffQ = 4; }
-      else { smokeExhale(); SMK.puffQ = joint ? 24 : 16; }
+      if (Math.random() < (joint ? .14 : vape ? .03 : .07)) { coughSound(); P.noise = Math.max(P.noise, 10); glitchKick = Math.max(glitchKick, .3); say('*hust hust*', 1500); SMK.puffQ = 4; }
+      else if (SMK.trick) {
+        smokeExhale(); mouthPos(_smv); let fx = -Math.sin(P.vyaw), fy = 0, fz = -Math.cos(P.vyaw), ox = _smv.x + fx * .2, oy = _smv.y, oz = _smv.z + fz * .2;
+        if (!P.third) { camera.getWorldDirection(_smd); fx = _smd.x; fy = _smd.y * .8; fz = _smd.z; ox = camera.position.x + fx * .3; oy = camera.position.y + fy * .3 - .1; oz = camera.position.z + fz * .3; }
+        trickBurst(SMK.trick, ox, oy, oz, fx, fy, fz); if (vape) SMK.puffQ = 8;
+      }
+      else { smokeExhale(); SMK.puffQ = vape ? 44 : joint ? 24 : 16; }
     }
-    if (t >= 1.5) { SMK.dragT = -1; SMK._ex = false; SMK.drag = 0; const lf = joint ? SMK.leftJ : SMK.left; if (lf <= 0) { if (joint) { SMK.leftJ = 1; P.joints++; P.high = Math.min(2.2, P.high + .12); } else SMK.left = 1; setHeld(null); smokeStub(joint ? 'Joint aufgeraucht (' + P.joints + '). Der Rausch ist gleich da …' : 'Aufgeraucht.'); } }
+    if (t >= 1.5) { SMK.dragT = -1; SMK._ex = false; SMK.drag = 0; const lf = vape ? 1 : joint ? SMK.leftJ : SMK.left; if (lf <= 0) { if (joint) { SMK.leftJ = 1; P.joints++; P.high = Math.min(2.2, P.high + .12); } else SMK.left = 1; setHeld(null); smokeStub(joint ? 'Joint aufgeraucht (' + P.joints + '). Der Rausch ist gleich da …' : 'Aufgeraucht.'); } }
   } else SMK.drag += (0 - SMK.drag) * Math.min(1, dt * 8);
   if (P.smoking && !P.hidden) {
-    if (SMK.drag < .05 || P.third) SMK.wispT -= dt;
+    if (!vape && (SMK.drag < .05 || P.third)) SMK.wispT -= dt;
     if (SMK.wispT <= 0) { SMK.wispT = .14; if (P.third || !camGrp.visible) mouthPos(_smv); else { cigTip.getWorldPosition(_smv); } smokeSpawn(_smv.x, _smv.y, _smv.z, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .32); }
     if (P.noise < 1.6) P.noise = 1.6;
   }
-  if (SMK.puffQ > 0) { const n = Math.min(SMK.puffQ, 2); SMK.puffQ -= n; const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw); mouthPos(_smv); if (!P.third) _smv.y = camera.position.y - .12; puffBurst(_smv.x + fx * .15, _smv.y, _smv.z + fz * .15, fx * .8, fz * .8, n); }
+  if (SMK.puffQ > 0) { const n = Math.min(SMK.puffQ, 2); SMK.puffQ -= n; const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw); mouthPos(_smv); if (!P.third) _smv.y = camera.position.y - .12; puffBurst(_smv.x + fx * .15, _smv.y, _smv.z + fz * .15, fx * .8, fz * .8, n, P.held === 'vape' ? 1.7 : 1); }
   // Glut an der Zigarette
   cigEmber.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); cigEmber.visible = true;
+  vapeLed.material.color.setRGB(.1 + SMK.drag * .1, .35 + SMK.drag * .65, .5 + SMK.drag * .5);
   cigBody.scale.z = Math.max(.15, (joint ? SMK.leftJ : SMK.left) * .95 + .05); if (joint) cigM.scale.set(2.8, 2.8, 2.3); else cigM.scale.set(2.0, 2.0, 2.0);
   // --- Mitspieler ---
   remotes.forEach(r => {
@@ -5133,16 +5171,18 @@ function updateSmoke(dt) {
     if (on && !r._smk) { if (AC) lighterSound(makeTempPanner(r.rx, r.rz)); r._smk = true; r._wt = 0; r._pt = rnd(2, 4); } else if (!on) r._smk = false;
     if (!on) return; r._wt -= dt; r._pt -= dt; const hy = r.crouch ? .95 : 1.5, fx = -Math.sin(r.ryaw), fz = -Math.cos(r.ryaw);
     if (r._wt <= 0) { r._wt = .16; smokeSpawn(r.rx + fx * .2, hy - .08, r.rz + fz * .2, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .3); }
-    if (r._pt <= 0) { r._pt = rnd(3.5, 6.5); puffBurst(r.rx + fx * .15, hy, r.rz + fz * .15, fx * .8, fz * .8, 14); if (AC) smokeExhale(makeTempPanner(r.rx, r.rz)); }
+    if (r._pt <= 0) { r._pt = rnd(3.5, 6.5); { const tk = Math.random(); if (tk < .28) trickBurst(1, r.rx + fx * .25, hy - .05, r.rz + fz * .25, fx, 0, fz); else if (tk < .42) trickBurst(2, r.rx + fx * .25, hy - .05, r.rz + fz * .25, fx, 0, fz); else puffBurst(r.rx + fx * .15, hy, r.rz + fz * .15, fx * .8, fz * .8, 14); } if (AC) smokeExhale(makeTempPanner(r.rx, r.rz)); }
   });
   // --- Partikel ---
   let alive = false;
   for (let i = 0; i < SMK.N; i++) {
     const a = SMK.age[i]; if (a >= SMK.life[i]) { if (SMK.aA[i] !== 0) { SMK.aA[i] = 0; alive = true; } continue; } alive = true;
     const na = a + dt, j = i * 3, k = na / SMK.life[i]; SMK.age[i] = na;
-    SMK.vel[j] += Math.sin(na * 1.7 + i) * dt * .16; SMK.vel[j + 2] += Math.cos(na * 1.3 + i * 2) * dt * .16; const dr = Math.max(0, 1 - dt * .55); SMK.vel[j] *= dr; SMK.vel[j + 2] *= dr; SMK.vel[j + 1] = SMK.vel[j + 1] * dr + .015 * dt;
+    const cm = SMK.calm[i];
+    if (!cm) { SMK.vel[j] += Math.sin(na * 1.7 + i) * dt * .16; SMK.vel[j + 2] += Math.cos(na * 1.3 + i * 2) * dt * .16; }
+    const dr = Math.max(0, 1 - dt * (cm ? .22 : .55)); SMK.vel[j] *= dr; SMK.vel[j + 2] *= dr; SMK.vel[j + 1] = SMK.vel[j + 1] * dr + (cm ? 0 : .015 * dt);
     SMK.pos[j] += SMK.vel[j] * dt; SMK.pos[j + 1] += SMK.vel[j + 1] * dt; SMK.pos[j + 2] += SMK.vel[j + 2] * dt;
-    SMK.aS[i] = SMK.s0[i] * (1 + k * 4); SMK.aA[i] = SMK.a0[i] * Math.pow(Math.max(0, 1 - k), 1.4) * Math.min(1, na * 5);
+    SMK.aS[i] = SMK.s0[i] * (1 + k * (cm ? 1.3 : 4)); SMK.aA[i] = SMK.a0[i] * Math.pow(Math.max(0, 1 - k), 1.4) * Math.min(1, na * 5);
   }
   if (alive) { SMK.geo.attributes.position.needsUpdate = true; SMK.geo.attributes.aA.needsUpdate = true; SMK.geo.attributes.aS.needsUpdate = true; }
   const lk = .22 + Math.min(.6, ambientL.intensity * .5 + hemiL.intensity * .6) + (P.flash ? .25 : 0); SMK.u.uCol.value.setScalar(Math.min(.85, lk));

@@ -43,9 +43,11 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 (Das Ende ist nur angedeutet: Blut auf der Linse, dann Schnitt auf Schwarz.)
 
-**Hotbar (Tasten 1–7, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel, 6 Zigarette, 7 Joint. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
+**Hotbar (Tasten 1–8, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel, 6 Zigarette, 7 Joint, 8 Vape. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
 
 **Zigarette (Taste 6):** Solo oder zu zweit (bzw. zu viert) im Co-op. Linksklick zündet an (Feuerzeug-Klick), danach zieht jeder Klick: Hand wandert zum Mund, Glut leuchtet auf, dann bläst du eine Rauchwolke aus, die im Raum hängen bleibt. Die Zigarette brennt nach ~13 Zügen ab. **Vorsicht:** Mit 7 % Wahrscheinlichkeit musst du husten – das ist laut und lockt das Wesen an. Im Co-op sehen und hören alle Mitspieler deinen Rauch.
+
+**Vape (Taste 8) & Rauch-Tricks:** Die Vape ist sofort einsatzbereit (kein Anzünden, brennt nicht ab, kaum Husten) und macht riesige Dampfwolken; die LED leuchtet beim Ziehen auf. Mit Zigarette, Joint und Vape kannst du Tricks: **Linksklick** = normaler Zug, **Rechtsklick** = **Rauchring** (fliegt als echter Ring durch den Raum), **X** = **Rauch-Qualle** (runde Kappe mit nachziehenden Fangarmen). Im Co-op blasen Mitspieler beim Rauchen ab und zu selbst Ringe und Quallen.
 
 **Joint (Taste 7) – Rausch & Anomalien:** Linksklick zündet an und zieht (~8 Züge pro Joint, Husten-Chance 14 %). Jeder Zug macht dich „high“; der Rausch klingt langsam ab, **mehrere Joints stapeln sich**. Je höher du bist, desto schlimmer die Anomalien – nur bei dir selbst, Mitspieler sehen nur den Rauch: wabernde Wände und Kamera, wechselnde Farben, Doppelbilder, Herzschlag, Flüstern, Schritte, Augen im Dunkeln, flackernde Lichter, Spieluhr, Phantome des Wesens und Blackouts; die Leichen unter den Tüchern beginnen zu atmen. Der Joint-Zähler steht in der Hotbar.
 
@@ -69,7 +71,7 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Solo oder Online-Co-op (bis 4 Spieler):** Einer klickt „Raum erstellen“, die anderen geben den 4-stelligen Code ein; in der Lobby startet der Host. Läuft per WebRTC ohne eigenen Server (auch auf Vercel); für den Verbindungsaufbau wird der öffentliche PeerJS-Broker genutzt. Proximity-Voice (Mikrofon im Menü anhaken): Stimmen sind räumlich, Wände dämpfen – aber Reden lockt das Wesen an. Wer stirbt, schaut zu; auf der nächsten Etage sind alle wieder dabei.
 
-**Steuerung:** WASD, Maus, Shift (rennen), C (ducken – kaum sichtbar), 1–7 (Gegenstand in die Hand), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
+**Steuerung:** WASD, Maus, Shift (rennen), C (ducken – kaum sichtbar), 1–8 (Gegenstand in die Hand), I / Tab (Inventar), B (Video aufnehmen), G (Foto mit Blitz), Mausrad (Zoom), F (Lampe), E (aufnehmen / benutzen / verstecken), linke Maustaste (sprühen), Q (Sprühfarbe), T (Ego/Third-Person), V (Mikrofon an/aus), Esc (Pause), R (nach dem Tod: Etage neu starten – im Co-op nur der Host), Leertaste (als Zuschauer: nächster Spieler).
 
 **Spraydosen** liegen auf dem Boden (je 3 pro Etage, verschiedene Farben). Das Gesprühte sehen im Co-op alle. An den Wänden stehen schon Graffitis („ACT“ u. a.) – aber nicht überall, damit du selbst noch Platz hast.
 
