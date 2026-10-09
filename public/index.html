@@ -87,7 +87,9 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 .keys span{color:#b9aea6;padding:.15em .1em}
 kbd{display:inline-block;font:inherit;font-weight:bold;color:#fff;background:linear-gradient(#3b2020,#170909);border:1px solid #6a2a26;border-bottom-width:3px;border-radius:3px;padding:.1em .5em;margin-right:.4em;letter-spacing:.08em;box-shadow:0 0 8px rgba(120,0,0,.3)}
 .screen .go.diff,.screen .go.qual{margin-top:.5em;padding:.5em 1.3em;letter-spacing:.2em;font-size:.92em}
-input[type=checkbox]{accent-color:#c0120f}
+input[type=checkbox],input[type=range]{accent-color:#c0120f}
+.srow{display:grid;grid-template-columns:minmax(150px,19em) minmax(120px,22em) 5em;gap:.8em;align-items:center;text-align:left;margin:.3em 0;font-size:clamp(11px,1.6vh,14px);letter-spacing:.08em}.srow input{width:100%}.srow b{text-align:right;font-weight:normal;color:#ff9b8c}
+#setprof{max-width:50em;flex-wrap:wrap;justify-content:center}.screen .go.prof{padding:.45em 1.1em;letter-spacing:.16em;font-size:.88em}
 #menu{padding-top:6vh}
 .joinbox{display:inline-flex;align-items:center}
 #codein{margin-top:1em;width:5em;padding:.75em .6em;background:#000;border:1px solid #ddd;color:#fff;font:inherit;letter-spacing:.35em;text-transform:uppercase;text-align:center}
@@ -227,6 +229,7 @@ input[type=checkbox]{accent-color:#c0120f}
   <div id="modes">
     <div class="go blink" id="startbtn">[ SOLO ]</div>
     <div class="go" id="lookbtn">[ AUSSEHEN ]</div>
+    <div class="go" id="setbtn">[ EINSTELLUNGEN ]</div>
     <div class="go" id="hostbtn">[ RAUM ERSTELLEN ]</div><br>
     <div class="joinbox"><input id="codein" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false"><div class="go" id="joinbtn">[ BEITRETEN ]</div></div>
   </div>
@@ -250,7 +253,11 @@ input[type=checkbox]{accent-color:#c0120f}
   <p class="k" id="lobinfo"></p>
   <div><div class="go" id="startrun">[ STARTEN ]</div><div class="go menubtn">[ VERLASSEN ]</div></div>
 </div>
-<div id="pause" class="screen"><h1>PAUSE</h1><p class="k" id="pauseinfo"></p><div class="go" id="resumebtn">[ KLICKEN ZUM FORTFAHREN ]</div></div>
+<div id="pause" class="screen"><h1>PAUSE</h1><p class="k" id="pauseinfo"></p><div class="go" id="resumebtn">[ KLICKEN ZUM FORTFAHREN ]</div> <div class="go" id="setbtn2">[ EINSTELLUNGEN ]</div></div>
+<div id="settings" class="screen"><h1>EINSTELLUNGEN</h1><div class="k lbl">TON</div>
+  <div id="setrows"></div><div class="k lbl">KLANGPROFIL</div><div id="setprof" class="diffrow"></div>
+  <div><div class="go" id="settest">[ HÖRPROBE ]</div><div class="go" id="setreset">[ ZURÜCKSETZEN ]</div><div class="go" id="setdone">[ FERTIG ]</div></div>
+  <p class="k">Alles wird im Browser gespeichert. Die Hörprobe spielt Herzschlag, Akkord, Flüstern, Spieluhr und einen dumpfen Schlag.</p></div>
 <div id="dead" class="screen"><h1>SIGNAL VERLOREN</h1><p id="deadtxt">Die Aufnahme bricht ab.</p><div><div class="go" id="retrybtn">[ R – ETAGE NEU STARTEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="win" class="screen"><h1>AUFNAHME GESICHERT</h1><p id="wintxt"></p><div><div class="go" id="againbtn">[ R – NOCHMAL SPIELEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="end" class="screen"><h1>ENDE</h1><p id="endtxt"></p><div><div class="go" id="endagain">[ R – VON VORNE ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
@@ -3254,7 +3261,7 @@ function hostPhoto(pid, x, z, yaw) {
 /* ====================================================================
    AUDIO (rein prozedural)
 ==================================================================== */
-let AC = null, master, sfx, revIn, noiseBuf, entPanner, entGain, chaseGain, droneGain, humGain, humOsc;
+let AC = null, master, ambBus, droneBus, voiceBus, revWet, eqLow, eqHigh, toneLP, toneHP, outGain, sfx, revIn, noiseBuf, entPanner, entGain, chaseGain, droneGain, humGain, humOsc;
 function impulse(sec, decay) {
   const len = Math.floor(AC.sampleRate * sec), b = AC.createBuffer(2, len, AC.sampleRate);
   for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
@@ -3266,10 +3273,15 @@ function initAudio() {
   try {
     AC = new (window.AudioContext || window.webkitAudioContext)();
     master = AC.createGain(); master.gain.value = .85;
-    const comp = AC.createDynamicsCompressor(); master.connect(comp); comp.connect(AC.destination);
+    // Mischpult: Effekte (master) + Hintergrund + Stimmen → Klangregelung (Bass/Höhen/Filter) → Gesamtlautstärke → Kompressor
+    const mixIn = AC.createGain(); ambBus = AC.createGain(); droneBus = AC.createGain(); voiceBus = AC.createGain(); droneBus.connect(ambBus); ambBus.connect(mixIn); voiceBus.connect(mixIn); master.connect(mixIn);
+    eqLow = AC.createBiquadFilter(); eqLow.type = 'lowshelf'; eqLow.frequency.value = 140; eqHigh = AC.createBiquadFilter(); eqHigh.type = 'highshelf'; eqHigh.frequency.value = 4200;
+    toneHP = AC.createBiquadFilter(); toneHP.type = 'highpass'; toneHP.frequency.value = 20; toneLP = AC.createBiquadFilter(); toneLP.type = 'lowpass'; toneLP.frequency.value = 20000; outGain = AC.createGain();
+    mixIn.connect(eqLow); eqLow.connect(eqHigh); eqHigh.connect(toneHP); toneHP.connect(toneLP); toneLP.connect(outGain);
+    const comp = AC.createDynamicsCompressor(); outGain.connect(comp); comp.connect(AC.destination);
     try { recDest = AC.createMediaStreamDestination(); comp.connect(recDest); } catch (e) { recDest = null; }
     const conv = AC.createConvolver(); conv.buffer = impulse(2.8, 2.3);
-    const wet = AC.createGain(); wet.gain.value = .45; revIn = AC.createGain(); revIn.connect(conv); conv.connect(wet); wet.connect(master);
+    const wet = revWet = AC.createGain(); wet.gain.value = .45; revIn = AC.createGain(); revIn.connect(conv); conv.connect(wet); wet.connect(master);
     sfx = AC.createGain(); sfx.connect(master); sfx.connect(revIn);
     noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
     const nd = noiseBuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
@@ -3277,12 +3289,12 @@ function initAudio() {
     const d2 = AC.createOscillator(); d2.type = 'sawtooth'; d2.frequency.value = 43.4;
     const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 130;
     droneGain = AC.createGain(); droneGain.gain.value = .13;
-    d1.connect(droneGain); d2.connect(lp); lp.connect(droneGain); droneGain.connect(master); d1.start(); d2.start();
+    d1.connect(droneGain); d2.connect(lp); lp.connect(droneGain); droneGain.connect(droneBus); d1.start(); d2.start();
     const wn = noiseSrc(), wbp = AC.createBiquadFilter(); wbp.type = 'bandpass'; wbp.frequency.value = 380; wbp.Q.value = .8;
-    const wg = AC.createGain(); wg.gain.value = .035; wn.connect(wbp); wbp.connect(wg); wg.connect(master);
+    const wg = AC.createGain(); wg.gain.value = .035; wn.connect(wbp); wbp.connect(wg); wg.connect(ambBus);
     const lfo = AC.createOscillator(); lfo.frequency.value = .11; const lg = AC.createGain(); lg.gain.value = 160; lfo.connect(lg); lg.connect(wbp.frequency); lfo.start();
     // Lampenbrummen (Neonröhre)
-    humGain = AC.createGain(); humGain.gain.value = 0; humGain.connect(master);
+    humGain = AC.createGain(); humGain.gain.value = 0; humGain.connect(ambBus);
     humOsc = AC.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.value = 100;
     const hlp = AC.createBiquadFilter(); hlp.type = 'lowpass'; hlp.frequency.value = 420; humOsc.connect(hlp); hlp.connect(humGain); humOsc.start();
     const hn = noiseSrc(), hhp = AC.createBiquadFilter(); hhp.type = 'bandpass'; hhp.frequency.value = 2500; hhp.Q.value = 3; const hng = AC.createGain(); hng.gain.value = .12; hn.connect(hhp); hhp.connect(hng); hng.connect(humGain);
@@ -3300,13 +3312,14 @@ function initAudio() {
     // rasselnder Atem
     const rn = noiseSrc(), rbp = AC.createBiquadFilter(); rbp.type = 'bandpass'; rbp.frequency.value = 900; rbp.Q.value = 2.5; const rg = AC.createGain(); rg.gain.value = .0;
     const rl = AC.createOscillator(); rl.frequency.value = .45; const rlg = AC.createGain(); rlg.gain.value = .22; rl.connect(rlg); rlg.connect(rg.gain); rl.start(); rn.connect(rbp); rbp.connect(rg); rg.connect(entGain);
-    chaseGain = AC.createGain(); chaseGain.gain.value = 0; chaseGain.connect(master);
+    chaseGain = AC.createGain(); chaseGain.gain.value = 0; chaseGain.connect(ambBus);
     // Jagd: kein Musikmotiv – dunkles Brummen mit Halbton-Reibung, Herzschlag-Pumpen, hohes Pfeifen
     const clp = AC.createBiquadFilter(); clp.type = 'lowpass'; clp.frequency.value = 280; clp.connect(chaseGain);
     [55, 58.3, 82.4].forEach(f => { const o = AC.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; const g = AC.createGain(); g.gain.value = .3; o.connect(g); g.connect(clp); o.start(); });
     const sub = AC.createOscillator(); sub.frequency.value = 38; const subg = AC.createGain(); subg.gain.value = 0; sub.connect(subg); subg.connect(chaseGain); sub.start();
     const hb = AC.createOscillator(); hb.frequency.value = 1.9; const hws = AC.createWaveShaper(); const hc = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 127.5 - 1; hc[i] = Math.pow(Math.max(0, x), 4) * 1.4; } hws.curve = hc; hb.connect(hws); hws.connect(subg.gain); hb.start();
     [1930, 2011].forEach(f => { const o = AC.createOscillator(); o.type = 'sine'; o.frequency.value = f; const g = AC.createGain(); g.gain.value = .018; o.connect(g); g.connect(chaseGain); o.start(); });
+    applyAudio();
   } catch (e) { AC = null; }
 }
 function setListener() {
@@ -5285,6 +5298,56 @@ function updateHigh(dt) {
 }
 
 /* ====================================================================
+   EINSTELLUNGEN – Ton: Lautstärken (Gesamt, Effekte, Hintergrund, Dauerbrummen, Stimmen), Hall, Bass/Höhen und
+   Klangprofile (Original, Kino, Dumpf, Hell, Radio, Tief, Trocken, Höhle). Wird im Browser gespeichert.
+==================================================================== */
+const AUD_DEF = { master: 1, fx: 1, amb: 1, drone: 1, voice: 1, rev: .45, bass: 0, treble: 0, lp: 20000, hp: 20, profile: 0 };
+const AUD = Object.assign({}, AUD_DEF);
+try { Object.assign(AUD, JSON.parse(localStorage.getItem('bcam_audio') || '{}')); } catch (e) { }
+const AUD_PROFILES = [['ORIGINAL', {}], ['KINO', { bass: 5, treble: 2, rev: .75 }], ['DUMPF', { bass: 4, treble: -9, lp: 3200, rev: .5 }], ['HELL', { bass: -3, treble: 8, rev: .35 }], ['RADIO', { bass: -6, treble: -2, lp: 3600, hp: 420, rev: .2 }], ['TIEF', { bass: 10, treble: -3, lp: 6000, rev: .5 }], ['TROCKEN', { rev: .05 }], ['HÖHLE', { bass: 2, treble: -4, rev: 1.1 }]];
+const AUD_ROWS = [['master', 'GESAMT', 0, 1, .01, v => Math.round(v * 100) + '%'], ['fx', 'EFFEKTE (Schritte, Türen, Schreie)', 0, 1, .01, v => Math.round(v * 100) + '%'], ['amb', 'HINTERGRUND (Wind, Lampen, Jagd-Brummen)', 0, 1, .01, v => Math.round(v * 100) + '%'],
+  ['drone', 'DAUERBRUMMEN (tiefer Dauerton)', 0, 1, .01, v => Math.round(v * 100) + '%'], ['voice', 'MITSPIELER-STIMMEN', 0, 2, .01, v => Math.round(v * 100) + '%'], ['rev', 'HALL', 0, 1.3, .01, v => Math.round(v * 100) + '%'],
+  ['bass', 'BÄSSE', -12, 12, .5, v => (v > 0 ? '+' : '') + v + ' dB'], ['treble', 'HÖHEN', -12, 12, .5, v => (v > 0 ? '+' : '') + v + ' dB']];
+function applyAudio() {
+  if (!AC) return; const t = AC.currentTime, k = .05, set = (p, v) => p.setTargetAtTime(v, t, k);
+  set(outGain.gain, AUD.master); set(master.gain, .85 * AUD.fx); set(ambBus.gain, AUD.amb); set(droneBus.gain, AUD.drone); set(voiceBus.gain, AUD.voice); set(revWet.gain, AUD.rev);
+  set(eqLow.gain, AUD.bass); set(eqHigh.gain, AUD.treble); set(toneLP.frequency, AUD.lp); set(toneHP.frequency, AUD.hp);
+}
+function saveAudio() { try { localStorage.setItem('bcam_audio', JSON.stringify(AUD)); } catch (e) { } }
+let setFrom = 'menu';
+function buildSettings() {
+  const host = $('setrows'); host.innerHTML = '';
+  AUD_ROWS.forEach(([k, label, mn, mx, st, fmt]) => {
+    const row = document.createElement('label'); row.className = 'srow';
+    row.innerHTML = '<span>' + label + '</span><input type="range" min="' + mn + '" max="' + mx + '" step="' + st + '" value="' + AUD[k] + '"><b></b>';
+    const inp = row.querySelector('input'), out = row.querySelector('b'); out.textContent = fmt(AUD[k]);
+    inp.addEventListener('input', () => { AUD[k] = +inp.value; out.textContent = fmt(AUD[k]); if (['bass', 'treble', 'rev'].includes(k)) { AUD.profile = -1; markProfile(); } applyAudio(); saveAudio(); });
+    inp.addEventListener('change', () => { initAudio(); applyAudio(); });
+    host.appendChild(row);
+  });
+  const ph = $('setprof'); ph.innerHTML = AUD_PROFILES.map((p, i) => '<div class="go prof" data-p="' + i + '">' + p[0] + '</div>').join('');
+  ph.querySelectorAll('.prof').forEach(b => b.addEventListener('click', () => { initAudio(); setProfile(+b.dataset.p); testSound(); }));
+  markProfile();
+}
+function markProfile() { document.querySelectorAll('#setprof .prof').forEach(b => b.classList.toggle('sel', +b.dataset.p === AUD.profile)); }
+function setProfile(i) {
+  const p = AUD_PROFILES[i][1]; AUD.profile = i; AUD.bass = p.bass || 0; AUD.treble = p.treble || 0; AUD.lp = p.lp || 20000; AUD.hp = p.hp || 20; AUD.rev = p.rev === undefined ? .45 : p.rev;
+  applyAudio(); saveAudio(); buildSettings();
+}
+function testSound() {   // kurze Hörprobe: Herzschlag, Akkord, Flüstern, Spieluhr, dumpfer Schlag
+  initAudio(); if (!AC) return; applyAudio(); heartbeat(.6); setTimeout(() => sting(.35), 700); setTimeout(() => whisper(P.x + 1.5, P.z + 1), 1500); setTimeout(() => musicBox(P.x + 4, P.z + 2), 3200); setTimeout(() => thud(.9, 300), 5600);
+}
+function openSettings(from) {
+  setFrom = from; ['menu', 'pause'].forEach(id => $(id).style.display = 'none'); buildSettings(); $('settings').style.display = 'flex'; initAudio();
+}
+function closeSettings() { $('settings').style.display = 'none'; $(setFrom).style.display = 'flex'; }
+$('setbtn').addEventListener('click', () => openSettings('menu'));
+$('setbtn2').addEventListener('click', e => { e.stopPropagation(); openSettings('pause'); });
+$('settest').addEventListener('click', testSound);
+$('setreset').addEventListener('click', () => { Object.assign(AUD, AUD_DEF); applyAudio(); saveAudio(); buildSettings(); });
+$('setdone').addEventListener('click', closeSettings);
+
+/* ====================================================================
    MULTIPLAYER (WebRTC / PeerJS) – Host-autoritativ
 ==================================================================== */
 const STATES = ['dormant', 'patrol', 'investigate', 'chase', 'flee'];
@@ -5444,7 +5507,7 @@ function attachVoice(id, stream) {
     const a = new Audio(); a.srcObject = stream; a.muted = true; a.play().catch(() => {});
     const src = AC.createMediaStreamSource(stream), lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000;
     const pan = AC.createPanner(); pan.panningModel = 'HRTF'; pan.distanceModel = 'inverse'; pan.refDistance = 2.5; pan.rolloffFactor = 1.4; pan.maxDistance = 40;
-    const g = AC.createGain(); g.gain.value = 1.6; src.connect(lp); lp.connect(pan); pan.connect(g); g.connect(master); g.connect(revIn); voices.set(id, { pan, lp, src, a, g });
+    const g = AC.createGain(); g.gain.value = 1.6; src.connect(lp); lp.connect(pan); pan.connect(g); g.connect(voiceBus); g.connect(revIn); voices.set(id, { pan, lp, src, a, g });
   } catch (e) {}
 }
 function dropVoice(id) { const v = voices.get(id); if (!v) return; try { v.g.disconnect(); v.a.srcObject = null; } catch (e) {} voices.delete(id); }
@@ -5813,7 +5876,7 @@ resize();
 requestAnimationFrame(frame);
 bloodInit();
 if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state = 'menu'; $('menu').style.display = 'flex'; } else bootStart();
-window.__game = { highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
+window.__game = { AUD, highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
   get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CAMC, PRO, get LOOK() { return LOOK; }, LOOK_FIELDS, openLook, closeLook, lookRandom, get LP() { return LP; }, lookUIvals, lookPreviewRebuild, get LOOKS() { return LOOKS; }, startLostScare, toggleSheet, startSchoolWake, INV, get SCH() { return SCH; }, loopAt, renderer, ambientL, flashlight, scene, camera, invToggle, invAddNote, startRec, stopRec, toggleRec, get camZoom() { return camZoom; }, camGrp, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };

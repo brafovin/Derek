@@ -67,6 +67,10 @@ Die Gegenstände in der Hand (Kamera, Lampe, Zigarette, Joint, Vape …) sitzen 
 
 **Unheimliches:** Zwischendurch passieren Dinge, ohne dass das Wesen dich jagt – eine verstimmte Spieluhr in der Ferne, Schritte hinter dir, die abrupt stoppen, zwei Augen im Dunkeln, die blinzeln und verschwinden, Bildstörungen mit kaputtem Zeitstempel, einzelne Einblendungen für Sekundenbruchteile. Und wer sich versteckt, hört es an der Tür kratzen.
 
+## Einstellungen (Menü und Pause: [ EINSTELLUNGEN ])
+
+**Ton:** Regler für Gesamt, Effekte, Hintergrund (Wind, Lampen, Jagd-Brummen), **Dauerbrummen** (der tiefe Dauerton lässt sich einzeln runterdrehen oder ausschalten), Mitspieler-Stimmen, Hall sowie **Bässe und Höhen** (±12 dB). Dazu **Klangprofile** (Original, Kino, Dumpf, Hell, Radio, Tief, Trocken, Höhle), die Filter, Hall und Klangfarbe verändern, und eine **Hörprobe**. Alles wird im Browser gespeichert.
+
 ## Allgemein
 
 **Schwierigkeit** (Leicht / Normal / Albtraum) wird im Menü bzw. in der Lobby (Host) gewählt.
