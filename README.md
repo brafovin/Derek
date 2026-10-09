@@ -45,7 +45,7 @@ Du wachst in einem komplett neuen, hellen Haus auf und glaubst an einen schlimme
 
 **Hotbar (Tasten 1–8, Mausrad):** Unten im Bild siehst du deine Gegenstände – 1 Kamera, 2 Taschenlampe, 3 Spraydose, 4 Sicherung, 5 Schlüssel, 6 Zigarette, 7 Joint, 8 Vape. **In der Hand hältst du immer nur EINE Sache**: Die Lampe leuchtet nur, solange du sie hältst (F schaltet sie an/aus), Kamera, Foto und Zoom gehen nur mit der Kamera in der Hand, gesprüht wird nur mit der Dose. Dieselbe Taste legt den Gegenstand wieder weg. Das Mausrad schaltet durch (mit der Kamera in der Hand zoomt es).
 
-**Zigarette (Taste 6):** Solo oder zu zweit (bzw. zu viert) im Co-op. Linksklick zündet an (Feuerzeug-Klick), danach zieht jeder Klick: Hand wandert zum Mund, Glut leuchtet auf, dann bläst du eine Rauchwolke aus, die im Raum hängen bleibt. Die Zigarette brennt nach ~13 Zügen ab. **Vorsicht:** Mit 7 % Wahrscheinlichkeit musst du husten – das ist laut und lockt das Wesen an. Im Co-op sehen und hören alle Mitspieler deinen Rauch.
+**Zigarette (Taste 6):** Solo oder zu zweit (bzw. zu viert) im Co-op. Linksklick zündet an (Feuerzeug-Klick), danach zieht jeder Klick: Hand wandert zum Mund, Glut leuchtet auf, dann bläst du eine Rauchwolke aus, die im Raum hängen bleibt. Die Zigarette brennt nach ~13 Zügen ab. **Vorsicht:** Mit 7 % Wahrscheinlichkeit musst du husten – das ist laut und lockt das Wesen an. Im Co-op sehen und hören alle Mitspieler, wie du rauchst: Die Figur hält Zigarette, Joint oder Vape in der Hand, führt sie zum Mund, atmet die Wolke aus – und auch deine Ringe und Quallen kommen genau so bei ihnen an.
 
 **Vape (Taste 8) & Rauch-Tricks:** Die Vape sieht aus wie eine „Bang Box“-Einweg-Vape (rosa→türkiser Verlauf, Krone, Totenkopf mit Hut, Display mit 100 %) und ist sofort einsatzbereit (kein Anzünden, brennt nicht ab, kaum Husten) und macht riesige Dampfwolken; die LED leuchtet beim Ziehen auf. Mit Zigarette, Joint und Vape kannst du Tricks: **Linksklick** = normaler Zug, **Rechtsklick** = **Rauchring** (dicker, fester Wirbelring mit Loch und leicht unregelmäßigem Rand, fliegt durch den Raum), **X** = **Rauch-Qualle** (leuchtender Wirbelring mit einer Glocke aus feinen Fäden, die zurück zum Mund fließen). Im Co-op blasen Mitspieler beim Rauchen ab und zu selbst Ringe und Quallen.
 
@@ -81,7 +81,13 @@ Wer stirbt, ist **nicht mehr raus**: Nach der Todesszene wachst du am **Anfang d
 
 **Handy/Tablet** (Touch wird automatisch erkannt, am besten im Querformat – beim ersten Antippen geht das Spiel in den Vollbildmodus): Joystick unten links = laufen, Wischen auf der rechten Bildhälfte = umsehen, Tasten für AKTION (halten), E · BENUTZEN, LAMPE, VIDEO, FOTO, RING, QUALLE, ITEM ◄ ►, RENNEN und DUCKEN (an/aus), INVENTAR, PAUSE; die Hotbar unten ist antippbar. Auf dem Handy startet die Grafik automatisch in der mittleren Stufe (sinkt bei zu niedriger Bildrate selbst).
 
+## Google Play Store / App
+
+Das Spiel ist als **installierbare Web-App (PWA)** vorbereitet (Manifest, Service Worker, Icons, Datenschutzseite `/privacy.html`). Wie du es als Android-App (TWA) im Play Store einreichst, steht Schritt für Schritt in **`ANDROID.md`** – das Veröffentlichen selbst geht nur über dein eigenes Play-Entwicklerkonto.
+
 ## Einstellungen (Menü und Pause: [ EINSTELLUNGEN ])
+
+Drei Reiter: **TON**, **STEUERUNG**, **ANZEIGE**. Steuerung: alle Tasten frei belegbar (anklicken, neue Taste drücken), Maus-/Controller-/Touch-Empfindlichkeit, Y-Achse invertieren, Touch-Tastengröße, Deckkraft und Linkshänder-Layout. Anzeige: Sichtfeld (FOV), Stärke der Bildstörungen, Grafikstufe. Im Pause-Menü und in den Einstellungen gibt es **[ SPIEL BEENDEN ]** (zurück zum Hauptmenü).
 
 **Ton:** Regler für Gesamt, Effekte, Hintergrund (Wind, Lampen, Jagd-Brummen), **Dauerbrummen** (der tiefe Dauerton lässt sich einzeln runterdrehen oder ausschalten), Mitspieler-Stimmen, Hall sowie **Bässe und Höhen** (±12 dB). Dazu **Klangprofile** (Original, Kino, Dumpf, Hell, Radio, Tief, Trocken, Höhle), die Filter, Hall und Klangfarbe verändern, und eine **Hörprobe**. Alles wird im Browser gespeichert.
 

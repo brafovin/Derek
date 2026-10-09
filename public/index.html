@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>LETZTE AUFNAHME – Bodycam Horror</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png"><meta name="theme-color" content="#0e0304">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <style>
@@ -89,7 +90,10 @@ canvas#gore{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-
 kbd{display:inline-block;font:inherit;font-weight:bold;color:#fff;background:linear-gradient(#3b2020,#170909);border:1px solid #6a2a26;border-bottom-width:3px;border-radius:3px;padding:.1em .5em;margin-right:.4em;letter-spacing:.08em;box-shadow:0 0 8px rgba(120,0,0,.3)}
 .screen .go.diff,.screen .go.qual{margin-top:.5em;padding:.5em 1.3em;letter-spacing:.2em;font-size:.92em}
 input[type=checkbox],input[type=range]{accent-color:#c0120f}
-.srow{display:grid;grid-template-columns:minmax(150px,19em) minmax(120px,22em) 5em;gap:.8em;align-items:center;text-align:left;margin:.3em 0;font-size:clamp(11px,1.6vh,14px);letter-spacing:.08em}.srow input{width:100%}.srow b{text-align:right;font-weight:normal;color:#ff9b8c}
+.srow{display:grid;grid-template-columns:minmax(150px,19em) minmax(120px,22em) 5em;gap:.8em;align-items:center;text-align:left;margin:.3em 0;font-size:clamp(11px,1.6vh,14px);letter-spacing:.08em}.srow input{width:100%}.srow.chk{grid-template-columns:minmax(150px,19em) 2em 5em}.srow.chk input{width:auto}
+.krow{display:grid;grid-template-columns:minmax(150px,17em) 9em;gap:.8em;align-items:center;text-align:left;margin:.2em 0;font-size:clamp(11px,1.5vh,13px);letter-spacing:.08em}.screen .go.kb{margin:0;padding:.3em .6em;text-align:center;font-size:.9em;letter-spacing:.08em}
+#keyrows{display:grid;grid-template-columns:1fr 1fr;gap:0 2.5em}@media(max-width:820px){#keyrows{grid-template-columns:1fr}}
+#set-audio,#set-ctrl,#set-view{text-align:center}.screen .go.stab{padding:.5em 1.4em}#settings{justify-content:flex-start;justify-content:safe flex-start;padding-top:4vh}.srow b{text-align:right;font-weight:normal;color:#ff9b8c}
 #setprof{max-width:50em;flex-wrap:wrap;justify-content:center}.screen .go.prof{padding:.45em 1.1em;letter-spacing:.16em;font-size:.88em}
 #menu{padding-top:6vh}
 .joinbox{display:inline-flex;align-items:center}
@@ -158,12 +162,13 @@ input[type=checkbox],input[type=range]{accent-color:#c0120f}
 #touch{position:fixed;inset:0;z-index:20;display:none;pointer-events:none;-webkit-tap-highlight-color:transparent;touch-action:none}
 #touch>*{pointer-events:auto;touch-action:none}
 #tlook{position:absolute;right:0;top:0;width:58vw;height:68vh;z-index:0}
-#tjoy{position:absolute;left:4vw;bottom:5vh;width:min(34vh,30vw);height:min(34vh,30vw);border-radius:50%;border:2px solid rgba(255,255,255,.35);background:radial-gradient(rgba(255,255,255,.08),rgba(255,255,255,.02));z-index:2}
+#tjoy{opacity:var(--tof,.8);position:absolute;left:4vw;bottom:5vh;width:min(34vh,30vw);height:min(34vh,30vw);border-radius:50%;border:2px solid rgba(255,255,255,.35);background:radial-gradient(rgba(255,255,255,.08),rgba(255,255,255,.02));z-index:2}
 #tknob{position:absolute;left:50%;top:50%;width:42%;height:42%;margin:-21% 0 0 -21%;border-radius:50%;background:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.6)}
-.tb{position:absolute;z-index:3;width:15vh;height:9vh;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(9px,2vh,15px);letter-spacing:.06em;color:#fff;border:2px solid rgba(255,255,255,.45);background:rgba(20,0,0,.55);border-radius:10px;user-select:none;line-height:1.1}
-.tb.big{width:22vh;height:22vh;font-size:clamp(12px,2.8vh,20px);border-radius:50%;border-color:rgba(255,80,60,.85);background:rgba(110,10,6,.55)}
-.tb.sm{width:13.5vh;height:8vh;font-size:clamp(8px,1.8vh,13px)}
+.tb{position:absolute;z-index:3;opacity:var(--tof,.8);width:calc(15vh*var(--tsc,1));height:calc(9vh*var(--tsc,1));display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(9px,2vh,15px);letter-spacing:.06em;color:#fff;border:2px solid rgba(255,255,255,.45);background:rgba(20,0,0,.55);border-radius:10px;user-select:none;line-height:1.1}
+.tb.big{width:calc(22vh*var(--tsc,1));height:calc(22vh*var(--tsc,1));font-size:clamp(12px,2.8vh,20px);border-radius:50%;border-color:rgba(255,80,60,.85);background:rgba(110,10,6,.55)}
+.tb.sm{width:calc(13.5vh*var(--tsc,1));height:calc(8vh*var(--tsc,1));font-size:clamp(8px,1.8vh,13px)}
 .tb.on,.tb.down{background:rgba(220,40,30,.8);border-color:#fff}
+#touch.lefty{transform:scaleX(-1)}#touch.lefty .tb{transform:scaleX(-1)}
 body.touch #stats,body.touch #cam,body.touch #ts,body.touch #roster,body.touch #room{display:none}
 body.touch .hs{min-width:44px;font-size:.62em;padding:.3em .3em}
 body.touch #hotbar{pointer-events:auto;bottom:.8vh}
@@ -269,11 +274,16 @@ body.touch .screen{-webkit-overflow-scrolling:touch}
   <p class="k" id="lobinfo"></p>
   <div><div class="go" id="startrun">[ STARTEN ]</div><div class="go menubtn">[ VERLASSEN ]</div></div>
 </div>
-<div id="pause" class="screen"><h1>PAUSE</h1><p class="k" id="pauseinfo"></p><div class="go" id="resumebtn">[ KLICKEN ZUM FORTFAHREN ]</div> <div class="go" id="setbtn2">[ EINSTELLUNGEN ]</div></div>
-<div id="settings" class="screen"><h1>EINSTELLUNGEN</h1><div class="k lbl">TON</div>
-  <div id="setrows"></div><div class="k lbl">KLANGPROFIL</div><div id="setprof" class="diffrow"></div>
-  <div><div class="go" id="settest">[ HÖRPROBE ]</div><div class="go" id="setreset">[ ZURÜCKSETZEN ]</div><div class="go" id="setdone">[ FERTIG ]</div></div>
-  <p class="k">Alles wird im Browser gespeichert. Die Hörprobe spielt Herzschlag, Akkord, Flüstern, Spieluhr und einen dumpfen Schlag.</p></div>
+<div id="pause" class="screen"><h1>PAUSE</h1><p class="k" id="pauseinfo"></p><div class="go" id="resumebtn">[ KLICKEN ZUM FORTFAHREN ]</div> <div class="go" id="setbtn2">[ EINSTELLUNGEN ]</div> <div class="go" id="quitbtn">[ SPIEL BEENDEN ]</div></div>
+<div id="settings" class="screen"><h1>EINSTELLUNGEN</h1>
+  <div class="diffrow" id="settabs"><div class="go stab sel" data-t="audio">TON</div><div class="go stab" data-t="ctrl">STEUERUNG</div><div class="go stab" data-t="view">ANZEIGE</div></div>
+  <div id="set-audio"><div class="k lbl">LAUTSTÄRKE &amp; KLANG</div><div id="setrows"></div><div class="k lbl">KLANGPROFIL</div><div id="setprof" class="diffrow"></div>
+    <div><div class="go" id="settest">[ HÖRPROBE ]</div><div class="go" id="setreset">[ ZURÜCKSETZEN ]</div></div></div>
+  <div id="set-ctrl" style="display:none"><div class="k lbl">TASTEN (anklicken, dann neue Taste drücken – Esc = abbrechen)</div><div id="keyrows"></div><div class="k lbl">EMPFINDLICHKEIT &amp; TOUCH</div><div id="sensrows"></div>
+    <div><div class="go" id="ctrlreset">[ STANDARD ]</div></div></div>
+  <div id="set-view" style="display:none"><div class="k lbl">BILD</div><div id="viewrows"></div><div class="k lbl">GRAFIKSTUFE</div><div id="setqual" class="diffrow"></div><div><div class="go" id="viewreset">[ STANDARD ]</div></div></div>
+  <div><div class="go" id="setdone">[ FERTIG ]</div><div class="go" id="quitbtn2">[ SPIEL BEENDEN ]</div></div>
+  <p class="k">Alles wird im Browser gespeichert. Controller: Steuerkreuz wählt, A bestätigt, links/rechts verstellt Regler.</p></div>
 <div id="dead" class="screen"><h1>SIGNAL VERLOREN</h1><p id="deadtxt">Die Aufnahme bricht ab.</p><div><div class="go" id="retrybtn">[ R – ETAGE NEU STARTEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="win" class="screen"><h1>AUFNAHME GESICHERT</h1><p id="wintxt"></p><div><div class="go" id="againbtn">[ R – NOCHMAL SPIELEN ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
 <div id="end" class="screen"><h1>ENDE</h1><p id="endtxt"></p><div><div class="go" id="endagain">[ R – VON VORNE ]</div><div class="go menubtn">[ MENÜ ]</div></div></div>
@@ -3548,9 +3558,9 @@ window.addEventListener('keyup', e => { keysDown[e.code] = false; });
 document.addEventListener('mousemove', e => {
   if (state !== 'play' || inputBlocked) return;
   if (document.pointerLockElement !== canvas && !(e.buttons & 2)) return;
-  const s = 0.0021 * (1 - .55 * Math.min(1, tvWatch)) / (1 + (camZoom - 1) * .7);
+  const s = 0.0021 * SET.sensM * (1 - .55 * Math.min(1, tvWatch)) / (1 + (camZoom - 1) * .7);
   if (P.hidden) P.yaw = Math.max(P.hidden.yaw - 0.6, Math.min(P.hidden.yaw + 0.6, P.yaw - e.movementX * s)); else P.yaw -= e.movementX * s;
-  P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - e.movementY * s));
+  P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - e.movementY * s * (SET.invY ? -1 : 1)));
 });
 function lockPointer() { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
 canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -3628,7 +3638,7 @@ function updateRemotes(dt) {
       const u = r.g.userData;
       r.g.position.set(r.x, 0, r.z); r.g.rotation.y = r.yaw + Math.PI; r.g.scale.y = r.crouch ? 0.8 : 1;
       r.walk += mv * 3.2; const sw = Math.sin(r.walk) * 0.6 * Math.min(1, r.moving * 1.5);
-      u.can.visible = !!r.spray; u.torch.visible = !!r.flash; poseAvatar(u, sw, tNow + r.idx * 1.3, r.spray, !!r.flash); u.head.rotation.x = -r.pitch * .6;
+      const smk = !!(r.smoke && r.alive !== false); u.can.visible = !!r.spray; u.torch.visible = !!r.flash && !smk; poseAvatar(u, sw, tNow + r.idx * 1.3, r.spray, !!r.flash && !smk); u.head.rotation.x = -r.pitch * .6; smokePose(u, r._kind || 'cig', smk, r.dragK || 0);
       u.led.visible = Math.sin(tNow * 3.5) > -0.2;
       const cy = r.crouch ? .85 : 1.38, fx = -Math.sin(r.yaw) * Math.cos(r.pitch), fy = Math.sin(r.pitch), fz = -Math.cos(r.yaw) * Math.cos(r.pitch);
       r.spot.position.set(r.x + Math.cos(r.yaw) * .28, cy - .18, r.z - Math.sin(r.yaw) * .28);
@@ -3660,7 +3670,7 @@ function updateLocalAvatar(show) {
   localAvatar.position.set(P.x, 0, P.z); localAvatar.rotation.y = P.vyaw + Math.PI; localAvatar.scale.y = P.crouch ? 0.78 : 1;
   const sw = Math.sin(P.bob) * 0.6 * Math.min(1, P.moving * 1.5);
   u.head.rotation.x = -P.vpitch * .6; poseAvatar(u, sw, tNow, P.spraying, P.held === 'torch');
-  u.torch.visible = P.held === 'torch'; u.can.visible = P.held === 'spray' && P.sel >= 0; if (P.sel >= 0) u.can.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
+  u.torch.visible = P.held === 'torch'; smokePose(u, P.held, !!P.smoking, SMK.drag); u.can.visible = P.held === 'spray' && P.sel >= 0; if (P.sel >= 0) u.can.userData.body.material.color.setHex(SPRAY_COLS[P.sel]);
 }
 function updateCamera(dt) {
   const k = Math.min(1, dt * 11);
@@ -3676,7 +3686,7 @@ function updateCamera(dt) {
   const pitch = P.vpitch + Math.sin(t * 7.3) * jit + (Math.random() - .5) * shake + Math.sin(P.bob * 2) * 0.012 * m + deathPitch;
   const yaw = P.vyaw + Math.sin(t * 5.1) * jit + (Math.random() - .5) * shake;
   camera.rotation.set(pitch, yaw, roll + deathRoll, 'YXZ');
-  const fov0 = 88 + tvFovFX + fovFX, fovT = camZoom > 1.005 ? 2 * Math.atan(Math.tan(fov0 * Math.PI / 360) / camZoom) * 180 / Math.PI : fov0; if (Math.abs(camera.fov - fovT) > .05) { camera.fov = fovT; camera.updateProjectionMatrix(); }
+  const fov0 = SET.fov + tvFovFX + fovFX, fovT = camZoom > 1.005 ? 2 * Math.atan(Math.tan(fov0 * Math.PI / 360) / camZoom) * 180 / Math.PI : fov0; if (Math.abs(camera.fov - fovT) > .05) { camera.fov = fovT; camera.updateProjectionMatrix(); }
   const wantTP = P.third && state === 'play' && !P.hidden;
   camBlend += ((wantTP ? 1 : 0) - camBlend) * Math.min(1, dt * 7); camDistNow = 0;
   if (camBlend > 0.02) {
@@ -3973,6 +3983,23 @@ function disposeAvatar(g) {
   if (g.userData && g.userData.faceTex) g.userData.faceTex.dispose();
 }
 
+/* ---------- Rauch-Gegenstände in der Hand der Figuren (Zigarette, Joint, Vape) + Haltung beim Ziehen ---------- */
+function addSmokeProps(u, robot) {
+  const par = u.fore[1], y = robot ? -.13 : -.31, z = robot ? .035 : .03, grp = new THREE.Group(); grp.position.set(0, y, z); par.add(grp); grp.visible = false;
+  const M = c => new THREE.MeshStandardMaterial({ color: c, roughness: .8 }), mk = (geo, mat, x, yy, zz) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, yy, zz); return m; };
+  const cig = new THREE.Group(); { const b = mk(new THREE.CylinderGeometry(.006, .006, .1, 8), M(0xf0ece0), 0, 0, 0); b.rotation.z = Math.PI / 2; cig.add(b); const f = mk(new THREE.CylinderGeometry(.0062, .0062, .03, 8), M(0xc98a3a), -.035, 0, 0); f.rotation.z = Math.PI / 2; cig.add(f); const em = mk(new THREE.SphereGeometry(.0065, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff5a1a }), .052, 0, 0); cig.add(em); cig.userData.ember = em; }
+  const joint = new THREE.Group(); { const b = mk(new THREE.CylinderGeometry(.0105, .0045, .13, 10), M(0xc4bb98), 0, 0, 0); b.rotation.z = -Math.PI / 2; joint.add(b); const f = mk(new THREE.CylinderGeometry(.0048, .0048, .035, 8), M(0xf6f4ec), -.08, 0, 0); f.rotation.z = Math.PI / 2; joint.add(f); const em = mk(new THREE.SphereGeometry(.009, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff5a1a }), .066, 0, 0); joint.add(em); joint.userData.ember = em; }
+  const vape = new THREE.Group(); { vape.add(mk(new THREE.BoxGeometry(.03, .022, .105), M(0x48c6da), 0, 0, 0)); vape.add(mk(new THREE.BoxGeometry(.031, .023, .04), M(0xf59ac0), 0, 0, .04)); vape.add(mk(new THREE.BoxGeometry(.016, .012, .02), M(0xf59ac0), 0, 0, .07)); const led = mk(new THREE.SphereGeometry(.005, 6, 5), new THREE.MeshBasicMaterial({ color: 0x9ff4ff }), 0, .012, -.02); vape.add(led); vape.userData.ember = led; }
+  vape.rotation.y = Math.PI / 2; [cig, joint, vape].forEach(o => { o.visible = false; grp.add(o); }); u.smk = { grp, cig, joint, vape, robot };
+}
+function smokePose(u, kind, on, drag) {   // nach poseAvatar aufrufen: Hand zum Mund beim Ziehen
+  const S = u.smk; if (!S) return; S.grp.visible = !!on; if (!on) return;
+  ['cig', 'joint', 'vape'].forEach(k => { S[k].visible = k === kind; }); S[kind].userData.ember.material.color.setRGB(1, .35 + drag * .3, .1 + drag * .1);
+  const idleA = S.robot ? -.45 : -.35, idleF = S.robot ? -1.0 : -1.05, dragA = S.robot ? -.55 : -.6, dragF = S.robot ? -2.25 : -2.3;
+  u.arms[1].rotation.x = idleA + (dragA - idleA) * drag; u.fore[1].rotation.x = idleF + (dragF - idleF) * drag; u.arms[1].rotation.z = -.1 - (S.robot ? .3 : .5) * drag; u.fore[1].rotation.y = .0;
+  if (u.torch) u.torch.visible = false;
+}
+
 /* ====================================================================
    ANDROID-KÖRPER: Figur im Look des grünen Android-Roboters (Kuppelkopf mit Antennen und weißen Augen,
    weißer Trennstrich, runder Rumpf, Kapselarme und -beine). Farbe, Oberfläche und Schmuck frei wählbar.
@@ -4121,7 +4148,7 @@ try { const sv = JSON.parse(localStorage.getItem('bcam_look') || 'null'); if (sv
 function saveLook() { try { localStorage.setItem('bcam_look', JSON.stringify(lookToArr(LOOK))); } catch (e) {} }
 
 /* ---------- Avatar bauen (Details in 53_human.js) ---------- */
-function buildAvatar(look, ci) { return buildHuman(look || defaultLook(ci)); }
+function buildAvatar(look, ci) { const L = look || defaultLook(ci), g = buildHuman(L); addSmokeProps(g.userData, L.body === 1); return g; }
 
 /* ---------- Editor-Oberfläche mit 3D-Vorschau ---------- */
 let LP = null; const _lpV = new THREE.Vector3();
@@ -4183,7 +4210,7 @@ function lookBy(dx, dy) {   // Bogenmaß; gleiche Regeln wie die Maus (TV-Bann, 
   if (state !== 'play' || inputBlocked || keypadOpen) return;
   const k = (1 - .55 * Math.min(1, tvWatch)) / (1 + (camZoom - 1) * .7);
   if (P.hidden) P.yaw = Math.max(P.hidden.yaw - .6, Math.min(P.hidden.yaw + .6, P.yaw - dx * k)); else P.yaw -= dx * k;
-  P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - dy * k));
+  P.pitch = Math.max(-1.35, Math.min(1.35, P.pitch - dy * k * (SET.invY ? -1 : 1)));
 }
 function pressKey(code) {   // Tastendruck simulieren (Spiel hört auf keydown/keyup)
   window.dispatchEvent(new KeyboardEvent('keydown', { code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code, bubbles: true }));
@@ -4218,7 +4245,7 @@ function pollPad(dt) {
   const playing = state === 'play' && !inputBlocked && !keypadOpen;
   if (playing) {
     VIN.fy = -ly; VIN.rx = lx;
-    lookBy(Math.sign(rx) * Math.pow(Math.abs(rx), 1.6) * 3.0 * dt, Math.sign(ry) * Math.pow(Math.abs(ry), 1.6) * 2.1 * dt);
+    lookBy(Math.sign(rx) * Math.pow(Math.abs(rx), 1.6) * 3.0 * SET.sensP * dt, Math.sign(ry) * Math.pow(Math.abs(ry), 1.6) * 2.1 * SET.sensP * dt);
     if (edge(0)) pressKey('KeyE'); if (edge(1)) pressKey('KeyC'); if (edge(2)) pressKey('KeyF'); if (edge(3)) pressKey('KeyG');
     if (edge(4)) cycleItem(-1); if (edge(5)) cycleItem(1); if (edge(8)) pressKey('KeyI'); if (edge(9)) doPause();
     if (edge(10)) VIN.run = !VIN.run; if (edge(11)) tryTrick(2);
@@ -4265,13 +4292,13 @@ function buildTouchUI() {
   });
   const joy = $('tjoy'), knob = $('tknob'), look = $('tlook');
   joy.addEventListener('touchstart', e => { e.preventDefault(); TCH.joy = e.changedTouches[0].identifier; joyMove(e.changedTouches[0]); }, { passive: false });
-  const joyMove = t => { const r = joy.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2; let dx = (t.clientX - cx) / R, dy = (t.clientY - cy) / R; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } TCH.jx = Math.abs(dx) < .12 ? 0 : dx; TCH.jy = Math.abs(dy) < .12 ? 0 : dy; knob.style.transform = 'translate(' + dx * R * .6 + 'px,' + dy * R * .6 + 'px)'; };
+  const joyMove = t => { const r = joy.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2; let dx = (t.clientX - cx) / R, dy = (t.clientY - cy) / R; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } TCH.jx = Math.abs(dx) < .12 ? 0 : dx; TCH.jy = Math.abs(dy) < .12 ? 0 : dy; knob.style.transform = (SET.lefty ? 'scaleX(-1) ' : '') + 'translate(' + dx * R * .6 + 'px,' + dy * R * .6 + 'px)'; };
   joy.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === TCH.joy) joyMove(t); }, { passive: false });
   const joyEnd = e => { for (const t of e.changedTouches) if (t.identifier === TCH.joy) { TCH.joy = null; TCH.jx = TCH.jy = 0; knob.style.transform = ''; } };
   joy.addEventListener('touchend', joyEnd); joy.addEventListener('touchcancel', joyEnd);
   let lt = null, lx = 0, ly = 0, tapT = 0;
   look.addEventListener('touchstart', e => { e.preventDefault(); initAudio(); const t = e.changedTouches[0]; lt = t.identifier; lx = t.clientX; ly = t.clientY; tapT = performance.now(); }, { passive: false });
-  look.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === lt) { lookBy((t.clientX - lx) * .0046, (t.clientY - ly) * .0046); lx = t.clientX; ly = t.clientY; } }, { passive: false });
+  look.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === lt) { lookBy((t.clientX - lx) * .0046 * SET.sensT * (SET.lefty ? -1 : 1), (t.clientY - ly) * .0046 * SET.sensT); lx = t.clientX; ly = t.clientY; } }, { passive: false });
   const lend = e => { for (const t of e.changedTouches) if (t.identifier === lt) { lt = null; } };
   look.addEventListener('touchend', lend); look.addEventListener('touchcancel', lend);
   // Hotbar antippen
@@ -4458,6 +4485,7 @@ function handleEvent(m) {
   else if (k === 'tvscare') { const tv = tvs[m.i]; if (tv) tvScareVisual(tv, m.by === net.idx); }
   else if (k === 'finale') finaleEvent();
   else if (k === 'lost') startLostScare();
+  else if (k === 'trick') { if (m.pid !== net.id) { const r = remotes.get(m.pid); if (r) { const hy = r.crouch ? 1.0 : 1.52, fx = -Math.sin(r.ryaw), fz = -Math.cos(r.ryaw); trickBurst(m.kind, r.rx + fx * .3, hy - .04, r.rz + fz * .3, fx, 0, fz); r._skipPuff = true; if (AC) smokeExhale(makeTempPanner(r.rx, r.rz)); } } }
   else if (k === 'fled') { panicShriek(); glitchKick = 1; flashOut = .3; say(m.by === net.idx || net.mode === 'solo' ? 'Der Blitz hat es geblendet! Es kreischt und rennt davon!' : 'Spieler ' + (m.by + 1) + ' hat das Wesen mit dem Blitz verscheucht!', 4200); }
   else if (k === 'chapter') chapterEnd();
   else if (k === 'sleep') startSleepEnding();
@@ -5501,7 +5529,7 @@ function updateSmoke(dt) {
       else if (SMK.trick) {
         smokeExhale(); mouthPos(_smv); let fx = -Math.sin(P.vyaw), fy = 0, fz = -Math.cos(P.vyaw), ox = _smv.x + fx * .2, oy = _smv.y, oz = _smv.z + fz * .2;
         if (!P.third) { camera.getWorldDirection(_smd); fx = _smd.x; fy = _smd.y * .8; fz = _smd.z; ox = camera.position.x + fx * .3; oy = camera.position.y + fy * .3 - .1; oz = camera.position.z + fz * .3; }
-        trickBurst(SMK.trick, ox, oy, oz, fx, fy, fz);
+        trickBurst(SMK.trick, ox, oy, oz, fx, fy, fz); netTrick(SMK.trick);
       }
       else { smokeExhale(); SMK.puffQ = vape ? 44 : joint ? 24 : 16; }
     }
@@ -5517,13 +5545,14 @@ function updateSmoke(dt) {
   vapeLed.material.opacity = .06 + SMK.drag * .28;
   { const em = joint ? jointEmber : cigEmber, bd = joint ? jointBody : cigBody, lf = joint ? SMK.leftJ : SMK.left;
     em.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); bd.scale.z = Math.max(.15, lf * .95 + .05); }
-  // --- Mitspieler ---
+  // --- Mitspieler: Gegenstand in der Hand, Zug (Hand zum Mund), Ausatmen als Rauchwolke ---
   remotes.forEach(r => {
-    const on = !!(r.smoke && r.alive !== false && !r.hidden);
-    if (on && !r._smk) { if (AC) lighterSound(makeTempPanner(r.rx, r.rz)); r._smk = true; r._wt = 0; r._pt = rnd(2, 4); } else if (!on) r._smk = false;
-    if (!on) return; r._wt -= dt; r._pt -= dt; const hy = r.crouch ? .95 : 1.5, fx = -Math.sin(r.ryaw), fz = -Math.cos(r.ryaw);
-    if (r._wt <= 0) { r._wt = .16; smokeSpawn(r.rx + fx * .2, hy - .08, r.rz + fz * .2, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .3); }
-    if (r._pt <= 0) { r._pt = rnd(3.5, 6.5); { const tk = Math.random(); if (tk < .28) trickBurst(1, r.rx + fx * .25, hy - .05, r.rz + fz * .25, fx, 0, fz); else if (tk < .42) trickBurst(2, r.rx + fx * .25, hy - .05, r.rz + fz * .25, fx, 0, fz); else puffBurst(r.rx + fx * .15, hy, r.rz + fz * .15, fx * .8, fz * .8, 14); } if (AC) smokeExhale(makeTempPanner(r.rx, r.rz)); }
+    const on = !!(r.smoke && r.alive !== false && !r.hidden), kind = r.smkV ? 'vape' : r.smkJ ? 'joint' : 'cig'; r._kind = kind; r.dragK = (r.dragK || 0) + (((on && r.puff) ? 1 : 0) - (r.dragK || 0)) * Math.min(1, dt * 7);
+    if (on && !r._smk) { if (AC) lighterSound(makeTempPanner(r.rx, r.rz)); r._smk = true; r._wt = 0; } else if (!on) r._smk = false;
+    if (!on) { r._pf = false; return; } r._wt -= dt; const hy = r.crouch ? .95 : 1.5, fx = -Math.sin(r.ryaw), fz = -Math.cos(r.ryaw);
+    if (kind !== 'vape' && r._wt <= 0 && !r.puff) { r._wt = .16; smokeSpawn(r.rx + fx * .3, hy - .35, r.rz + fz * .3, rnd(-.03, .03), rnd(.1, .17), rnd(-.03, .03), rnd(3, 4.5), .035, .3); }
+    if (r._pf && !r.puff) { if (r._skipPuff) r._skipPuff = false; else { puffBurst(r.rx + fx * .15, hy, r.rz + fz * .15, fx * .8, fz * .8, kind === 'vape' ? 44 : kind === 'joint' ? 24 : 16, kind === 'vape' ? 1.7 : 1); if (AC) smokeExhale(makeTempPanner(r.rx, r.rz)); } }
+    if (!r._pf && r.puff && AC) smokeInhale(makeTempPanner(r.rx, r.rz)); r._pf = r.puff;
   });
   // --- Partikel ---
   let alive = false;
@@ -5701,7 +5730,7 @@ function testSound() {   // kurze Hörprobe: Herzschlag, Akkord, Flüstern, Spie
   initAudio(); if (!AC) return; applyAudio(); heartbeat(.6); setTimeout(() => sting(.35), 700); setTimeout(() => whisper(P.x + 1.5, P.z + 1), 1500); setTimeout(() => musicBox(P.x + 4, P.z + 2), 3200); setTimeout(() => thud(.9, 300), 5600);
 }
 function openSettings(from) {
-  setFrom = from; ['menu', 'pause'].forEach(id => $(id).style.display = 'none'); buildSettings(); $('settings').style.display = 'flex'; initAudio();
+  setFrom = from; ['menu', 'pause'].forEach(id => $(id).style.display = 'none'); setTab('audio'); $('settings').style.display = 'flex'; initAudio();
 }
 function closeSettings() { $('settings').style.display = 'none'; $(setFrom).style.display = 'flex'; }
 $('setbtn').addEventListener('click', () => openSettings('menu'));
@@ -5709,6 +5738,80 @@ $('setbtn2').addEventListener('click', e => { e.stopPropagation(); openSettings(
 $('settest').addEventListener('click', testSound);
 $('setreset').addEventListener('click', () => { Object.assign(AUD, AUD_DEF); applyAudio(); saveAudio(); buildSettings(); });
 $('setdone').addEventListener('click', closeSettings);
+
+/* ====================================================================
+   STEUERUNG & ANZEIGE: Tasten frei belegen, Empfindlichkeit (Maus/Controller/Touch), Y-Achse, Touch-Layout
+   (Größe, Transparenz, Linkshänder), Sichtfeld, Bildstörungen – plus "Spiel beenden". Alles wird gespeichert.
+==================================================================== */
+const SET_DEF = { sensM: 1, sensP: 1, sensT: 1, invY: false, tsc: 1, tof: .8, lefty: false, fov: 88, glitch: 1 };
+const SET = Object.assign({}, SET_DEF);
+try { Object.assign(SET, JSON.parse(localStorage.getItem('bcam_set') || '{}')); } catch (e) { }
+function saveSet() { try { localStorage.setItem('bcam_set', JSON.stringify(SET)); } catch (e) { } }
+const ACTIONS = [['fwd', 'VORWÄRTS', 'KeyW'], ['back', 'RÜCKWÄRTS', 'KeyS'], ['left', 'LINKS', 'KeyA'], ['right', 'RECHTS', 'KeyD'], ['sprint', 'RENNEN (halten)', 'ShiftLeft'], ['crouch', 'DUCKEN', 'KeyC'], ['use', 'BENUTZEN / VERSTECKEN', 'KeyE'],
+  ['lamp', 'LAMPE AN/AUS', 'KeyF'], ['rec', 'VIDEO AUFNEHMEN', 'KeyB'], ['photo', 'BLITZFOTO', 'KeyG'], ['inv', 'INVENTAR', 'KeyI'], ['persp', 'EGO / 3RD PERSON', 'KeyT'], ['mic', 'MIKROFON', 'KeyV'], ['color', 'SPRÜHFARBE', 'KeyQ'], ['jelly', 'RAUCH-QUALLE', 'KeyX']];
+const BIND = {}; ACTIONS.forEach(a => BIND[a[0]] = a[2]);
+try { Object.assign(BIND, JSON.parse(localStorage.getItem('bcam_bind') || '{}')); } catch (e) { }
+let REMAP = {};
+function saveBind() { try { localStorage.setItem('bcam_bind', JSON.stringify(BIND)); } catch (e) { } buildRemap(); }
+function buildRemap() {   // gedrückte Taste → Standard-Taste, die das Spiel intern kennt
+  REMAP = {}; const bound = new Set(ACTIONS.map(a => BIND[a[0]]));
+  ACTIONS.forEach(([k, , d]) => { if (BIND[k] !== d) REMAP[BIND[k]] = d; });
+  ACTIONS.forEach(([k, , d]) => { if (BIND[k] !== d && !bound.has(d)) REMAP[d] = 'None'; });   // alte Taste ist jetzt frei → macht nichts mehr
+  if (BIND.sprint !== 'ShiftLeft' && !bound.has('ShiftRight')) REMAP.ShiftRight = 'None';
+}
+buildRemap();
+let rebinding = null;
+function keyLabel(c) { return c.replace(/^Key/, '').replace(/^Digit/, '').replace('ShiftLeft', 'Shift links').replace('ShiftRight', 'Shift rechts').replace('ControlLeft', 'Strg links').replace('Space', 'Leertaste').replace('Arrow', 'Pfeil '); }
+['keydown', 'keyup'].forEach(type => window.addEventListener(type, e => {
+  if (e._r) return;
+  if (rebinding) { if (type === 'keydown') { e.preventDefault(); e.stopImmediatePropagation(); if (e.code !== 'Escape') { const a = rebinding; const other = ACTIONS.find(x => x[0] !== a && BIND[x[0]] === e.code); if (other) BIND[other[0]] = BIND[a]; BIND[a] = e.code; saveBind(); } rebinding = null; buildCtrl(); } return; }
+  const c = REMAP[e.code]; if (c === undefined) return; e.stopImmediatePropagation(); e.preventDefault();
+  if (c === 'None') return; const ev = new KeyboardEvent(type, { code: c, key: e.key, bubbles: true, cancelable: true, repeat: e.repeat }); ev._r = true; window.dispatchEvent(ev);
+}, true));
+
+/* ---------- Oberfläche ---------- */
+function sliderRow(host, obj, key, label, mn, mx, st, fmt, after) {
+  const row = document.createElement('label'); row.className = 'srow'; row.innerHTML = '<span>' + label + '</span><input type="range" min="' + mn + '" max="' + mx + '" step="' + st + '" value="' + obj[key] + '"><b></b>';
+  const inp = row.querySelector('input'), out = row.querySelector('b'); out.textContent = fmt(obj[key]);
+  inp.addEventListener('input', () => { obj[key] = +inp.value; out.textContent = fmt(obj[key]); saveSet(); applySettings(); after && after(); }); host.appendChild(row);
+}
+function checkRow(host, obj, key, label) {
+  const row = document.createElement('label'); row.className = 'srow chk'; row.innerHTML = '<span>' + label + '</span><input type="checkbox"' + (obj[key] ? ' checked' : '') + '><b></b>';
+  row.querySelector('input').addEventListener('change', e => { obj[key] = e.target.checked; saveSet(); applySettings(); }); host.appendChild(row);
+}
+const pc = v => Math.round(v * 100) + '%';
+function buildCtrl() {
+  const kr = $('keyrows'); kr.innerHTML = '';
+  ACTIONS.forEach(([k, label]) => { const r = document.createElement('div'); r.className = 'krow'; r.innerHTML = '<span>' + label + '</span><div class="go kb' + (rebinding === k ? ' sel' : '') + '" data-k="' + k + '">' + (rebinding === k ? 'Taste drücken …' : keyLabel(BIND[k])) + '</div>'; kr.appendChild(r); });
+  kr.querySelectorAll('.kb').forEach(b => b.addEventListener('click', () => { rebinding = b.dataset.k; buildCtrl(); }));
+  const sr = $('sensrows'); sr.innerHTML = '';
+  sliderRow(sr, SET, 'sensM', 'MAUS-EMPFINDLICHKEIT', .2, 3, .05, pc); sliderRow(sr, SET, 'sensP', 'CONTROLLER-EMPFINDLICHKEIT', .3, 3, .05, pc); sliderRow(sr, SET, 'sensT', 'TOUCH-EMPFINDLICHKEIT', .3, 3, .05, pc);
+  checkRow(sr, SET, 'invY', 'Y-ACHSE INVERTIEREN (Hoch/Runter tauschen)');
+  sliderRow(sr, SET, 'tsc', 'TOUCH: TASTENGRÖSSE', .6, 1.5, .05, pc); sliderRow(sr, SET, 'tof', 'TOUCH: DECKKRAFT', .2, 1, .05, pc); checkRow(sr, SET, 'lefty', 'TOUCH: LINKSHÄNDER-LAYOUT (spiegeln)');
+}
+function buildView() {
+  const vr = $('viewrows'); vr.innerHTML = '';
+  sliderRow(vr, SET, 'fov', 'SICHTFELD (FOV)', 60, 110, 1, v => v + '°'); sliderRow(vr, SET, 'glitch', 'BILDSTÖRUNGEN / RAUSCHEN', 0, 1.5, .05, pc);
+  const q = $('setqual'); q.innerHTML = ['NIEDRIG', 'MITTEL', 'HOCH', 'ULTRA'].map((n, i) => '<div class="go qual' + (i === QI ? ' sel' : '') + '" data-q="' + i + '">' + n + '</div>').join('');
+  q.querySelectorAll('.qual').forEach(b => b.addEventListener('click', () => setQuality(+b.dataset.q)));
+}
+function setTab(t) {
+  ['audio', 'ctrl', 'view'].forEach(k => { $('set-' + k).style.display = k === t ? 'block' : 'none'; document.querySelector('.stab[data-t="' + k + '"]').classList.toggle('sel', k === t); });
+  if (t === 'ctrl') buildCtrl(); if (t === 'view') buildView(); if (t === 'audio') buildSettings(); PADS.ui = -1;
+}
+document.querySelectorAll('.stab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.t)));
+$('ctrlreset').addEventListener('click', () => { ACTIONS.forEach(a => BIND[a[0]] = a[2]); Object.assign(SET, { sensM: 1, sensP: 1, sensT: 1, invY: false, tsc: 1, tof: .8, lefty: false }); saveBind(); saveSet(); applySettings(); buildCtrl(); });
+$('viewreset').addEventListener('click', () => { Object.assign(SET, { fov: 88, glitch: 1 }); saveSet(); applySettings(); buildView(); });
+function applySettings() {
+  const t = $('touch'); if (t) { t.style.setProperty('--tsc', SET.tsc); t.style.setProperty('--tof', SET.tof); t.classList.toggle('lefty', !!SET.lefty); }
+}
+function quitGame() {
+  if (!confirm('Spiel beenden und zurück zum Hauptmenü?\n(Der Fortschritt dieser Runde geht verloren.)')) return;
+  try { if (net.peer) net.peer.destroy(); } catch (e) { } try { stopRec(); } catch (e) { }
+  location.replace(location.pathname + '?skip');
+}
+$('quitbtn').addEventListener('click', e => { e.stopPropagation(); quitGame(); }); $('quitbtn2').addEventListener('click', quitGame);
+applySettings();
 
 /* ====================================================================
    MULTIPLAYER (WebRTC / PeerJS) – Host-autoritativ
@@ -5791,9 +5894,10 @@ function onHostData(pid, m) {
   if (m.t === 'p') {
     if (!isFinite(m.x) || !isFinite(m.z)) return;
     r.rx = m.x; r.rz = m.z; r.ryaw = m.yaw; r.rpitch = m.pitch; const f = m.f | 0;
-    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.smoke = !!(f & 32); r.hidden = m.h; r.noise = Math.min(14, m.n || 1);
+    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.smoke = !!(f & 32); r.smkJ = !!(f & 64); r.smkV = !!(f & 128); r.puff = !!(f & 256); r.hidden = m.h; r.noise = Math.min(14, m.n || 1);
   } else if (m.t === 'pick') { const it = items[m.i]; if (it && r.alive && Math.hypot(r.rx - it.x, r.rz - it.z) < 5) hostPick(pid, m.i); }
   else if (m.t === 'respawn') { const sp = SPAWN[r.idx % 4]; r.alive = true; r.hidden = -1; r.rx = r.x = startCell.cx * CELL + sp[0]; r.rz = r.z = startCell.cy * CELL + sp[1]; if (Math.hypot(E.x - r.rx, E.z - r.rz) < 16 && !floorDef.noEntity) respawnEntity(); }
+  else if (m.t === 'trick') { const mm = { t: 'ev', k: 'trick', pid, kind: m.kind | 0 }; broadcast(mm); handleEvent(mm); }
   else if (m.t === 'fuse') { if (r.alive) hostFuse(); }
   else if (m.t === 'door') { if (r.alive) hostDoor(m.s); }
   else if (m.t === 'c2') { if (r.alive) { if (m.s === 'phone') hostPhone(); else if (m.s === 'eat') hostEat(); else if (m.s === 'door') hostHouseDoor(); else if (m.s === 'sleep') hostSleep(); } }
@@ -5824,7 +5928,8 @@ function onClientData(m) {
   else if (m.t === 'over') { gameOver = m.k; if (m.k === 'win') win(); }
   else if (m.t === 'full') { net.mode = 'solo'; netMsg('Der Raum ist voll (max. 4 Spieler).'); try { net.peer.destroy(); } catch (e) {} }
 }
-function localFlags() { return (P.flash && P.bat > 0 ? 1 : 0) | (P.crouch ? 2 : 0) | (P.sprinting ? 4 : 0) | (P.talk ? 8 : 0) | (P.spraying ? 16 : 0) | (P.smoking ? 32 : 0); }
+function netTrick(kind) { if (net.mode === 'host') broadcast({ t: 'ev', k: 'trick', pid: net.id, kind }); else if (net.mode === 'client' && net.hostConn) netSend(net.hostConn, { t: 'trick', kind }); }
+function localFlags() { return (P.flash && P.bat > 0 ? 1 : 0) | (P.crouch ? 2 : 0) | (P.sprinting ? 4 : 0) | (P.talk ? 8 : 0) | (P.spraying ? 16 : 0) | (P.smoking ? 32 : 0) | (P.smoking && P.held === 'joint' ? 64 : 0) | (P.smoking && P.held === 'vape' ? 128 : 0) | (P.smoking && SMK.dragT >= 0 && SMK.dragT < .95 ? 256 : 0); }
 function teamArr() { return [team.fuses, team.fusesIn, team.key, team.codeOk ? 1 : 0, team.notes.map(d => d === null ? '-' : d).join(''), team.doors.join(''), team.powered ? 1 : 0, team.stage, team.finale ? 1 : 0]; }
 function applyTeam(a) {
   const prev = { powered: team.powered, codeOk: team.codeOk, doors: team.doors.slice() };
@@ -5836,7 +5941,7 @@ function applyTeam(a) {
 }
 function buildSnapshot() {
   const p = [[net.id, 0, r2(P.x), r2(P.z), r2(P.vyaw), r2(P.vpitch), localFlags(), P.hidden ? P.hidden.id : -1, state === 'play' ? 1 : 0]];
-  remotes.forEach(r => p.push([r.id, r.idx, r2(r.rx), r2(r.rz), r2(r.ryaw), r2(r.rpitch), (r.flash ? 1 : 0) | (r.crouch ? 2 : 0) | (r.sprint ? 4 : 0) | (r.talk ? 8 : 0) | (r.spray ? 16 : 0) | (r.smoke ? 32 : 0), r.hidden, r.alive ? 1 : 0]));
+  remotes.forEach(r => p.push([r.id, r.idx, r2(r.rx), r2(r.rz), r2(r.ryaw), r2(r.rpitch), (r.flash ? 1 : 0) | (r.crouch ? 2 : 0) | (r.sprint ? 4 : 0) | (r.talk ? 8 : 0) | (r.spray ? 16 : 0) | (r.smoke ? 32 : 0) | (r.smkJ ? 64 : 0) | (r.smkV ? 128 : 0) | (r.puff ? 256 : 0), r.hidden, r.alive ? 1 : 0]));
   return { t: 's', g: r2(tGame), fl: FLN, tm: teamArr(), i: items.map(i => i.active ? 1 : 0).join(''), tvd: tvs.map(t => (t.dead || t.scareT > 0) ? 1 : 0).join(''), e: [r2(E.x), r2(E.z), r2(entity.rotation.y), Math.max(0, STATES.indexOf(E.state)), r2(E.curSpeed || 0)], p };
 }
 function applySnapshot(m) {
@@ -5850,7 +5955,7 @@ function applySnapshot(m) {
   m.p.forEach(a => {
     if (a[0] === net.id) return; seen.add(a[0]); const r = addRemote(a[0], a[1]);
     r.idx = a[1]; r.rx = a[2]; r.rz = a[3]; r.ryaw = a[4]; r.rpitch = a[5]; const f = a[6];
-    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.smoke = !!(f & 32); r.hidden = a[7]; r.alive = !!a[8];
+    r.flash = !!(f & 1); r.crouch = !!(f & 2); r.sprint = !!(f & 4); r.talk = !!(f & 8); r.spray = !!(f & 16); r.smoke = !!(f & 32); r.smkJ = !!(f & 64); r.smkV = !!(f & 128); r.puff = !!(f & 256); r.hidden = a[7]; r.alive = !!a[8];
   });
   [...remotes.keys()].forEach(id => { if (!seen.has(id)) { removeRemote(id); dropVoice(id); } });
 }
@@ -6222,7 +6327,7 @@ function frame(now) {
   glitchKick = Math.max(0, glitchKick - dt * 1.4); flashKick = Math.max(0, flashKick - dt * 3);
   const proxG = (live && E.state !== 'dormant') ? Math.max(0, 1 - E.dist / 7) : 0;
   postMat.uniforms.glitch.value = Math.min(1, glitchKick + proxG * proxG * 0.6 + (E.state === 'chase' && state === 'play' ? .08 : 0) + (state === 'ending' ? .05 + (endT > 4 ? Math.min(.25, (endT - 4) * .02) : 0) : 0));
-  if (DBG.noGlitch) postMat.uniforms.glitch.value = 0;
+  postMat.uniforms.glitch.value *= SET.glitch; if (DBG.noGlitch) postMat.uniforms.glitch.value = 0;
   postMat.uniforms.flash.value = Math.max(flashKick * 0.8, endFlash); postMat.uniforms.time.value = tNow % 1000;
   postMat.uniforms.expo.value = .94 + zoneK * .25 + (floorDef.kind === 'house' ? .35 : 0);
   // Angst-Effekt: pulsierender roter Rand, solange das Wesen nah ist oder jagt
@@ -6238,9 +6343,10 @@ function frame(now) {
 GAME_SEED = randSeed(); DIFF = 1; setQuality(QI); buildFloor(0); placePlayerAtStart(); entity.visible = false;
 resize();
 requestAnimationFrame(frame);
+try { if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('/sw.js').catch(() => { }); } catch (e) { }
 bloodInit();
 if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state = 'menu'; $('menu').style.display = 'flex'; } else bootStart();
-window.__game = { PADS, padScreenItems, padUi, VIN, get inputBlockedV() { return inputBlocked; }, HAL, halSpawn, AUD, highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
+window.__game = { smokePose, PADS, padScreenItems, padUi, VIN, get inputBlockedV() { return inputBlocked; }, HAL, halSpawn, AUD, highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
   get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CAMC, PRO, get LOOK() { return LOOK; }, LOOK_FIELDS, openLook, closeLook, lookRandom, get LP() { return LP; }, lookUIvals, lookPreviewRebuild, get LOOKS() { return LOOKS; }, startLostScare, toggleSheet, startSchoolWake, INV, get SCH() { return SCH; }, loopAt, renderer, ambientL, flashlight, scene, camera, invToggle, invAddNote, startRec, stopRec, toggleRec, get camZoom() { return camZoom; }, camGrp, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
