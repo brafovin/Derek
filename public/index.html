@@ -172,7 +172,7 @@ input[type=checkbox]{accent-color:#c0120f}
   <div id="sheet"><div class="paper"><div class="tape"></div><h2>AUSHANG · STEUERUNG</h2>
     <div class="cols"><div><h3>BEWEGEN</h3><p><b>W A S D</b> — gehen<br><b>MAUS</b> — umsehen<br><b>SHIFT</b> — rennen (Ausdauer!)<br><b>C</b> — ducken (geduckt wirst du kaum noch gesehen)</p>
     <h3>BENUTZEN</h3><p><b>E</b> — aufnehmen · benutzen · verstecken<br>(Spind, Schrank, Lehrertisch)<br><b>F</b> — Taschenlampe an/aus</p></div>
-    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen<br><b>1–6</b> — Gegenstand in die Hand nehmen (immer nur EINER!), Mausrad schaltet durch<br><b>6</b> — Zigarette: Linksklick anzünden / ziehen (Husten ist laut!)</p>
+    <div><h3>INVENTAR</h3><p><b>I</b> oder <b>TAB</b> — Lampe, Sicherungen, Schlüssel, Türcode, Spray und alle Notizen<br><b>1–7</b> — Gegenstand in die Hand nehmen (immer nur EINER!), Mausrad schaltet durch<br><b>6</b> — Zigarette · <b>7</b> — Joint: Linksklick anzünden / ziehen (Husten ist laut, Joints machen high!)</p>
     <h3>KAMERA</h3><p><b>B</b> — Aufnahme starten/stoppen<br><b>G</b> — Foto mit Blitz (verscheucht das Wesen!)<br><b>MAUSRAD</b> — Zoom</p>
     <h3>SPRAY</h3><p><b>linke Maustaste</b> — sprühen<br><b>Q</b> — Farbe wechseln</p>
     <h3>SONSTIGES</h3><p><b>T</b> Ego/Third-Person · <b>V</b> Mikrofon<br><b>ESC</b> Pause</p></div></div>
@@ -214,7 +214,7 @@ input[type=checkbox]{accent-color:#c0120f}
   <p class="story">Du bist K. Marlow und filmst Lost Places – heute die verlassene <b>Grundschule St. Aurelia</b>. Bei Tag ist alles ruhig. Dann kommt etwas um die Ecke … und du wachst nachts im selben Gebäude auf. Es hört dich, und es sieht dein Licht. Löse die Rätsel, versteck dich, komm raus. Und schau nicht zu lange in die Fernseher …</p>
   <div class="keys">
     <span><kbd>W A S D</kbd> gehen</span><span><kbd>MAUS</kbd> umsehen</span><span><kbd>SHIFT</kbd> rennen</span><span><kbd>C</kbd> ducken</span><span><kbd>E</kbd> benutzen / verstecken</span><span><kbd>F</kbd> Lampe</span>
-    <span><kbd>1–6</kbd> Gegenstand</span><span><kbd>I</kbd> Inventar</span><span><kbd>B</kbd> Video</span><span><kbd>G</kbd> Blitzfoto</span><span><kbd>LMT</kbd> sprühen</span><span><kbd>Q</kbd> Farbe</span><span><kbd>T</kbd> Ego/3rd</span><span><kbd>V</kbd> Mikro</span><span><kbd>ESC</kbd> Pause</span>
+    <span><kbd>1–7</kbd> Gegenstand</span><span><kbd>I</kbd> Inventar</span><span><kbd>B</kbd> Video</span><span><kbd>G</kbd> Blitzfoto</span><span><kbd>LMT</kbd> sprühen</span><span><kbd>Q</kbd> Farbe</span><span><kbd>T</kbd> Ego/3rd</span><span><kbd>V</kbd> Mikro</span><span><kbd>ESC</kbd> Pause</span>
   </div>
   <div class="k lbl">SCHWIERIGKEIT</div>
   <div class="diffrow">
@@ -338,11 +338,11 @@ const postMat = new THREE.ShaderMaterial({
     tDiffuse: { value: rt.texture }, tDepth: { value: rt.depthTexture }, tBloomA: { value: rtB1.texture }, tBloomB: { value: rtC2.texture },
     time: { value: 0 }, glitch: { value: 0 }, fade: { value: 1 },
     flash: { value: 0 }, flashCol: { value: new THREE.Vector3(1, 1, 1) }, res: { value: new THREE.Vector2(960, RT_H) },
-    expo: { value: 1.0 }, bleed: { value: 0 }, warm: { value: 0 }, fear: { value: 0 }, aoK: { value: 1 }, bloomK: { value: 1 }, hdr: { value: HDR ? 1 : 0 }, camNF: { value: new THREE.Vector2(0.08, 220) }
+    expo: { value: 1.0 }, bleed: { value: 0 }, warm: { value: 0 }, fear: { value: 0 }, high: { value: 0 }, aoK: { value: 1 }, bloomK: { value: 1 }, hdr: { value: HDR ? 1 : 0 }, camNF: { value: new THREE.Vector2(0.08, 220) }
   },
   vertexShader: POST_VS,
   fragmentShader: `
-    uniform sampler2D tDiffuse, tDepth, tBloomA, tBloomB; uniform float time, glitch, fade, flash, expo, bleed, warm, fear, aoK, bloomK, hdr; uniform vec3 flashCol; uniform vec2 res, camNF; varying vec2 vUv;
+    uniform sampler2D tDiffuse, tDepth, tBloomA, tBloomB; uniform float time, glitch, fade, flash, expo, bleed, warm, fear, high, aoK, bloomK, hdr; uniform vec3 flashCol; uniform vec2 res, camNF; varying vec2 vUv;
     float hash(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
     float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y); }
     float fbm(vec2 p){ return vnoise(p)*0.55+vnoise(p*2.07+3.1)*0.3+vnoise(p*4.3+7.7)*0.15; }
@@ -355,16 +355,19 @@ const postMat = new THREE.ShaderMaterial({
       float tear=step(0.975-glitch*0.35,hash(vec2(band,tick)))*(0.012+glitch*0.14);
       vec2 s=0.5+c*(0.90+0.62*r2);
       s.x+=tear*(hash(vec2(band,tick+3.0))-0.5)*2.0;
+      s+=high*0.010*vec2(sin(uv.y*9.0+time*1.7)+0.5*sin(uv.y*23.0-time*2.3),cos(uv.x*8.0+time*1.3));
+      s=0.5+(s-0.5)*(1.0-high*0.035*sin(time*1.1));
       float blk=step(0.72,hash(vec2(band*1.7,tick*1.3)))*smoothstep(0.35,0.9,glitch);
       vec2 grid=vec2(52.0,29.0);
       s=mix(s,(floor(s*grid)+0.5)/grid,blk);
       vec2 px=1.0/res;
-      float ca=0.0022+glitch*0.014+r2*0.014+fear*r2*0.01;
+      float ca=0.0022+glitch*0.014+r2*0.014+fear*r2*0.01+high*0.008;
       vec2 dir=normalize(c+vec2(1e-5));
       float rr=texture2D(tDiffuse,s+dir*ca).r;
       vec3 mid=texture2D(tDiffuse,s).rgb;
       float bb=texture2D(tDiffuse,s-dir*ca).b;
       vec3 col=vec3(rr,mid.g,bb);
+      if(high>0.001){ vec3 gh=texture2D(tDiffuse,s+vec2(sin(time*0.7)*high*0.016,cos(time*0.6)*high*0.008)).rgb; col=mix(col,gh,min(0.45,high*0.35)); }
       // Schärfen (Unscharf-Maske) – das niedrig aufgelöste Bild wirkt sonst matschig
       vec3 nb=(texture2D(tDiffuse,s+vec2(px.x,0.0)).rgb+texture2D(tDiffuse,s-vec2(px.x,0.0)).rgb+texture2D(tDiffuse,s+vec2(0.0,px.y)).rgb+texture2D(tDiffuse,s-vec2(0.0,px.y)).rgb)*0.25;
       col=max(col+(mid-nb)*0.3,0.0);
@@ -389,6 +392,9 @@ const postMat = new THREE.ShaderMaterial({
       float luma=dot(col,vec3(0.299,0.587,0.114));
       // Farbkorrektur: Schatten kühl-grünlich, Lichter warm, Sättigung runter (im Haus wärmer)
       col=mix(vec3(luma),col,0.8-fear*0.25);
+      if(high>0.001){ float an=sin(time*0.35)*high*0.9+high*0.4, cs=cos(an), sn=sin(an);
+        col=vec3(dot(vec3(0.299+0.701*cs+0.168*sn,0.587-0.587*cs+0.330*sn,0.114-0.114*cs-0.497*sn),col),dot(vec3(0.299-0.299*cs-0.328*sn,0.587+0.413*cs+0.035*sn,0.114-0.114*cs+0.292*sn),col),dot(vec3(0.299-0.300*cs+1.250*sn,0.587-0.588*cs-1.050*sn,0.114+0.886*cs-0.203*sn),col));
+        col=mix(vec3(luma),col,1.0+high*0.7); col*=1.0+high*0.12*sin(time*1.6); col+=vec3(0.04,0.0,0.05)*high*(0.5+0.5*sin(time*2.0)); }
       col*=mix(vec3(0.97,1.03,1.0),vec3(1.1,1.02,0.9),warm);
       col=mix(col,col*vec3(0.82,1.04,1.1),pow(1.0-clamp(luma*1.8,0.0,1.0),2.0)*0.55*(1.0-warm));
       col+=vec3(0.05,0.022,0.0)*pow(luma,3.0);
@@ -2693,7 +2699,7 @@ function tvScareVisual(tv, mine) {
    Spinnweben, verstreute Papiere, abgedeckte Leichen und tropfende Decken – alles aus festen Seeds
    (gleich bei allen Spielern), nach Material verschmolzen (wenige Draw-Calls)
 ==================================================================== */
-const GORE = { drips: [], tex: null, spots: [] };
+const GORE = { drips: [], tex: null, spots: [], bodies: [] };
 function goreTexSet() {
   if (GORE.tex) return GORE.tex;
   const mk = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); fn(g, w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t; };
@@ -2776,7 +2782,7 @@ function wallPose(fc, y, along) {   // Position/Drehung eines Wand-Decals (wie p
 const BLOOD_WRITES = ['ER SIEHT\nDICH', 'NICHT\nATMEN', 'HINTER\nDIR', 'LAUF', 'SIE\nWARTET', 'ICH WAR\nHIER', 'HILFE', 'ES HÖRT\nALLES', 'KOMM\nNICHT', 'DREH DICH\nNICHT UM', 'ER IST\nIMMER DA'];
 function goreDecor(def, faces, protect) {
   const idx = FLN, R = mulberry32((GAME_SEED | 0) * 7919 + idx * 131 + 17), rr = (a, b) => a + R() * (b - a), pick = a => a[(R() * a.length) | 0];
-  const T = goreTexSet(), grp = new THREE.Group(); worldGroup.add(grp); GORE.spots = [];
+  const T = goreTexSet(), grp = new THREE.Group(); worldGroup.add(grp); GORE.spots = []; GORE.bodies = [];
   const NRM = { W: [-1, 0], E: [1, 0], N: [0, -1], S: [0, 1] }, spot = (k, x, z, nx, nz) => GORE.spots.push({ k, x, z, nx, nz });
   const fmap = new Map(); faces.forEach(fc => fmap.set(fc.x + ',' + fc.y + ',' + fc.f, fc));
   const use = faces.filter(fc => !protect.has(fc.oy * MW + fc.ox)); for (let i = use.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [use[i], use[j]] = [use[j], use[i]]; }
@@ -2830,7 +2836,7 @@ function goreDecor(def, faces, protect) {
     const rot = pick([0, Math.PI / 2]) + rr(-.25, .25), g = new THREE.Group(), ell = (rx, ry, rz, x, y, z) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), sheetM); m.scale.set(rx, ry, rz); m.position.set(x, y, z); g.add(m); };
     ell(.14, .11, .12, .86, .11, 0); ell(.3, .15, .27, .5, .13, 0); ell(.3, .12, .25, .0, .11, 0); ell(.42, .1, .2, -.55, .09, .02); ell(.13, .09, .13, -1.0, .1, .1);
     { const sh = new THREE.Mesh(new THREE.BoxGeometry(.2, .07, .12), MAT.rubber); sh.position.set(-1.14, .045, .11); sh.rotation.y = .3; g.add(sh); }
-    const x = cx * CELL + rr(-.5, .5), z = cy * CELL + rr(-.5, .5); mergeProp(g); g.position.set(x, 0, z); g.rotation.y = rot; grp.add(g); g.traverse(o => { if (o.isMesh) { worldMeshes.push(o); o.castShadow = true; } });
+    const x = cx * CELL + rr(-.5, .5), z = cy * CELL + rr(-.5, .5); mergeProp(g); g.position.set(x, 0, z); g.rotation.y = rot; grp.add(g); GORE.bodies.push(g); g.traverse(o => { if (o.isMesh) { worldMeshes.push(o); o.castShadow = true; } });
     const q = Math.abs(Math.sin(rot)) > .7; addCol(x, z, q ? .6 : 1.9, q ? 1.9 : .6); poolB.add(rr(1.8, 2.4), rr(1.4, 2), x + rr(-.3, .3), .013, z + rr(-.3, .3), -Math.PI / 2, 0, rr(0, 6.28)); bodyCells.push([cx, cy]); spot('body', x, z, 0, 1);
   }
   // --- tropfende Decken: Pfütze + fallende Tropfen mit Wellen ---
@@ -2846,6 +2852,7 @@ function goreDecor(def, faces, protect) {
   handB.forEach(b => b.build(grp)); [dragB, poolB, scrB, ...footB, ...webB].forEach(b => b.build(grp));
 }
 function goreUpdate(dt) {
+  const hi = P.high || 0; for (const b of GORE.bodies) { const k = Math.min(1, Math.max(0, (hi - .3) * 1.6)); b.scale.y = 1 + Math.sin(tNow * (1.4 + hi) + b.position.x) * .07 * k; b.rotation.z = Math.sin(tNow * .9 + b.position.z) * .015 * k * (hi > .9 ? 3 : 1); }
   for (const d of GORE.drips) {
     if (d.st === 0) { d.t -= dt; if (d.t <= 0) { d.st = 1; d.vy = 0; d.drop.position.y = WALLH - .02; d.drop.visible = true; } }
     else if (d.st === 1) { d.vy += 9.8 * dt; d.drop.position.y -= d.vy * dt; if (d.drop.position.y <= .02) { d.drop.visible = false; d.st = 2; d.rt = 0; if (typeof dripSound === 'function') dripSound(d.x, d.z); } }
@@ -3493,7 +3500,7 @@ window.addEventListener('keydown', e => {
   if (inputBlocked) return;
   if (state === 'play') {
     if (e.code === 'KeyF' && !P.hidden) toggleLamp();
-    if (/^Digit[1-6]$/.test(e.code)) selectSlot(+e.code[5]);
+    if (/^Digit[1-7]$/.test(e.code)) selectSlot(+e.code[5]);
     if (e.code === 'KeyC' && !P.hidden) P.crouch = !P.crouch;
     if (e.code === 'KeyB') toggleRec();
     if (e.code === 'KeyG') takePhoto();
@@ -4052,7 +4059,7 @@ function startRun(seed, diff, floor) {
   initAudio(); GAME_SEED = seed; DIFF = diff; gameRunning = true; net.running = true;
   ['menu', 'lobby', 'pause', 'dead', 'win', 'end', 'boot', 'trailer'].forEach(id => $(id).style.display = 'none'); $('hud').style.display = 'block'; CHAPTER = 1; cinS.mode = null; houseSkipped = false;
   INV.notes.length = 0; invToggle(false); P.paint = [0, 0, 0, 0, 0]; P.sel = -1; P.third = false; P.bat = 100; P.stamina = 1; P.hasTorch = floor !== undefined; P.held = P.hasTorch ? 'torch' : 'cam'; P.lampPref = true; refreshLamp(); gameOver = null; deadShown = false; tGame = 0;
-  postMat.uniforms.fade.value = 0;
+  postMat.uniforms.fade.value = 0; highReset();
   proReset(); const first = floor === undefined ? 5 : floor;
   enterFloor(first, false); lockPointer();
   if (first !== 5) say(net.mode === 'solo' ? 'Aufnahme läuft. Ich muss hier raus – Stockwerk für Stockwerk …' : 'Aufnahme läuft. Bleibt zusammen. Raum-Code: ' + net.code, 6000);
@@ -4778,31 +4785,42 @@ let cigBody, cigEmber, cigTip;
   torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM].forEach(m => { m.visible = false; itemG.add(m); });
 }
 // Hand & Arm (zuletzt gezeichnet = liegt über Kamera/Gegenstand; Farben folgen dem Aussehen aus dem Figur-Editor)
-const skinM = cMat(0xd9a07a), sleeveM = cMat(0x2a2d30), cuffM = cMat(0x1c1e20), handG = new THREE.Group(); camGrp.add(handG);
+const skinM = cMat(0xd9a07a), skinD = cMat(0xc08a68), nailM = cMat(0xecc9bc), veinM = cMat(0xa08c8c), sleeveM = cMat(0x2a2d30), cuffM = cMat(0x1c1e20), handG = new THREE.Group(); camGrp.add(handG);
 {
-  const sk = skinM; cMesh(new THREE.SphereGeometry(.044, 16, 12), sk, .012, -.072, .05, handG).scale.set(1.0, .55, 1.3);
-  for (let i = 0; i < 4; i++) {   // vier Finger greifen unter dem Gegenstand durch und biegen sich an der linken Seite hoch
-    const z = .09 - i * .027, k = 1 - i * .03;
-    cMesh(new THREE.SphereGeometry(.0105 * k, 8, 8), sk, .04, -.069, z, handG);
-    cMesh(new THREE.CylinderGeometry(.0098 * k, .0092 * k, .082, 8), sk, .0, -.069, z, handG, 0, 0, Math.PI / 2);
-    cMesh(new THREE.SphereGeometry(.0092 * k, 8, 8), sk, -.041, -.069, z, handG);
-    cMesh(new THREE.CylinderGeometry(.0088 * k, .0082 * k, .05 * k, 8), sk, -.056, -.047, z, handG, 0, 0, .42);
-    cMesh(new THREE.SphereGeometry(.0085 * k, 8, 8), sk, -.066, -.023, z, handG);
-  }
-  cMesh(new THREE.CylinderGeometry(.0125, .011, .08, 8), sk, .05, -.04, .0, handG, 1.15, 0, -.25);   // Daumen
-  cMesh(new THREE.SphereGeometry(.0115, 8, 8), sk, .056, -.012, -.034, handG);
+  const sk = skinM, S = (r, mat, x, y, z, sx, sy, sz) => { const m = cMesh(new THREE.SphereGeometry(r, 12, 9), mat || sk, x, y, z, handG); m.scale.set(sx || 1, sy || 1, sz || 1); return m; };
+  const C = (r0, r1, len, x, y, z, rx, rz) => cMesh(new THREE.CylinderGeometry(r0, r1, len, 9), sk, x, y, z, handG, rx || 0, 0, rz || 0);
+  // Handfläche mit Ballen, Handrücken mit Knöcheln und Adern, Handgelenk
+  S(.044, sk, .012, -.072, .05, 1.0, .55, 1.3); S(.022, sk, .046, -.062, .03, 1, .8, 1.2); S(.02, sk, -.018, -.076, .082, 1, .7, 1.2); S(.04, sk, .016, -.06, .045, 1, .4, 1.25);
+  C(.031, .035, .09, .03, -.088, .13, 1.22);
+  for (let v = 0; v < 3; v++) cMesh(new THREE.CylinderGeometry(.0016, .0016, .05, 5), veinM, .0 + v * .018, -.043 + Math.abs(v - 1) * .002, .06 - v * .004, handG, 1.45, 0, (v - 1) * .12);
+  const FL = [[1, 1, .09], [1.05, 1.06, .063], [.98, 1.0, .036], [.86, .82, .009]];   // [Dicke, Länge, z]
+  FL.forEach(([k, lk, z]) => {
+    const r1 = .0098 * k, r2 = .0088 * k, r3 = .008 * k, l1 = .045 * lk, l2 = .03 * lk, l3 = .022 * lk;
+    S(r1 * 1.12, skinD, .04, -.069, z);                                                         // Fingergrundgelenk (Knöchel)
+    C(r1, r1 * .94, l1, .04 - l1 / 2, -.069, z, 0, Math.PI / 2);                                 // Grundglied
+    const jx = .04 - l1; S(r2 * 1.08, skinD, jx, -.069, z);                                      // Mittelgelenk
+    const dx2 = -Math.sin(.873) * l2, dy2 = Math.cos(.873) * l2; C(r2, r2 * .92, l2, jx + dx2 / 2, -.069 + dy2 / 2, z, 0, .873);
+    const jx2 = jx + dx2, jy2 = -.069 + dy2; S(r3 * 1.06, skinD, jx2, jy2, z);                   // Endgelenk
+    const dx3 = -Math.sin(.4) * l3, dy3 = Math.cos(.4) * l3; C(r3, r3 * .85, l3, jx2 + dx3 / 2, jy2 + dy3 / 2, z, 0, .4);
+    const tx = jx2 + dx3, ty = jy2 + dy3; S(r3 * .86, sk, tx, ty, z);                            // Fingerkuppe
+    S(r3 * .7, nailM, tx - r3 * .55, ty - r3 * .05, z, .22, 1.0, .85);                            // Fingernagel
+  });
+  // Daumen: zwei Glieder, Nagel oben
+  C(.0125, .011, .06, .05, -.04, .0, 1.15, -.25); S(.0125, skinD, .056, -.012, -.034);
+  C(.0112, .0098, .04, .058, -.003, -.062, 1.38, -.2); S(.0098, sk, .061, .004, -.083); S(.0072, nailM, .06, .0105, -.082, 1.0, .22, 1.1);
 }
 const camArm = cMesh(new THREE.CylinderGeometry(.044, .06, 1.1, 16), sleeveM, .09, -.17, .62, camGrp, 1.22);
 const camCuff = cMesh(new THREE.CylinderGeometry(.048, .048, .045, 16), cuffM, .052, -.113, .13, camGrp, 1.22);
 const camWatch = cMesh(new THREE.BoxGeometry(.088, .02, .052), cMat(0x1c1f22), .056, -.092, .165, camGrp, 1.22), camBrace = cMesh(new THREE.TorusGeometry(.049, .008, 6, 16), cMat(0x4a2e18), .055, -.108, .18, camGrp, 1.22);
 function applyLookToViewmodel() {
-  const sk = LOOK_SKIN[LOOK.skin]; skinM.userData.base.set(sk).multiplyScalar(.86);
+  const sk = LOOK_SKIN[LOOK.skin], c = new THREE.Color(sk); skinM.userData.base.copy(c).multiplyScalar(.86); skinD.userData.base.copy(c).multiplyScalar(.7);
+  nailM.userData.base.copy(c).lerp(new THREE.Color('#f4dcd2'), .55).multiplyScalar(.9); veinM.userData.base.copy(c).lerp(new THREE.Color('#5a6c96'), .32).multiplyScalar(.78);
   const sc = LOOK.top === 0 ? sk : LOOK.top === 3 ? '#cfcfc8' : LOOK_PAL[LOOK.topc]; sleeveM.userData.base.set(sc); cuffM.userData.base.set(sc).multiplyScalar(LOOK.top === 0 ? 1 : .72);
   camWatch.visible = !!LOOK.watch; camWatch.material.userData.base.set(LOOK.watch === 2 ? '#d8b04a' : '#1c1f22'); camBrace.visible = !!LOOK.brace; camBrace.material.userData.base.set(LOOK.brace === 2 ? '#d8b04a' : '#4a2e18');
 }
 applyLookToViewmodel();
 let vmK = .6;
-const GRIP = { cam: .004, torch: .034, fuse: .03, key: .034, cig: .03 };
+const GRIP = { cam: .004, torch: .034, fuse: .03, key: .034, cig: .03, joint: .034 };
 function vmLight(dt) {   // das Handmodell wird im Dunkeln dunkel, in Lampennähe heller
   let k = .22 + Math.min(.55, ambientL.intensity * .5 + hemiL.intensity * .6); if (P.flash) k += .2;
   let nl = 0; for (const l of lamps) { if (l.lv < .2) continue; const d = Math.hypot(l.x - P.x, l.z - P.z); if (d < 6) nl = Math.max(nl, (1 - d / 6) * l.lv); } k += nl * .4;
@@ -4882,9 +4900,9 @@ window.addEventListener('wheel', e => { if (state === 'play' && !inputBlocked &&
 function camZoomT_set(k) { CAMC.zoomT = Math.max(1, Math.min(3.4, CAMC.zoomT * k)); }
 function updateCamcorder(dt) {
   CAMC.photoCool = Math.max(0, CAMC.photoCool - dt); CAMC.bulbT = Math.max(0, CAMC.bulbT - dt); camBulb.visible = CAMC.bulbT > 0 && camGrp.visible; const fs = $('flashst'); if (fs) { fs.textContent = CAMC.photoCool > 0 ? 'lädt' : '[G]'; fs.style.opacity = CAMC.photoCool > 0 ? .45 : 1; }
-  const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key' || P.held === 'cig';
+  const hv = P.held === 'cam' || P.held === 'torch' || P.held === 'fuse' || P.held === 'key' || P.held === 'cig' || P.held === 'joint';
   const show = state === 'play' && !P.third && !cinS.mode && !fadeBusy && hv;
-  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig'; HELDS.swap = Math.max(0, HELDS.swap - dt);
+  camBody.visible = P.held === 'cam'; torchM.visible = P.held === 'torch'; fuseM.visible = P.held === 'fuse'; keyM.visible = P.held === 'key'; cigM.visible = P.held === 'cig' || P.held === 'joint'; HELDS.swap = Math.max(0, HELDS.swap - dt);
   CAMC.vis += ((show ? 1 : 0) - CAMC.vis) * Math.min(1, dt * 8); camGrp.visible = CAMC.vis > .05;
   if (!show || P.hidden || P.held !== 'cam') CAMC.zoomT = 1;
   camZoom += (CAMC.zoomT - camZoom) * Math.min(1, dt * 7);
@@ -4943,8 +4961,8 @@ function updateInventory(dt) {
    1 Kamera · 2 Taschenlampe · 3 Spraydose · 4 Sicherung · 5 Schlüssel · 6 Zigarette   (Mausrad schaltet durch, wenn die Kamera nicht in der Hand ist)
 ==================================================================== */
 const HELDS = { swap: 0, sig: '' };
-const HSLOTS = [['cam', 'KAMERA'], ['torch', 'LAMPE'], ['spray', 'SPRAY'], ['fuse', 'SICHERUNG'], ['key', 'SCHLÜSSEL'], ['cig', 'ZIGARETTE']];
-function slotOwned(k) { return k === 'cam' ? true : k === 'torch' ? P.hasTorch : k === 'spray' ? P.sel >= 0 : k === 'fuse' ? team.fuses > 0 : k === 'key' ? team.key > 0 : k === 'cig'; }
+const HSLOTS = [['cam', 'KAMERA'], ['torch', 'LAMPE'], ['spray', 'SPRAY'], ['fuse', 'SICHERUNG'], ['key', 'SCHLÜSSEL'], ['cig', 'ZIGARETTE'], ['joint', 'JOINT']];
+function slotOwned(k) { return k === 'cam' ? true : k === 'torch' ? P.hasTorch : k === 'spray' ? P.sel >= 0 : k === 'fuse' ? team.fuses > 0 : k === 'key' ? team.key > 0 : k === 'cig' || k === 'joint'; }
 function refreshLamp() { P.flash = !!(P.hasTorch && P.held === 'torch' && P.lampPref && P.bat > 0 && !P.hidden && !floorDef.day); }
 function setHeld(k) {
   if (k && !slotOwned(k)) { say(k === 'torch' ? 'Ich habe keine Taschenlampe. Ich muss eine finden …' : k === 'spray' ? 'Keine Spraydose. Sie liegen auf dem Boden – such sie!' : k === 'fuse' ? 'Ich habe keine Sicherung dabei.' : 'Ich habe keinen Schlüssel.', 2500); return; }
@@ -4967,7 +4985,7 @@ function toggleLamp() {
 function hotbarRender(force) {
   const owned = HSLOTS.map(s => slotOwned(s[0]) ? 1 : 0);
   if (P.held && !owned[HSLOTS.findIndex(s => s[0] === P.held)]) { P.held = null; refreshLamp(); }   // z. B. Sicherung eingesetzt → Hand leer
-  const sub = { cam: CAMC.rec ? '● REC' : '', torch: P.hasTorch ? (P.flash ? 'AN' : 'AUS') : '', spray: P.sel >= 0 ? SPRAY_NAMES[P.sel] : '', fuse: team.fuses > 0 ? '×' + team.fuses : '', key: '', cig: SMK.lit ? 'GLIMMT' : '' };
+  const sub = { cam: CAMC.rec ? '● REC' : '', torch: P.hasTorch ? (P.flash ? 'AN' : 'AUS') : '', spray: P.sel >= 0 ? SPRAY_NAMES[P.sel] : '', fuse: team.fuses > 0 ? '×' + team.fuses : '', key: '', cig: SMK.lit && P.held === 'cig' ? 'GLIMMT' : '', joint: SMK.lit && P.held === 'joint' ? 'GLIMMT' : (P.joints ? '×' + P.joints : '') };
   const sig = HSLOTS.map((s, i) => s[0] + owned[i] + (P.held === s[0] ? 'H' : '') + sub[s[0]]).join('|');
   if (!force && sig === HELDS.sig) return; HELDS.sig = sig;
   $('hotbar').innerHTML = HSLOTS.map((s, i) => '<div class="hs' + (owned[i] ? '' : ' off') + (P.held === s[0] ? ' sel' : '') + '"><i>' + (i + 1) + '</i><b>' + s[1] + '</b><small>' + (sub[s[0]] || '&nbsp;') + '</small></div>').join('');
@@ -5037,8 +5055,9 @@ function togglePerspective() { if (P.hidden) return; P.third = !P.third; say(P.t
    ZIGARETTEN: Taste 6 = Zigarette in die Hand, Linksklick = anzünden / ziehen. Rauchwolken, Glut, Husten
    (das Husten ist laut!). Im Co-op sehen und hören alle Mitspieler den Rauch (Flag 32 im Spielerstatus).
 ==================================================================== */
-const SMK = { N: 360, k: 0, lit: false, left: 1, dragT: -1, drag: 0, puffQ: 0, wispT: 0, hint: false, thirdPuff: 0 };
-P.smoking = false;
+const SMK = { N: 360, k: 0, lit: false, left: 1, leftJ: 1, dragT: -1, drag: 0, puffQ: 0, wispT: 0, hint: false, thirdPuff: 0 };
+P.smoking = false; P.high = 0; P.joints = 0;
+const isSm = k => k === 'cig' || k === 'joint';
 {
   const N = SMK.N; SMK.pos = new Float32Array(N * 3).fill(0); SMK.aA = new Float32Array(N); SMK.aS = new Float32Array(N);
   for (let i = 0; i < N; i++) SMK.pos[i * 3 + 1] = -50;
@@ -5073,8 +5092,8 @@ function coughSound(dest) {
 }
 // ---------- Eingabe ----------
 function smokeClick() {
-  if (state !== 'play' || inputBlocked || P.held !== 'cig' || P.hidden || fadeBusy) return;
-  if (!SMK.lit) { SMK.lit = true; SMK.dragT = -1; lighterSound(); say(SMK.hint ? 'Zigarette angezündet.' : 'Angezündet. Linksklick = ziehen – aber Husten ist laut!', 3000); SMK.hint = true; hotbarRender(true); }
+  if (state !== 'play' || inputBlocked || !isSm(P.held) || P.hidden || fadeBusy) return;
+  if (!SMK.lit) { SMK.lit = true; SMK.dragT = -1; lighterSound(); say(P.held === 'joint' ? (P.joints ? 'Noch ein Joint … die Wände wissen es schon.' : 'Joint angezündet. Linksklick = ziehen. Danach sieht man Dinge …') : (SMK.hint ? 'Zigarette angezündet.' : 'Angezündet. Linksklick = ziehen – aber Husten ist laut!'), 3200); SMK.hint = true; hotbarRender(true); }
   else if (SMK.dragT < 0) { SMK.dragT = 0; smokeInhale(); }
 }
 document.addEventListener('mousedown', e => { if (e.button === 0) smokeClick(); });
@@ -5084,19 +5103,20 @@ function mouthPos(out) { return out.set(P.x - Math.sin(P.vyaw) * .12, P.crouch ?
 function puffBurst(x, y, z, dx, dz, n) { for (let i = 0; i < n; i++) smokeSpawn(x + rnd(-.03, .03), y + rnd(-.03, .03), z + rnd(-.03, .03), dx * rnd(.45, 1.0) + rnd(-.12, .12), rnd(.04, .22), dz * rnd(.45, 1.0) + rnd(-.12, .12), rnd(3.2, 5.5), rnd(.07, .13), rnd(.35, .55)); }
 function updateSmoke(dt) {
   // --- eigene Zigarette ---
-  const holding = P.held === 'cig' && state === 'play';
-  if (SMK.lit && P.held !== 'cig' && state === 'play') smokeStub();
+  const holding = isSm(P.held) && state === 'play', joint = P.held === 'joint';
+  if (SMK.lit && !holding && state === 'play') smokeStub();
   if (state !== 'play' && SMK.lit) { SMK.dragT = -1; SMK.drag = 0; }
   P.smoking = !!(SMK.lit && holding && !P.hidden);
   if (SMK.dragT >= 0) {
     SMK.dragT += dt; const t = SMK.dragT;
     SMK.drag = t < .55 ? t / .55 : t < .95 ? 1 : Math.max(0, 1 - (t - .95) / .55);
     if (!SMK._ex && t >= .95) {
-      SMK._ex = true; SMK.left -= .075; P.noise = Math.max(P.noise, 3);
-      if (Math.random() < .07) { coughSound(); P.noise = Math.max(P.noise, 10); glitchKick = Math.max(glitchKick, .3); say('*hust hust*', 1500); SMK.puffQ = 4; }
-      else { smokeExhale(); SMK.puffQ = 16; }
+      SMK._ex = true; if (joint) SMK.leftJ -= .125; else SMK.left -= .075; P.noise = Math.max(P.noise, joint ? 4 : 3);
+      if (joint) { P.high = Math.min(2.2, P.high + .15 + P.joints * .03); P.highT = 0; }
+      if (Math.random() < (joint ? .14 : .07)) { coughSound(); P.noise = Math.max(P.noise, 10); glitchKick = Math.max(glitchKick, .3); say('*hust hust*', 1500); SMK.puffQ = 4; }
+      else { smokeExhale(); SMK.puffQ = joint ? 24 : 16; }
     }
-    if (t >= 1.5) { SMK.dragT = -1; SMK._ex = false; SMK.drag = 0; if (SMK.left <= 0) { SMK.left = 1; setHeld(null); smokeStub('Aufgeraucht.'); } }
+    if (t >= 1.5) { SMK.dragT = -1; SMK._ex = false; SMK.drag = 0; const lf = joint ? SMK.leftJ : SMK.left; if (lf <= 0) { if (joint) { SMK.leftJ = 1; P.joints++; P.high = Math.min(2.2, P.high + .12); } else SMK.left = 1; setHeld(null); smokeStub(joint ? 'Joint aufgeraucht (' + P.joints + '). Der Rausch ist gleich da …' : 'Aufgeraucht.'); } }
   } else SMK.drag += (0 - SMK.drag) * Math.min(1, dt * 8);
   if (P.smoking && !P.hidden) {
     if (SMK.drag < .05 || P.third) SMK.wispT -= dt;
@@ -5106,7 +5126,7 @@ function updateSmoke(dt) {
   if (SMK.puffQ > 0) { const n = Math.min(SMK.puffQ, 2); SMK.puffQ -= n; const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw); mouthPos(_smv); if (!P.third) _smv.y = camera.position.y - .12; puffBurst(_smv.x + fx * .15, _smv.y, _smv.z + fz * .15, fx * .8, fz * .8, n); }
   // Glut an der Zigarette
   cigEmber.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); cigEmber.visible = true;
-  cigBody.scale.z = Math.max(.15, SMK.left * .95 + .05);
+  cigBody.scale.z = Math.max(.15, (joint ? SMK.leftJ : SMK.left) * .95 + .05); if (joint) cigM.scale.set(2.8, 2.8, 2.3); else cigM.scale.set(2.0, 2.0, 2.0);
   // --- Mitspieler ---
   remotes.forEach(r => {
     const on = !!(r.smoke && r.alive !== false && !r.hidden);
@@ -5126,6 +5146,52 @@ function updateSmoke(dt) {
   }
   if (alive) { SMK.geo.attributes.position.needsUpdate = true; SMK.geo.attributes.aA.needsUpdate = true; SMK.geo.attributes.aS.needsUpdate = true; }
   const lk = .22 + Math.min(.6, ambientL.intensity * .5 + hemiL.intensity * .6) + (P.flash ? .25 : 0); SMK.u.uCol.value.setScalar(Math.min(.85, lk));
+}
+
+/* ====================================================================
+   RAUSCH: Joints (Taste 7) machen high. Je mehr Joints, desto heftiger die Anomalien – nur bei dir selbst:
+   wabernde Wände, Farbwechsel, Doppelbilder, Atmen der Leichen, Flüstern, Schritte, Augen, Phantome, Blackouts.
+==================================================================== */
+const HI = { an: 14, msg: 18, beat: 0, fx: false, lamp: false, comedown: false };
+const HI_BASE = new THREE.Color(0x2a3430), _hiC = new THREE.Color();
+const HI_L1 = ['Die Wände … haben sich bewegt.', 'War da gerade jemand?', 'Mein Herz schlägt so laut …', 'Die Lampen summen meinen Namen.', 'Ich höre jemanden atmen.', 'Alles ist so … weich.'];
+const HI_L2 = ['Die Wände atmen.', 'Sie waren immer hier. Alle.', 'Das Blut bewegt sich.', 'Wer lacht da? Hör auf zu lachen!', 'Die Gesichter in den Fliesen …', 'Ich sehe die Geräusche.'];
+const HI_L3 = ['ER IST SCHON IN MIR.', 'ALLES IST DAS WESEN.', 'ICH KANN NICHT MEHR ATMEN.', 'DREH DICH NICHT UM.', 'SIE HABEN MICH GEFUNDEN.', 'DIE LEICHEN STEHEN AUF.'];
+function highReset() { P.high = 0; P.joints = 0; SMK.leftJ = 1; HI.an = 14; postMat.uniforms.high.value = 0; ambientL.color.copy(HI_BASE); HI.fx = HI.lamp = false; }
+function highAnomaly(h) {
+  const house = floorDef.noEntity || floorDef.noScare, r = Math.random(), a = rnd(0, 6.28), d = rnd(4, 10), px = P.x + Math.cos(a) * d, pz = P.z + Math.sin(a) * d, pick = L => L[(Math.random() * L.length) | 0];
+  if (r < .2) say(pick(h > .9 ? HI_L3 : h > .4 ? HI_L2 : HI_L1), 2800);
+  else if (r < .36) whisper(px, pz);
+  else if (r < .5) footstepsBehind();
+  else if (r < .6 && h > .3) subliminal();
+  else if (r < .7 && h > .3 && !floorDef.day && floorDef.kind !== 'house') { if (!spawnEyes()) whisper(px, pz); }
+  else if (r < .8) { flickerAll = Math.max(flickerAll, .5 + h * .5); breath(.14 + h * .1); }
+  else if (r < .9 && h > .45) musicBox(px, pz);
+  else if (h > .55 && !house && !SC.kind && !P.hidden) startScare(h > .95 ? 'apparition2' : 'apparition');
+  else if (h > .8) { blackoutT = Math.max(blackoutT, rnd(.9, 2.2)); clunk(); flashOut = 1; glitchKick = 1; }
+  else whisper(px, pz);
+  if (h > .6 && Math.random() < .5) heartbeat(.35 + h * .25);
+}
+function updateHigh(dt) {
+  const u = postMat.uniforms.high;
+  if (P.high > 0) { P.highT = (P.highT || 0) + dt; P.high = Math.max(0, P.high - dt * (P.highT > 25 ? .0075 : .002)); }
+  const h = Math.min(1.6, P.high), live = state === 'play';
+  u.value += (h - u.value) * Math.min(1, dt * 1.6); const hv = u.value;
+  // Raumlicht wechselt langsam die Farbe
+  if (hv > .03) { _hiC.setHSL((tNow * .045 * (1 + hv)) % 1, .65, .2 + hv * .05); ambientL.color.copy(HI_BASE).lerp(_hiC, Math.min(.9, hv * .85)); HI.lamp = true; }
+  else if (HI.lamp) { ambientL.color.copy(HI_BASE); HI.lamp = false; }
+  // Kamera wabert
+  const free = live && !cinS.mode && !fadeBusy && !P.hidden;
+  if (hv > .03 && free) { fovFX = Math.sin(tNow * 1.3) * 3.2 * hv + Math.sin(tNow * .41) * 2 * hv; deathRoll = Math.sin(tNow * .7) * .035 * hv; deathPitch = Math.sin(tNow * .53 + 1) * .02 * hv; HI.fx = true; }
+  else if (HI.fx && live) { fovFX = 0; deathRoll = 0; deathPitch = 0; HI.fx = false; }
+  if (!live || hv < .05) { if (P.high < .02 && HI.comedown) HI.comedown = false; return; }
+  if (P.high > .1) HI.comedown = true; else if (HI.comedown && P.high < .04 && free) { HI.comedown = false; say('Der Rausch lässt nach …', 3000); }
+  // Anomalien (häufiger und schlimmer je höher)
+  if (free) {
+    HI.an -= dt * (.6 + hv * 2.2);
+    if (HI.an <= 0) { HI.an = rnd(11, 22) / (.5 + hv); highAnomaly(hv); }
+    if (hv > .45 && AC) { HI.beat -= dt; if (HI.beat <= 0) { HI.beat = Math.max(.55, 1.5 - hv * .6); heartbeat(.1 + hv * .2); } }
+  }
 }
 
 /* ====================================================================
@@ -5613,7 +5679,7 @@ function frame(now) {
   if (cinS.mode === 'chapter') endFlash = Math.min(1, endFlash + dt * .55);
   const live = state === 'play' || state === 'spectate' || state === 'dead';
   if (state === 'play') { tGame += dt; updatePlayer(dt); } else if (state === 'spectate') spectateFollow(dt);
-  updateSmoke(dt);
+  updateSmoke(dt); updateHigh(dt);
   if (live) {
     if (net.mode === 'client') updateEntityClient(dt); else updateEntityHost(dt);
     updateRemotes(dt); netTick(dt); updateLights(dt); if (state === 'play') updateScares(dt);
@@ -5657,7 +5723,7 @@ resize();
 requestAnimationFrame(frame);
 bloodInit();
 if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state = 'menu'; $('menu').style.display = 'flex'; } else bootStart();
-window.__game = { SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
+window.__game = { highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
   get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CAMC, PRO, get LOOK() { return LOOK; }, LOOK_FIELDS, openLook, closeLook, lookRandom, get LP() { return LP; }, lookUIvals, lookPreviewRebuild, get LOOKS() { return LOOKS; }, startLostScare, toggleSheet, startSchoolWake, INV, get SCH() { return SCH; }, loopAt, renderer, ambientL, flashlight, scene, camera, invToggle, invAddNote, startRec, stopRec, toggleRec, get camZoom() { return camZoom; }, camGrp, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
