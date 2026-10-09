@@ -5400,8 +5400,64 @@ const HI_BASE = new THREE.Color(0x2a3430), _hiC = new THREE.Color();
 const HI_L1 = ['Die Wände … haben sich bewegt.', 'War da gerade jemand?', 'Mein Herz schlägt so laut …', 'Die Lampen summen meinen Namen.', 'Ich höre jemanden atmen.', 'Alles ist so … weich.'];
 const HI_L2 = ['Die Wände atmen.', 'Sie waren immer hier. Alle.', 'Das Blut bewegt sich.', 'Wer lacht da? Hör auf zu lachen!', 'Die Gesichter in den Fliesen …', 'Ich sehe die Geräusche.'];
 const HI_L3 = ['ER IST SCHON IN MIR.', 'ALLES IST DAS WESEN.', 'ICH KANN NICHT MEHR ATMEN.', 'DREH DICH NICHT UM.', 'SIE HABEN MICH GEFUNDEN.', 'DIE LEICHEN STEHEN AUF.'];
-function highReset() { P.high = 0; P.joints = 0; SMK.leftJ = 1; HI.an = 14; postMat.uniforms.high.value = 0; ambientL.color.copy(HI_BASE); HI.fx = HI.lamp = false; }
+
+
+/* ---------- Halluzinationen: Dinge, die nicht da sind (nur für dich sichtbar) – schweben, starren, verschwinden wenn man hinsieht ---------- */
+const HAL = { list: [], grp: new THREE.Group(), geo: null, mats: [] };
+scene.add(HAL.grp);
+function halHead(pale, black) {
+  if (!HAL.geo) HAL.geo = huHeadGeo();
+  const L = defaultLook(); L.skin = pale ? 7 : (Math.random() * 6) | 0; L.eye = (Math.random() * 5) | 0; L.hairc = (Math.random() * 6) | 0; L.beard = Math.random() < .3 ? 1 : 0;
+  const tex = huFaceTex(L), m = new THREE.MeshStandardMaterial({ map: tex, roughness: .6, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: .7, transparent: true, opacity: 0 });
+  const g = new THREE.Group(), hd = new THREE.Mesh(HAL.geo, m); hd.scale.setScalar(2.3); g.add(hd);
+  if (black) [-1, 1].forEach(sg => { const e = new THREE.Mesh(new THREE.SphereGeometry(.055, 8, 6), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true })); e.scale.set(1, 1.3, .5); e.position.set(sg * .16, .06, .2); g.add(e); });
+  const jaw = new THREE.Mesh(new THREE.SphereGeometry(.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0x050101, transparent: true, opacity: 0 })); jaw.scale.set(1.4, 1.3, .5); jaw.position.set(0, -.15, .2); g.add(jaw); g.userData = { mat: m, jaw };
+  return g;
+}
+function halSpot(minD, maxD, front) {
+  const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw);
+  for (let k = 0; k < 40; k++) {
+    const c = openCells[(Math.random() * openCells.length) | 0], x = c[0] * CELL + rnd(-1, 1), z = c[1] * CELL + rnd(-1, 1), dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz);
+    if (d < minD || d > maxD || (front && (dx * fx + dz * fz) / d < .5) || !hasLOS(P.x, P.z, x, z)) continue; return { x, z };
+  }
+  return null;
+}
+function halSpawn(h) {
+  if (HAL.list.length > 7 || state !== 'play') return; const r = Math.random();
+  if (r < .45) {   // einzelner schwebender Kopf, starrt dich an
+    const sp = halSpot(3.8, 8.5, true); if (!sp) return; const g = halHead(Math.random() < .5, h > .7); g.position.set(sp.x, rnd(1.35, 2.1), sp.z); HAL.grp.add(g);
+    HAL.list.push({ g, k: 'head', t: 0, life: rnd(5, 10), look: 0, ph: Math.random() * 6 });
+  } else if (r < .7 && h > .5) {   // Köpfe baumeln von der Decke (an dünnen Fäden)
+    const sp = halSpot(4, 10, true); if (!sp) return; const n = 3 + ((Math.random() * 3) | 0), grp = new THREE.Group();
+    for (let i = 0; i < n; i++) { const hd = halHead(true, false); const ox = rnd(-1.2, 1.2), oz = rnd(-1.2, 1.2), y = rnd(1.1, 2.0); hd.position.set(ox, y, oz); hd.rotation.set(rnd(-.4, .4), rnd(0, 6), rnd(-.4, .4)); grp.add(hd); const th = new THREE.Mesh(new THREE.CylinderGeometry(.004, .004, WALLH - y, 4), new THREE.MeshBasicMaterial({ color: 0x0a0a0a })); th.position.set(ox, y + (WALLH - y) / 2 + .1, oz); grp.add(th); }
+    grp.position.set(sp.x, 0, sp.z); HAL.grp.add(grp); HAL.list.push({ g: grp, k: 'hang', t: 0, life: rnd(6, 11), look: 0, ph: 0, multi: true });
+  } else if (h > .6) {   // schwarze Gestalt, steht regungslos am Ende des Gangs
+    const sp = halSpot(7, 16, true); if (!sp) return; const L = defaultLook(); const g = buildHuman(L); g.traverse(o => { if (o.isMesh) { o.material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, fog: false }); } });
+    g.position.set(sp.x, 0, sp.z); g.rotation.y = Math.atan2(P.x - sp.x, P.z - sp.z); g.scale.set(1.0, 1.12, 1.0); HAL.grp.add(g); HAL.list.push({ g, k: 'shadow', t: 0, life: rnd(6, 12), look: 0, ph: 0 });
+  } else { const sp = halSpot(4.5, 12, true); if (!sp) return; const g = halHead(true, true); g.position.set(sp.x, 1.5, sp.z); HAL.grp.add(g); HAL.list.push({ g, k: 'head', t: 0, life: 7, look: 0, ph: 0 }); }
+  if (AC && h > .4) { if (Math.random() < .5) whisper(P.x + rnd(-2, 2), P.z + rnd(-2, 2)); else heartbeat(.3); }
+}
+function halSetOpacity(g, a) { g.traverse(o => { if (o.material && o.material.transparent) { const m = o.material; m.opacity = o === g.userData.jaw ? a * .8 : a; } }); }
+function halClear() { HAL.list.forEach(o => { HAL.grp.remove(o.g); o.g.traverse(m => { if (m.material && m.material.map) m.material.map.dispose(); if (m.material) m.material.dispose(); }); }); HAL.list.length = 0; }
+function halUpdate(dt) {
+  const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw);
+  for (let i = HAL.list.length - 1; i >= 0; i--) {
+    const o = HAL.list[i], g = o.g; o.t += dt;
+    const dx = g.position.x - P.x, dz = g.position.z - P.z, d = Math.hypot(dx, dz) || 1, aim = (dx * fx + dz * fz) / d;
+    if (o.t > 1.6 && aim > .965) o.look += dt; else o.look = Math.max(0, o.look - dt * .5);
+    const dying = o.look > (o.k === 'shadow' ? .5 : .75) || d < 2.6 || o.t > o.life || state !== 'play' || P.hidden;
+    o.fade = Math.max(0, Math.min(1, (o.fade === undefined ? 0 : o.fade) + dt * (dying ? -2.2 : .9)));
+    halSetOpacity(g, o.fade * (o.k === 'shadow' ? .96 : .92));
+    if (o.k === 'head') { g.lookAt(P.x, 1.5, P.z); g.position.y += Math.sin(tNow * 1.3 + o.ph) * dt * .12; g.rotation.z += Math.sin(tNow * 3 + o.ph) * .004; const jw = g.userData.jaw; jw.scale.y = 1.3 + Math.abs(Math.sin(tNow * 2.6 + o.ph)) * (P.high > 1 ? 2.2 : .8); }
+    if (o.k === 'hang') g.children.forEach((c, j) => { if (c.userData && c.userData.mat) { c.rotation.y += Math.sin(tNow * .9 + j) * .004; c.lookAt(P.x, c.getWorldPosition(_hV).y, P.z); } });
+    if (o.k === 'shadow') { g.rotation.y = Math.atan2(P.x - g.position.x, P.z - g.position.z); if (o.t > 2.5 && o.t < o.life && d > 5) { g.position.x -= dx / d * dt * .35; g.position.z -= dz / d * dt * .35; } }
+    if (dying && o.fade <= 0.01 && (o.look > .3 || o.t > o.life || state !== 'play' || d < 2.7)) { if (o.look > .3 && AC) hiss2(); HAL.grp.remove(g); g.traverse(m => { if (m.material && m.material.map) m.material.map.dispose(); if (m.material) m.material.dispose(); }); HAL.list.splice(i, 1); }
+  }
+}
+const _hV = new THREE.Vector3();
+function highReset() { halClear(); P.high = 0; P.joints = 0; SMK.leftJ = 1; HI.an = 14; postMat.uniforms.high.value = 0; ambientL.color.copy(HI_BASE); HI.fx = HI.lamp = false; }
 function highAnomaly(h) {
+  if (h > .25 && Math.random() < .5 + h * .2) { halSpawn(h); return; }
   const house = floorDef.noEntity || floorDef.noScare, r = Math.random(), a = rnd(0, 6.28), d = rnd(4, 10), px = P.x + Math.cos(a) * d, pz = P.z + Math.sin(a) * d, pick = L => L[(Math.random() * L.length) | 0];
   if (r < .2) say(pick(h > .9 ? HI_L3 : h > .4 ? HI_L2 : HI_L1), 2800);
   else if (r < .36) whisper(px, pz);
@@ -5416,6 +5472,7 @@ function highAnomaly(h) {
   if (h > .6 && Math.random() < .5) heartbeat(.35 + h * .25);
 }
 function updateHigh(dt) {
+  halUpdate(dt); if (P.high < .05 && P.highT > 30 && HAL.list.length) { HAL.list.forEach(o => { o.life = 0; }); }
   const u = postMat.uniforms.high;
   if (P.high > 0) { P.highT = (P.highT || 0) + dt; P.high = Math.max(0, P.high - dt * (P.highT > 8 ? .05 : .012)); }
   const h = Math.min(1.6, P.high), live = state === 'play';
@@ -6016,7 +6073,7 @@ resize();
 requestAnimationFrame(frame);
 bloodInit();
 if (/[?&]skip/.test(location.search)) { $('boot').style.display = 'none'; state = 'menu'; $('menu').style.display = 'flex'; } else bootStart();
-window.__game = { AUD, highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
+window.__game = { HAL, halSpawn, AUD, highReset, SMK, GORE, texWall, texFloor, texCeil, TG, getTheme, postMat, QUAL, setQuality, rt, HDR, bloomBright, get QI() { return QI; }, get GR() { return GR_LOG; }, SC, DBG, get deathT() { return deathT; }, P, E, net, remotes, get items() { return items; }, get lockers() { return lockers; }, team, get state() { return state; }, get gameOver() { return gameOver; }, interact, bfs, get openCells() { return openCells; }, isSolidCell, circleHit, addDot, get startCell() { return startCell; },
   get feats() { return feats; }, get doorList() { return doorList; }, get FLN() { return FLN; }, get floorDef() { return floorDef; }, get dots() { return decalTotal; }, setSpraying(v) { spraying = v; }, get camDist() { return camDistNow; },
   startRun, enterFloor, hostFloorChange, hostPick, hostFuse, hostDoor, hostCode, hostAdvance, get chairInfo() { return chairInfo; }, get lamps() { return lamps; }, get spawnE() { return spawnE; }, set tGame(v) { tGame = v; }, get tGame() { return tGame; }, startScare, setDiff, die, get fadeBusy() { return fadeBusy; }, get zoneK() { return zoneK; },
   get tvs() { return tvs; }, get tvWatch() { return tvWatch; }, hostTVScare, hostPhone, hostHouseDoor, hostEat, hostSleep, startTrailer, endTrailer, get trailT() { return trailT; }, get endT() { return endT; }, get cin() { return cinS; }, get CHAPTER() { return CHAPTER; }, startSleepEnding, chapterEnd, startCollapse, get houseState() { return houseState; }, bootGo, get bootReady() { return bootReady; }, get bootPct() { return bootPct; }, get houseWindows() { return houseWindows; }, setFX(a, b, c, d) { deathDy = a; deathPitch = b; deathRoll = c; fovFX = d || 0; }, enterLocker, leaveLocker, tvScareVisual, handleEvent, emit, updateTVs, setLids, showEnd, FATHER, get tvWatchV() { return tvWatch; }, growl, scream, sting, initAudio, get AC() { return AC; }, CAMC, PRO, get LOOK() { return LOOK; }, LOOK_FIELDS, openLook, closeLook, lookRandom, get LP() { return LP; }, lookUIvals, lookPreviewRebuild, get LOOKS() { return LOOKS; }, startLostScare, toggleSheet, startSchoolWake, INV, get SCH() { return SCH; }, loopAt, renderer, ambientL, flashlight, scene, camera, invToggle, invAddNote, startRec, stopRec, toggleRec, get camZoom() { return camZoom; }, camGrp, CR, creepEvent, musicBox, spawnEyes, subliminal, footstepsBehind, scratchDoor, updateCreep, eyesGrp };
