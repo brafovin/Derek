@@ -1,4 +1,11 @@
-# LETZTE AUFNAHME im Google Play Store
+# LETZTE AUFNAHME als Android-App
+
+## Fertige App (APK) – sofort installierbar
+Die App liegt fertig gebaut unter **`/downloads/LetzteAufnahme.apk`** (auf der Spiele-Webseite: `https://DEINE-URL/downloads/LetzteAufnahme.apk`; auf Android-Handys erscheint im Hauptmenü der Link „ANDROID-APP HERUNTERLADEN“). Installieren: APK öffnen → „Aus dieser Quelle installieren erlauben“ → Installieren. Querformat, Vollbild, Touch + Controller, Mikrofon für den Sprachchat.
+Neu bauen: `./android-app/build-apk.sh` (braucht Node, Java 17, Android SDK) – oder in GitHub unter **Actions → „Android-APK bauen“** (liefert die APK als Download).
+Die APK ist mit einem **Debug-Schlüssel** signiert: gut zum Weitergeben und Testen, **nicht** für den Play Store (dafür braucht es eine mit deinem eigenen Schlüssel signierte AAB, siehe unten).
+
+# Weg in den Google Play Store
 
 Das Spiel ist eine **PWA** (installierbare Web-App: `manifest.webmanifest`, `sw.js`, Icons in `public/icons/`). Für den Play Store wird sie als **Trusted Web Activity (TWA)** verpackt – das ist eine dünne Android-App, die die Seite im Vollbild zeigt.
 

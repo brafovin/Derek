@@ -1,0 +1,2 @@
+{ "appId": "de.letzteaufnahme.game", "appName": "Letzte Aufnahme", "webDir": "www", "backgroundColor": "#0e0304",
+  "android": { "allowMixedContent": false }, "server": { "androidScheme": "https" } }

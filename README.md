@@ -85,7 +85,9 @@ Wer stirbt, ist **nicht mehr raus**: Nach der Todesszene wachst du am **Anfang d
 
 **Handy/Tablet** (Touch wird automatisch erkannt, am besten im Querformat – beim ersten Antippen geht das Spiel in den Vollbildmodus): Joystick unten links = laufen, Wischen auf der rechten Bildhälfte = umsehen, Tasten für AKTION (halten), E · BENUTZEN, LAMPE, VIDEO, FOTO, RING, QUALLE, ITEM ◄ ►, RENNEN und DUCKEN (an/aus), INVENTAR, PAUSE; die Hotbar unten ist antippbar. Auf dem Handy startet die Grafik automatisch in der mittleren Stufe (sinkt bei zu niedriger Bildrate selbst).
 
-## Google Play Store / App
+## Android-App (APK) & Google Play Store
+
+**Fertige Android-App:** `public/downloads/LetzteAufnahme.apk` (Capacitor-App im Querformat/Vollbild, Quellen in `android-app/`). Details in `ANDROID.md`.
 
 Das Spiel ist als **installierbare Web-App (PWA)** vorbereitet (Manifest, Service Worker, Icons, Datenschutzseite `/privacy.html`). Wie du es als Android-App (TWA) im Play Store einreichst, steht Schritt für Schritt in **`ANDROID.md`** – das Veröffentlichen selbst geht nur über dein eigenes Play-Entwicklerkonto.
 
