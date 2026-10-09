@@ -27,7 +27,7 @@ Die **Grundschule St. Aurelia** (3. OG Klassentrakt → 2. OG Fachräume → Erd
 
 **Jede Etage ist anders gebaut:** Das **3. OG** hat klassische Klassenzimmer-Flure, das **2. OG** ist ein **Labyrinth** aus engen Gängen mit Sackgassen, Schleifen und widersprüchlichen Wegweisern („← AUSGANG“, „→ AUSGANG“ …), das **Erdgeschoss** ist eine große **Halle mit Pfeilern** und Rundgängen (leichter wegzulaufen, aber das Wesen sieht dich von weitem). Das Gebäude in Kapitel 2 ist wieder der Klassentrakt.
 
-Statt einer Tür führt nur ein **Treppenschacht mit Geländer** nach unten (abgesperrt mit Flatterband, bis die Aufgabe gelöst ist). Auf jeder Etage musst du Rätsel lösen – im Erdgeschoss gibt es zum Schluss den Haupteingang mit Glastür. Je tiefer, desto schlimmer: schnelleres Wesen, mehr Schocks, mehr Dunkelheit.
+Statt einer Tür führt nur ein **zweiläufiges Treppenhaus** nach unten (Betontreppe mit Zwischenpodest, Stahl-Stabgeländer, Edelstahl-Handlauf, helle Trittkanten) (abgesperrt mit Flatterband, bis die Aufgabe gelöst ist). Auf jeder Etage musst du Rätsel lösen – im Erdgeschoss gibt es zum Schluss den Haupteingang mit Glastür. Je tiefer, desto schlimmer: schnelleres Wesen, mehr Schocks, mehr Dunkelheit.
 
 - **3. OG:** Sicherungen finden und im Sicherungskasten einsetzen.
 - **2. OG:** Schlüssel im Nachsitzraum (rot/grünes Flackerlicht) → Schularchiv aufschließen → Notizen mit Code-Ziffern sammeln → Code am Tastenfeld eingeben.

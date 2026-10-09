@@ -1993,11 +1993,12 @@ const UNIT = new THREE.BoxGeometry(1, 1, 1), UPLANE = new THREE.PlaneGeometry(1,
 const SM = {   // Materialien der Schule
   frame: new THREE.MeshStandardMaterial({ color: 0xb9b6a8, roughness: .85 }),
   board: new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: .95 }),
-  rail: new THREE.MeshStandardMaterial({ color: 0x23302a, roughness: .5, metalness: .6 }),
-  handrail: new THREE.MeshStandardMaterial({ color: 0x4b2f1a, roughness: .55 }),
+  rail: new THREE.MeshStandardMaterial({ color: 0x2d3d4c, roughness: .42, metalness: .65 }),
+  handrail: new THREE.MeshStandardMaterial({ color: 0xc4c8cc, roughness: .22, metalness: .9 }),
+  stripe: new THREE.MeshStandardMaterial({ color: 0xe9e6da, roughness: .7 }),
   conc: null, rad: null, tape: null
 };
-SM.conc = new THREE.MeshStandardMaterial({ map: canvasTex(128, (g, s) => { g.fillStyle = '#575853'; g.fillRect(0, 0, s, s); stains(g, s, 14, 'rgba(20,20,18,.5)', 1, 10, 40); grain(g, s, 40); }), roughness: .95 });
+SM.conc = new THREE.MeshStandardMaterial({ map: canvasTex(128, (g, s) => { g.fillStyle = '#6f706a'; g.fillRect(0, 0, s, s); stains(g, s, 14, 'rgba(20,20,18,.5)', 1, 10, 40); grain(g, s, 40); }), roughness: .95 });
 SM.rad = new THREE.MeshStandardMaterial({ map: canvasTex(64, (g, s) => { g.fillStyle = '#c9c4b2'; g.fillRect(0, 0, s, s); g.fillStyle = 'rgba(40,36,28,.55)'; for (let x = 0; x < s; x += 6) g.fillRect(x, 4, 2, s - 8); stains(g, s, 4, 'rgba(70,50,20,.4)', 1, 8, 20); }), roughness: .6, metalness: .3 });
 SM.tape = new THREE.MeshBasicMaterial({ map: (() => { const t = canvasTex(64, (g, s) => { g.fillStyle = '#e8e8e8'; g.fillRect(0, 0, s, s); g.fillStyle = '#d02018'; for (let i = -s; i < s * 2; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 8, 0); g.lineTo(i + 8 + s, s); g.lineTo(i + s, s); g.fill(); } }, 6, 1); return t; })(), side: THREE.DoubleSide });
 
@@ -2108,22 +2109,38 @@ function schoolStairs(f, def) {
   const cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2, hw = W / 2;
   const ex = { N: cx, S: cx, W: r.x0, E: r.x1 }[entry], ez = { N: r.z0, S: r.z1, W: cz, E: cz }[entry];
   const g = new THREE.Group(); g.position.set(ex, 0, ez); g.rotation.y = ang; worldGroup.add(g);
-  const L = W, N = 10, run = L / N, rise = .21;
+  const L = W, wl = .2, landD = .78, zA1 = L - landD, NS = 8, rise = 1.45 / NS, run = zA1 / NS, stripes = new InstSet(UNIT, SM.stripe);
   const steps = new InstSet(UNIT, SM.conc), posts = new InstSet(UNIT, SM.rail), rails = new InstSet(UNIT, SM.handrail), bal = new InstSet(UNIT, SM.rail);
   const loc = (set, lx, ly, lz, sx, sy, sz) => set.add(lx, ly, lz, sx, sy, sz, 0);
-  for (let i = 0; i < N; i++) { const top = -(i + 1) * rise, h = 2.9 + top; loc(steps, 0, top - h / 2, (i + .5) * run, W, h, run); loc(steps, 0, top + .01, i * run + .03, W, .03, .07); }
+  // Zweiläufige Treppe mit Podest (wie im Treppenhaus der Vorlage): links hinunter, Podest, rechts zurück; offenes Auge in der Mitte
+  const xA = -(hw + wl) / 2, xB = (hw + wl) / 2, fw = hw - wl;
+  for (let i = 0; i < NS; i++) {
+    const topA = -(i + 1) * rise, hA = 2.9 + topA; loc(steps, xA, topA - hA / 2, (i + .5) * run, fw, hA, run); loc(stripes, xA, topA + .012, i * run + .035, fw - .04, .012, .07);
+    const topB = -1.45 - (i + 1) * rise, zc = zA1 - (i + .5) * run, hB = 2.9 + topB; loc(steps, xB, topB - hB / 2, zc, fw, hB, run); loc(stripes, xB, topB + .012, zc + run / 2 - .035, fw - .04, .012, .07);
+  }
+  loc(steps, 0, -2.175, zA1 + landD / 2, W, 1.45, landD);   // Podest
   loc(steps, -(hw + .05), -1.45, L / 2, .1, 2.9, L + .2); loc(steps, hw + .05, -1.45, L / 2, .1, 2.9, L + .2); loc(steps, 0, -1.45, L + .05, W + .2, 2.9, .1); loc(steps, 0, -1.45, -.05, W + .2, 2.9, .1);
   const gw = .55;   // halbe Torbreite
-  const seg = (lx0, lz0, lx1, lz1) => {   // Geländersegment mit Pfosten, Handlauf, Mittelholm, Stäben
-    const len = Math.hypot(lx1 - lx0, lz1 - lz0), n = Math.max(1, Math.round(len / .13)), a = Math.atan2(lx1 - lx0, lz1 - lz0);
+  const seg = (lx0, lz0, lx1, lz1) => {   // Geländersegment am Schachtrand mit Pfosten, Handlauf, Mittelholm, Stäben
+    const len = Math.hypot(lx1 - lx0, lz1 - lz0), n = Math.max(1, Math.round(len / .11)), a = Math.atan2(lx1 - lx0, lz1 - lz0);
     const mx = (lx0 + lx1) / 2, mz = (lz0 + lz1) / 2;
-    _scd.position.set(mx, 1.0, mz); _scd.rotation.set(0, a, 0); _scd.scale.set(.07, .05, len); _scd.updateMatrix(); rails.m.push(_scd.matrix.clone());
-    _scd.position.set(mx, .5, mz); _scd.scale.set(.04, .035, len); _scd.updateMatrix(); posts.m.push(_scd.matrix.clone());
-    for (let k = 1; k < n; k++) { const t = k / n; loc(bal, lx0 + (lx1 - lx0) * t, .5, lz0 + (lz1 - lz0) * t, .02, 1.0, .02); }
+    _scd.position.set(mx, 1.0, mz); _scd.rotation.set(0, a, 0); _scd.scale.set(.05, .045, len); _scd.updateMatrix(); rails.m.push(_scd.matrix.clone());
+    _scd.position.set(mx, .5, mz); _scd.scale.set(.035, .03, len); _scd.updateMatrix(); posts.m.push(_scd.matrix.clone());
+    for (let k = 1; k < n; k++) { const t = k / n; loc(bal, lx0 + (lx1 - lx0) * t, .5, lz0 + (lz1 - lz0) * t, .016, 1.0, .016); }
   };
+  const incl = (x, za, ya, zb, yb, hgt, rail) => {   // geneigtes Geländer/Handlauf entlang der Läufe (za < zb)
+    const dz = zb - za, dy = yb - ya, len = Math.hypot(dz, dy), th = -Math.atan2(dy, dz), mz = (za + zb) / 2, my = (ya + yb) / 2 + hgt;
+    _scd.position.set(x, my, mz); _scd.rotation.set(th, 0, 0); _scd.scale.set(.05, .045, len); _scd.updateMatrix(); rails.m.push(_scd.matrix.clone());
+    if (!rail) return; _scd.position.set(x, my - hgt + .14, mz); _scd.scale.set(.03, .03, len); _scd.updateMatrix(); posts.m.push(_scd.matrix.clone());
+    const n = Math.max(2, Math.round(len / .115)); for (let k = 0; k <= n; k++) { const t = k / n, z = za + dz * t, y = ya + dy * t; loc(bal, x, y + hgt / 2 + .07, z, .016, hgt - .14, .016); if (k % 3 === 0) loc(posts, x, y + hgt / 2, z, .045, hgt, .045); }
+  };
+  incl(-wl, 0, 0, zA1, -1.45, .95, true); incl(wl, 0, -2.9, zA1, -1.45, .95, true);       // Geländer am Treppenauge
+  incl(-(hw - .05), 0, 0, zA1, -1.45, .92, false); incl(hw - .05, 0, -2.9, zA1, -1.45, .92, false);   // Handläufe an der Wand
   const post = (lx, lz) => loc(posts, lx, .5, lz, .07, 1.0, .07);
+  seg(-wl, zA1, wl, zA1);
   seg(-hw, 0, -hw, L); seg(hw, 0, hw, L); seg(-hw, L, hw, L); seg(-hw, 0, -gw, 0); seg(gw, 0, hw, 0);
   [[-hw, 0], [hw, 0], [-hw, L], [hw, L], [-gw, 0], [gw, 0], [-hw, L / 2], [hw, L / 2], [0, L]].forEach(p => post(p[0], p[1]));
+  stripes.build(g, false, true);
   [steps, posts, rails, bal].forEach(s => s.build(g, false, true));
   // Tor + Absperrband
   const gate = new THREE.Group(); gate.position.set(-gw, 0, 0); g.add(gate);
