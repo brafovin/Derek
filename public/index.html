@@ -4057,7 +4057,7 @@ const LOOK_FIELDS = [
   { k: 'ear', label: 'OHRRINGE', names: ['Keine', 'Ohrstecker', 'Creolen'], def: 0 },
   { k: 'watch', label: 'UHR', names: ['Keine', 'Digitaluhr', 'Goldene Uhr'], def: 0 },
   { k: 'brace', label: 'ARMBAND', names: ['Keines', 'Lederarmband', 'Goldreif'], def: 0 },
-  { k: 'body', label: 'KÖRPER', names: ['Mensch', 'Android-Roboter'], def: 0 },
+  { k: 'body', label: 'KÖRPER', names: ['Mensch', 'Roboter'], def: 1 },
   { k: 'rtype', label: 'ROBOTER-TYP', names: ['Kugelauge-Roboter', 'Android (Logo)'], def: 0, g: 'r' },
   { k: 'rcol', label: 'ROBOTER-FARBE', names: ROBO_PAL_N, sw: ROBO_PAL, def: 1, g: 'r' },
   { k: 'rmet', label: 'OBERFLÄCHE', names: ['Matt', 'Glänzend', 'Metall'], def: 0, g: 'r' },
@@ -4066,9 +4066,9 @@ const LOOK_FIELDS = [
 ['skin', 'eye', 'hair', 'hairc', 'beard', 'cap', 'capc', 'glasses', 'mask', 'top', 'topc', 'pants', 'pantsc', 'shoec', 'bag', 'bagc'].forEach(k => { LOOK_FIELDS.find(f => f.k === k).g = 'h'; });
 const lookVisible = f => !f.g || (f.g === 'r') === (LOOK.body === 1);
 function lookOrder() { const ix = LOOK_FIELDS.map((f, i) => i), pr = f => f.k === 'body' ? 0 : f.k === 'rtype' ? .5 : f.g === 'r' ? 1 : 2; return ix.sort((a, b) => pr(LOOK_FIELDS[a]) - pr(LOOK_FIELDS[b]) || a - b); }
-function defaultLook(ci) { const L = {}; LOOK_FIELDS.forEach(f => L[f.k] = f.def); if (ci !== undefined) { L.topc = [11, 14, 12, 13][ci % 4]; L.cap = ci % 2 ? 2 : 1; } return L; }
+function defaultLook(ci) { const L = {}; LOOK_FIELDS.forEach(f => L[f.k] = f.def); if (ci !== undefined) { L.topc = [11, 14, 12, 13][ci % 4]; L.cap = ci % 2 ? 2 : 1; L.rcol = [1, 2, 3, 0][ci % 4]; } return L; }
 function lookToArr(L) { return LOOK_FIELDS.map(f => L[f.k] | 0); }
-function arrToLook(a, ci) { const L = defaultLook(ci); if (!Array.isArray(a)) return L; LOOK_FIELDS.forEach((f, i) => { const v = a[i] | 0; L[f.k] = v >= 0 && v < f.names.length ? v : f.def; }); return L; }
+function arrToLook(a, ci) { const L = defaultLook(ci); if (!Array.isArray(a)) return L; LOOK_FIELDS.forEach((f, i) => { const v = a[i] === undefined ? f.def : a[i] | 0; L[f.k] = v >= 0 && v < f.names.length ? v : f.def; }); return L; }
 let LOOK = defaultLook(), LOOKS = {};
 try { const sv = JSON.parse(localStorage.getItem('bcam_look') || 'null'); if (sv) LOOK = arrToLook(sv); } catch (e) {}
 function saveLook() { try { localStorage.setItem('bcam_look', JSON.stringify(lookToArr(LOOK))); } catch (e) {} }
