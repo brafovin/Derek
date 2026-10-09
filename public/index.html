@@ -238,7 +238,7 @@ input[type=checkbox],input[type=range]{accent-color:#c0120f}
   <p class="k">Dunkelheit, Schockmomente, Blut, flackernde Bilder. Kopfhörer empfohlen.</p>
 </div>
 <div id="look" class="screen"><h1>FIGUR</h1>
-  <div class="lkwrap"><div class="lkprev"><canvas id="lookcv" width="300" height="420"></canvas><div class="k">Maus ziehen = drehen</div></div>
+  <div class="lkwrap"><div class="lkprev"><canvas id="lookcv" width="300" height="420"></canvas><div class="k">Maus ziehen = drehen · Mausrad = Zoom (Gesicht)</div></div>
   <div class="lkside"><div id="lookrows"></div></div></div>
   <div class="lkbtns"><div class="go" id="lookrand">[ ZUFALL ]</div><div class="go" id="lookreset">[ STANDARD ]</div><div class="go" id="lookdone">[ FERTIG ]</div></div></div>
 <div id="lobby" class="screen">
@@ -3815,20 +3815,21 @@ function buildHuman(L) {
   const g = new THREE.Group(), T = huTex();
   const col = i => new THREE.Color(LOOK_PAL[i]);
   const M = (c, r, m, bump, bs) => new THREE.MeshStandardMaterial({ color: c, roughness: r === undefined ? .85 : r, metalness: m || 0, map: bump || null });
-  const skinM = M(LOOK_SKIN[L.skin], .62), faceTex = huFaceTex(L), faceM = new THREE.MeshStandardMaterial({ map: faceTex, roughness: .6 });
+  const skinM = M(LOOK_SKIN[L.skin], .55), faceTex = huFaceTex(L), faceM = new THREE.MeshStandardMaterial({ map: faceTex, roughness: .52, emissive: 0xffffff, emissiveMap: faceTex, emissiveIntensity: .09 });
+  skinM.emissive = new THREE.Color(LOOK_SKIN[L.skin]).multiplyScalar(.1);
   const hairM = M(LOOK_HAIRC[L.hairc], .5, .1), dark = M(0x1c1f22, .8), capM = M(LOOK_PAL[L.capc], .85, 0, T.fabric, .12), knitM = M(LOOK_PAL[L.capc], .95, 0, T.knit, .25);
   const topC = col(L.topc), topM = M(topC, .85, 0, T.fabric, .12), topDk = M(topC.clone().multiplyScalar(.7), .85, 0, T.fabric, .12), topLt = M(topC.clone().multiplyScalar(1.3), .8, 0, T.fabric, .12);
-  const shirtM = L.top === 3 ? M(0xd2d0c8, .9, 0, T.fabric, .12) : topM;
+  const shirtM = L.top === 3 ? M(0xd2d0c8, .9, 0, T.fabric, .12) : L.top === 4 ? M(0x3b3f43, .9, 0, T.fabric, .12) : L.top === 5 ? M(0xe6dfc8, .92, 0, T.fabric, .12) : topM;
   const pantsM = M(col(L.pantsc), .9, 0, L.pants === 0 ? T.denim : T.fabric, L.pants === 0 ? .3 : .12), pantsDk = M(col(L.pantsc).multiplyScalar(.72), .9);
   const shoeM = M(col(L.shoec), .75, 0, T.fabric, .1), sole = M(0xe8e6e0, .6), lace = M(0xf2f2ee, .8);
   const bagM = M(col(L.bagc), .85, 0, T.fabric, .12), gold = M(0xd8b04a, .28, .95), silver = M(0xc8ccd0, .28, .95), leather = M(0x4a2e18, .8, 0, T.fabric, .12);
   const mk = (geo, mat, x, y, z, parent) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; (parent || g).add(m); return m; };
   const B = (w, h, d) => new THREE.BoxGeometry(w, h, d), TO = (R, r, a) => new THREE.TorusGeometry(R, r, 8, a || 22);
-  const tshirt = L.top === 0, hood = L.top === 1, jacket = L.top === 2, vest = L.top === 3, longSleeve = !tshirt;
+  const vestL = L.top >= 3, tshirt = L.top === 0, hood = L.top === 1, jacket = L.top === 2, vest = L.top === 3, longSleeve = !tshirt;
   /* ---------- Rumpf (Kleidungshülle) ---------- */
   const torsoShell = (mat, k) => {
     const pts = new THREE.SplineCurve([[.07, 1.53], [.1, 1.5], [.165, 1.46], [.2, 1.41], [.213, 1.32], [.2, 1.2], [.178, 1.07], [.176, .99], [.19, .93], [.185, .86]].map(p => new THREE.Vector2(p[0] * k, p[1])).reverse()).getPoints(48);
-    const geo = new THREE.LatheGeometry(pts, 30); geo.scale(1, 1, .62); const m = new THREE.Mesh(geo, mat); m.castShadow = true; g.add(m);
+    const geo = new THREE.LatheGeometry(pts, 30); geo.scale(1, 1, .62); const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.userData.torso = true; g.add(m);
     [-1, 1].forEach(s => mk(huSphere(.05 * k, .05 * k, .05 * k, 10), mat, s * .205, 1.42, 0));
   };
   torsoShell(shirtM, 1.0);
@@ -3838,6 +3839,17 @@ function buildHuman(L) {
   if (hood) { torsoShell(topM, 1.09); mk(huSphere(.085, .075, .06, 12), topM, 0, 1.5, -.1); mk(TO(.072, .028, 18), topM, 0, 1.49, -.035).rotation.x = Math.PI / 2 - .55; mk(B(.2, .1, .02), topDk, 0, 1.08, .145); [-.035, .035].forEach(x => mk(new THREE.CylinderGeometry(.004, .004, .14, 5), lace, x, 1.4, .13)); mk(new THREE.CylinderGeometry(.19, .19, .05, 18), topDk, 0, .9, 0).scale.z = .74; }
   if (jacket) { torsoShell(topM, 1.08); [-1, 1].forEach(s => { mk(B(.07, .045, .1), topLt, s * .05, 1.545, -.01).rotation.z = -s * .3; mk(B(.1, .11, .02), topDk, s * .12, 1.1, .138); mk(B(.07, .03, .012), topDk, s * .1, 1.34, .14); }); mk(B(.012, .5, .02), dark, 0, 1.2, .139); mk(new THREE.CylinderGeometry(.185, .19, .06, 18), topDk, 0, .9, 0).scale.z = .74; }
   if (vest) { torsoShell(topM, 1.12); mk(B(.012, .52, .02), dark, 0, 1.2, .143); [-1, 1].forEach(s => { mk(B(.12, .12, .02), topDk, s * .1, 1.04, .148); mk(B(.2, .018, .02), M(0xe6e07a, .5), s * .0, 1.18 - .0, .152).position.set(s * .06, 1.18, .152); }); mk(B(.4, .02, .02), M(0xe6e07a, .5), 0, 1.3, .152); }
+  const quilt = (k) => { for (let r = 0; r < 5; r++) mk(B(.26, .007, .01), topDk, 0, 1.14 + r * .075, .142 * k); for (let c = -2; c <= 2; c++) mk(B(.007, .33, .01), topDk, c * .06, 1.28, .142 * k); };
+  if (L.top === 4) {   // taktische Weste über dunklem Langarmshirt: Brusttaschen, Schulterriemen, Magazintaschen
+    torsoShell(topM, 1.1); mk(B(.012, .5, .02), dark, 0, 1.2, .146);
+    [-1, 1].forEach(sg => { mk(B(.07, .03, .24), topDk, sg * .1, 1.55, 0).rotation.z = -sg * .2; [0, 1, 2].forEach(i => mk(B(.075, .1, .045), topDk, sg * .095 + sg * i * .0, 1.28 - i * 0 , .15).position.set(sg * (.085 + (i % 2) * .09), 1.3 - Math.floor(i / 2) * .13, .16)); mk(B(.11, .12, .05), topDk, sg * .11, 1.08, .162); mk(B(.11, .015, .052), dark, sg * .11, 1.13, .164); });
+    mk(B(.17, .09, .02), dark, 0, 1.34, .162); mk(B(.04, .03, .026), M(0xb8bcc2, .3, .9), 0, 1.34, .175);
+  }
+  if (L.top === 5) {   // lange Tunika bis zu den Knien + gesteppte Weste
+    const tun = mk(new THREE.CylinderGeometry(.185, .27, .56, 24, 1, true), shirtM, 0, .69, 0); tun.scale.z = .75; tun.material = shirtM.clone(); tun.material.side = THREE.DoubleSide;
+    mk(new THREE.CylinderGeometry(.275, .275, .02, 24, 1, true), topDk, 0, .415, 0).scale.z = .75; 
+    torsoShell(topM, 1.12); mk(B(.012, .5, .02), dark, 0, 1.2, .156); [-1, 1].forEach(sg => mk(B(.09, .05, .1), topLt, sg * .055, 1.55, 0).rotation.z = -sg * .3);
+  }
   /* ---------- Beine ---------- */
   const legs = [], shins = [], feet = [];
   [-1, 1].forEach(s => {
@@ -3858,10 +3870,10 @@ function buildHuman(L) {
   [-1, 1].forEach((s, i) => {
     const a = new THREE.Group(); a.position.set(s * .212, 1.42, 0); g.add(a); arms.push(a);
     mk(huTube(.045, .038, .29, 12), skinM, 0, 0, 0, a);
-    mk(huTube(.048, .042, longSleeve ? .29 : .14, 12), tshirt ? topM : (hood || jacket || vest ? (vest ? shirtM : topM) : topM), 0, 0, 0, a);
+    mk(huTube(.048, .042, longSleeve ? .29 : .14, 12), tshirt ? topM : (hood || jacket || vestL ? (vestL ? shirtM : topM) : topM), 0, 0, 0, a);
     const fa = new THREE.Group(); fa.position.set(0, -.29, 0); a.add(fa); fore.push(fa); mk(huSphere(.04, .04, .04, 8), skinM, 0, 0, 0, fa);
     mk(huTube(.038, .031, .26, 12), skinM, 0, 0, 0, fa);
-    if (longSleeve) { mk(huTube(.042, .037, .22, 12), vest ? shirtM : topM, 0, 0, 0, fa); if (hood || jacket) mk(huTube(.043, .043, .04, 12), topDk, 0, -.2, 0, fa); }
+    if (longSleeve) { mk(huTube(.042, .037, .22, 12), vestL ? shirtM : topM, 0, 0, 0, fa); if (hood || jacket) mk(huTube(.043, .043, .04, 12), topDk, 0, -.2, 0, fa); }
     // Hand
     const h = new THREE.Group(); h.position.set(0, -.26, 0); fa.add(h);
     mk(B(.076, .085, .03), skinM, 0, -.045, 0, h);
@@ -3876,6 +3888,8 @@ function buildHuman(L) {
   const head = new THREE.Group(); head.position.set(0, 1.67, 0); g.add(head);
   mk(huHeadGeo(), faceM, 0, 0, 0, head);
   mk(huSphere(.014, .03, .021, 8), skinM, .079, -.004, -.004, head); mk(huSphere(.014, .03, .021, 8), skinM, -.079, -.004, -.004, head);   // Ohren
+  if (L.ears === 1) [-1, 1].forEach(sg => { const e = mk(new THREE.CylinderGeometry(.007, .022, .075, 10), skinM, sg * .108, .028, -.01, head); e.rotation.z = -sg * 1.15; mk(huSphere(.024, .024, .008, 10), skinM, sg * .141, .052, -.01, head).rotation.y = sg * .5; });
+  if (L.ears === 2) [-1, 1].forEach(sg => { const e = mk(new THREE.ConeGeometry(.02, .09, 8), skinM, sg * .1, .05, -.01, head); e.rotation.z = -sg * .9; });
   const nose = mk(huSphere(.012, .024, .02, 10), skinM, 0, -.019, .092, head); nose.rotation.x = -.3; mk(huSphere(.017, .01, .012, 8), skinM, 0, -.037, .094, head);
   // Haare
   const hat = L.cap === 2 || L.cap === 4 || L.cap === 3 || L.cap === 5;
@@ -3886,9 +3900,12 @@ function buildHuman(L) {
   if (L.hair === 4) { if (!hat) hairCap(.083, .111, .102, .4); for (let i = 0; i < 8; i++) mk(huSphere(.014, .02, .016, 6), hairM, 0, -.03 - i * .03, -.092 - i * .002, head); mk(huSphere(.02, .02, .02, 6), hairM, 0, -.26, -.095, head); }
   if (L.hair === 5) { if (!hat) hairCap(.084, .112, .104, .4); mk(huSphere(.045, .045, .045, 10), hairM, 0, .13, -.06, head); }
   if (L.hair === 6) { if (!hat) { mk(huSphere(.081, .1, .1, 14, 0, Math.PI * 2, 0, Math.PI * .45), M(new THREE.Color(LOOK_HAIRC[L.hairc]).multiplyScalar(.45).getHex(), .9), 0, .004, -.004, head); for (let i = 0; i < 9; i++) mk(B(.02, .035, .02 + (i % 3) * .02), hairM, 0, .125, -.07 + i * .02, head); } }
+  if (L.hair === 8) { if (!hat) { for (let i = 0; i < 120; i++) { const th = Math.acos(1 - Math.random() * .78), ph = Math.random() * 6.28; if (Math.sin(th) * Math.sin(ph) > .55 && th > .9) continue; mk(huSphere(.019, .019, .019, 5), hairM, Math.sin(th) * Math.cos(ph) * .082, Math.cos(th) * .104 + .008, Math.sin(th) * Math.sin(ph) * .094, head); } mk(huSphere(.082, .104, .095, 14, 0, Math.PI * 2, 0, Math.PI * .34), hairM, 0, .008, -.004, head); } }
   if (L.hair === 7) { if (!hat) { for (let i = 0; i < 34; i++) { const th = Math.acos(1 - Math.random() * .85), ph = Math.random() * 6.28; mk(huSphere(.034, .034, .034, 6), hairM, Math.sin(th) * Math.cos(ph) * .082, Math.cos(th) * .1 + .01, Math.sin(th) * Math.sin(ph) * .09, head); } } }
   // Bart
   if (L.beard === 2) { mk(huSphere(.079, .062, .092, 16, Math.PI * .08, Math.PI * .84, Math.PI * .63, Math.PI * .3), hairM, 0, -.04, .004, head); mk(huSphere(.03, .009, .018, 8), hairM, 0, -.054, .1, head); }
+  if (L.beard === 4) { mk(huSphere(.03, .03, .022, 10), hairM, 0, -.075, .084, head); mk(huSphere(.034, .01, .018, 8), hairM, 0, -.052, .1, head); }
+  if (L.beard === 5) { mk(huSphere(.081, .07, .095, 18, Math.PI * .05, Math.PI * .9, Math.PI * .56, Math.PI * .36), hairM, 0, -.045, .004, head); mk(huSphere(.04, .04, .03, 12), hairM, 0, -.098, .078, head); mk(huSphere(.026, .045, .02, 10), hairM, 0, -.135, .066, head); mk(huSphere(.034, .01, .018, 8), hairM, 0, -.052, .1, head); [-1, 1].forEach(sg => mk(huSphere(.012, .045, .03, 8), hairM, sg * .075, -.02, .03, head)); }
   if (L.beard === 3) mk(huSphere(.032, .01, .018, 8), hairM, 0, -.052, .1, head);
   // Kopfbedeckung
   const capShell = (mat, sx, sy, sz, tl) => mk(huSphere(sx, sy, sz, 20, 0, Math.PI * 2, 0, Math.PI * tl), mat, 0, .012, -.004, head);
@@ -3910,9 +3927,19 @@ function buildHuman(L) {
   if (L.ear === 2) [-1, 1].forEach(s => { const m = mk(TO(.016, .0028, 12), gold, s * .082, -.05, .006, head); m.rotation.y = Math.PI / 2; });
   if (L.bag === 1) { mk(huSphere(.17, .22, .09, 12), bagM, 0, 1.24, -.19); mk(B(.2, .12, .05), M(col(L.bagc).multiplyScalar(.8), .85, 0, T.fabric, .12), 0, 1.14, -.27); mk(huSphere(.07, .03, .05, 8), M(col(L.bagc).multiplyScalar(.7), .85), 0, 1.47, -.19); [-1, 1].forEach(s => { mk(B(.045, .3, .018), dark, s * .11, 1.34, .13).rotation.x = -.05; mk(B(.045, .26, .018), dark, s * .11, 1.38, -.1).rotation.x = .1; mk(B(.04, .016, .26), dark, s * .11, 1.49, .0); }); }
   if (L.bag === 2) { mk(B(.3, .22, .1), bagM, .26, .94, .02); mk(B(.3, .04, .11), M(col(L.bagc).multiplyScalar(.75), .85), .26, 1.04, .02); const st = mk(B(.034, 1.0, .014), dark, .02, 1.22, .13); st.rotation.z = -.62; const st2 = mk(B(.034, 1.0, .014), dark, .02, 1.22, -.13); st2.rotation.z = -.62; }
+  /* ---------- Ausrüstung: Gürtel, Holster, Taschen, Brustgurte ---------- */
+  if (L.gear) {
+    const lt = M(0x3a2414, .75, 0, T.fabric, .12), lt2 = M(0x5a3a22, .7, 0, T.fabric, .12);
+    mk(new THREE.CylinderGeometry(.176, .18, .06, 20), lt, 0, .97, 0).scale.z = .74; mk(B(.05, .05, .016), M(0xc8ccd0, .25, .95), 0, .97, .13);
+    if (L.gear === 1 || L.gear === 3) { mk(B(.058, .2, .085), lt2, .205, .86, .03); mk(B(.04, .1, .06), M(0x1c1f22, .5, .6), .205, .93, .035); mk(B(.012, .14, .012), lt, .183, .93, .03); }
+    if (L.gear === 2) [[-.15, .08], [.15, .08], [-.19, -.06], [.19, -.06]].forEach(([x, z]) => { mk(B(.07, .09, .055), lt2, x, .93, z + .02).rotation.y = x * 1.4; mk(B(.072, .02, .057), lt, x, .975, z + .02).rotation.y = x * 1.4; });
+    if (L.gear === 3) { [1, -1].forEach(dz => { const st = mk(B(.04, .58, .014), lt, 0, 1.22, dz * .152); st.rotation.z = dz * .66; }); mk(B(.055, .05, .02), M(0xc8ccd0, .25, .95), 0, 1.22, .158); [-.08, 0, .08].forEach(x => mk(B(.04, .09, .035), lt2, x * 1.0 - .13 + x * 0, 1.07, .15)); }
+  }
   // Bodycam-LED + Mini-Kamera (Brust)
   const led = new THREE.Mesh(new THREE.SphereGeometry(.014, 6, 6), new THREE.MeshBasicMaterial({ color: 0xff2020 })); led.position.set(.05, 1.38, .15); g.add(led);
   mk(B(.07, .05, .04), dark, .05, 1.38, .13);
+  { const wk = [.88, 1, 1.13, 1.3][L.build === undefined ? 1 : L.build] || 1, lk = [.86, 1, 1.14, 1.32][L.build === undefined ? 1 : L.build] || 1, zk = 1 + (wk - 1) * .8;
+    if (wk !== 1) { g.children.slice().forEach(o => { if (!o.isMesh || !(o.userData.torso || (o.position.y >= .88 && o.position.y <= 1.57))) return; o.scale.x *= wk; o.position.x *= wk; o.scale.z *= zk; o.position.z *= zk; }); arms.forEach(a => { a.position.x *= wk * 1.02; a.scale.set(lk, 1, lk); }); legs.forEach(h => { h.position.x *= 1 + (wk - 1) * .5; h.scale.set(lk, 1, lk); }); head.scale.setScalar(1 + (wk - 1) * .12); } }
   g.userData = { legs, arms, shins, fore, feet, head, led, can, torch, faceTex };
   return g;
 }
@@ -4034,19 +4061,19 @@ function buildBlobBot(L) {
 ==================================================================== */
 const LOOK_PAL = ['#cc2a22', '#2f6bff', '#30d058', '#ffd820', '#f08a24', '#8a3fd0', '#e84a8a', '#f2f2ee', '#1c1c1e', '#6a6e72', '#5a3a22', '#2a4a3a', '#3b5b88', '#8a8266', '#6a1f2a', '#c8b898'];
 const LOOK_PAL_N = ['Rot', 'Blau', 'Grün', 'Gelb', 'Orange', 'Lila', 'Pink', 'Weiß', 'Schwarz', 'Grau', 'Braun', 'Tannengrün', 'Jeansblau', 'Khaki', 'Bordeaux', 'Beige'];
-const LOOK_SKIN = ['#f1c7a4', '#e0a87e', '#c68a5e', '#a06a45', '#7a4a2e', '#523020'];
+const LOOK_SKIN = ['#f1c7a4', '#e0a87e', '#c68a5e', '#a06a45', '#7a4a2e', '#523020', '#8ea83e', '#f7e0d2'];
 const LOOK_HAIRC = ['#16100c', '#3a2416', '#7a5230', '#c8a050', '#b03a20', '#8a8a8a', '#f0f0f0', '#4a2a8a'];
 const LOOK_FIELDS = [
-  { k: 'skin', label: 'HAUTTON', names: ['Hell', 'Hell-Mittel', 'Mittel', 'Braun', 'Dunkel', 'Sehr dunkel'], sw: LOOK_SKIN, def: 1 },
+  { k: 'skin', label: 'HAUTTON', names: ['Hell', 'Hell-Mittel', 'Mittel', 'Braun', 'Dunkel', 'Sehr dunkel', 'Grün (Oger)', 'Blass'], sw: LOOK_SKIN, def: 1 },
   { k: 'eye', label: 'AUGENFARBE', names: ['Braun', 'Blau', 'Grün', 'Grau', 'Haselnuss'], sw: ['#5a3418', '#3a78b8', '#4a8a4a', '#7a8a96', '#8a6428'], def: 0 },
-  { k: 'hair', label: 'FRISUR', names: ['Kahl', 'Kurz', 'Seitenscheitel', 'Lang', 'Zopf', 'Dutt', 'Irokese', 'Locken'], def: 1 },
+  { k: 'hair', label: 'FRISUR', names: ['Kahl', 'Kurz', 'Seitenscheitel', 'Lang', 'Zopf', 'Dutt', 'Irokese', 'Locken', 'Kurze Locken'], def: 1 },
   { k: 'hairc', label: 'HAARFARBE', names: ['Schwarz', 'Dunkelbraun', 'Hellbraun', 'Blond', 'Rot', 'Grau', 'Weiß', 'Lila'], sw: LOOK_HAIRC, def: 1 },
-  { k: 'beard', label: 'BART', names: ['Kein Bart', 'Stoppeln', 'Vollbart', 'Schnurrbart'], def: 0 },
+  { k: 'beard', label: 'BART', names: ['Kein Bart', 'Stoppeln', 'Vollbart', 'Schnurrbart', 'Kinnbart', 'Gepflegter Vollbart'], def: 0 },
   { k: 'cap', label: 'KOPFBEDECKUNG', names: ['Keine', 'Baseballcap', 'Beanie', 'Eimerhut', 'Kapuze', 'Cowboyhut', 'Stirnband'], def: 1 },
   { k: 'capc', label: 'FARBE KOPFBEDECKUNG', names: LOOK_PAL_N, sw: LOOK_PAL, def: 8 },
   { k: 'glasses', label: 'BRILLE', names: ['Keine', 'Rund', 'Sonnenbrille', 'Schutzbrille'], def: 0 },
   { k: 'mask', label: 'GESICHT', names: ['Frei', 'Mundschutz', 'Bandana'], def: 0 },
-  { k: 'top', label: 'OBERTEIL', names: ['T-Shirt', 'Hoodie', 'Jacke', 'Weste'], def: 2 },
+  { k: 'top', label: 'OBERTEIL', names: ['T-Shirt', 'Hoodie', 'Jacke', 'Weste', 'Taktische Weste', 'Tunika + Weste'], def: 2 },
   { k: 'topc', label: 'FARBE OBERTEIL', names: LOOK_PAL_N, sw: LOOK_PAL, def: 11 },
   { k: 'pants', label: 'HOSE', names: ['Jeans', 'Cargohose', 'Shorts'], def: 0 },
   { k: 'pantsc', label: 'FARBE HOSE', names: LOOK_PAL_N, sw: LOOK_PAL, def: 12 },
@@ -4057,6 +4084,9 @@ const LOOK_FIELDS = [
   { k: 'ear', label: 'OHRRINGE', names: ['Keine', 'Ohrstecker', 'Creolen'], def: 0 },
   { k: 'watch', label: 'UHR', names: ['Keine', 'Digitaluhr', 'Goldene Uhr'], def: 0 },
   { k: 'brace', label: 'ARMBAND', names: ['Keines', 'Lederarmband', 'Goldreif'], def: 0 },
+  { k: 'build', label: 'KÖRPERBAU', names: ['Schlank', 'Normal', 'Kräftig', 'Massiv'], def: 1, g: 'h' },
+  { k: 'gear', label: 'AUSRÜSTUNG', names: ['Keine', 'Gürtel + Holster', 'Gürtel + Taschen', 'Brustgurte + Holster'], def: 0, g: 'h' },
+  { k: 'ears', label: 'OHREN', names: ['Normal', 'Trompetenohren', 'Spitze Ohren'], def: 0, g: 'h' },
   { k: 'body', label: 'KÖRPER', names: ['Mensch', 'Roboter'], def: 1 },
   { k: 'rtype', label: 'ROBOTER-TYP', names: ['Kugelauge-Roboter', 'Android (Logo)'], def: 0, g: 'r' },
   { k: 'rcol', label: 'ROBOTER-FARBE', names: ROBO_PAL_N, sw: ROBO_PAL, def: 1, g: 'r' },
@@ -4077,19 +4107,20 @@ function saveLook() { try { localStorage.setItem('bcam_look', JSON.stringify(loo
 function buildAvatar(look, ci) { return buildHuman(look || defaultLook(ci)); }
 
 /* ---------- Editor-Oberfläche mit 3D-Vorschau ---------- */
-let LP = null;
+let LP = null; const _lpV = new THREE.Vector3();
 function lookPreviewStart() {
   if (!LP) {
     const cv = $('lookcv'); let rr; try { rr = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { return; }
     rr.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); rr.setSize(300, 420, false);
-    const sc = new THREE.Scene(), cm = new THREE.PerspectiveCamera(32, 300 / 420, .1, 30); cm.position.set(0, 1.18, 4.3); cm.lookAt(0, .96, 0);
+    const sc = new THREE.Scene(), cm = new THREE.PerspectiveCamera(32, 300 / 420, .1, 30); cm.position.set(0, 1.18, 3.9); cm.lookAt(0, .98, 0);
     sc.add(new THREE.HemisphereLight(0xdfe8f0, 0x2a2e33, 1.15)); const dl = new THREE.DirectionalLight(0xfff2e0, 1.4); dl.position.set(2, 3, 3); sc.add(dl);
     const disc = new THREE.Mesh(new THREE.CylinderGeometry(.8, .85, .04, 24), new THREE.MeshStandardMaterial({ color: 0x14181a, roughness: .6 })); disc.position.y = -.02; sc.add(disc);
-    LP = { rr, sc, cm, av: null, ry: .5, drag: false, lx: 0, run: false };
+    LP = { rr, sc, cm, av: null, ry: .5, drag: false, lx: 0, run: false, zoom: 0 }; const rim = new THREE.DirectionalLight(0x9fc4ff, 1.1); rim.position.set(-3, 2.5, -2.5); sc.add(rim);
+    cv.addEventListener('wheel', e => { e.preventDefault(); LP.zoom = Math.max(0, Math.min(1, LP.zoom + (e.deltaY < 0 ? .12 : -.12))); }, { passive: false });
     cv.addEventListener('mousedown', e => { LP.drag = true; LP.lx = e.clientX; }); window.addEventListener('mouseup', () => { if (LP) LP.drag = false; });
     window.addEventListener('mousemove', e => { if (LP && LP.drag) { LP.ry += (e.clientX - LP.lx) * .012; LP.lx = e.clientX; } });
   }
-  lookPreviewRebuild(); if (!LP.run) { LP.run = true; const loop = () => { if (!LP || !LP.run) return; requestAnimationFrame(loop); if (!LP.drag) LP.ry += .01; if (LP.av) LP.av.rotation.y = LP.ry; LP.rr.render(LP.sc, LP.cm); }; loop(); }
+  lookPreviewRebuild(); if (!LP.run) { LP.run = true; const loop = () => { if (!LP || !LP.run) return; requestAnimationFrame(loop); if (!LP.drag) LP.ry += .01; if (LP.av) LP.av.rotation.y = LP.ry; { const z = LP.zoom, k = LP.av && LP.av.userData.head ? (LP.av.userData.head.getWorldPosition(_lpV).y) : 1.67; LP.cm.position.set(0, 1.18 + (k - 1.18) * z * .92, 3.9 - 2.65 * z); LP.cm.lookAt(0, .98 + (k - .98) * z, 0); } LP.rr.render(LP.sc, LP.cm); }; loop(); }
 }
 function lookPreviewRebuild() {
   if (!LP) return; if (LP.av) { LP.sc.remove(LP.av); disposeAvatar(LP.av); }
