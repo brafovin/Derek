@@ -4763,6 +4763,24 @@ const scrM = new THREE.Mesh(new THREE.PlaneGeometry(.105, .078), new THREE.MeshB
 const ledM = new THREE.Mesh(new THREE.SphereGeometry(.007, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2010, depthTest: false, fog: false })); ledM.position.set(.05, .05, .139); ledM.renderOrder = camOrd++; camBody.add(ledM);
 camGrp.visible = false;
 const camBulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, fog: false })); camBulb.position.set(0, .085, -.06); camBulb.renderOrder = camOrd++; camBulb.visible = false; camBody.add(camBulb);
+function vapeTex() {   // "Bang Box"-Einweg-Vape: Verlauf rosa→türkis, Krone, Totenkopf mit Hut, Display mit 100 %
+  const c = document.createElement('canvas'); c.width = 168; c.height = 540; const g = c.getContext('2d'), W = 168, H = 540;
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#ff8cb8'); gr.addColorStop(.3, '#f7a3cc'); gr.addColorStop(.5, '#59d6e8'); gr.addColorStop(1, '#2fb6c6'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.fillStyle = 'rgba(30,150,160,.55)'; g.fillRect(0, H * .66, W, H * .34);
+  g.fillStyle = '#4a2a6a'; g.beginPath(); g.moveTo(52, 44); g.lineTo(58, 26); g.lineTo(68, 38); g.lineTo(80, 20); g.lineTo(92, 38); g.lineTo(102, 26); g.lineTo(108, 44); g.closePath(); g.fill();
+  g.font = 'bold 22px Impact, Arial Black, sans-serif'; g.textAlign = 'center'; g.fillText('BANG', 80, 70); g.fillText('BOX', 80, 94);
+  const sx = 84, sy = 215; g.fillStyle = '#d9d6cf'; g.beginPath(); g.ellipse(sx, sy, 40, 38, 0, 0, 7); g.fill(); g.fillRect(sx - 24, sy + 24, 48, 28);   // Schädel
+  g.fillStyle = '#6a3a22'; g.beginPath(); g.ellipse(sx - 15, sy - 2, 11, 13, 0, 0, 7); g.ellipse(sx + 15, sy - 2, 11, 13, 0, 0, 7); g.fill(); g.fillStyle = '#ff7a2a'; g.beginPath(); g.arc(sx - 15, sy - 1, 5, 0, 7); g.arc(sx + 15, sy - 1, 5, 0, 7); g.fill();
+  g.fillStyle = '#222'; g.beginPath(); g.moveTo(sx, sy + 8); g.lineTo(sx - 5, sy + 20); g.lineTo(sx + 5, sy + 20); g.fill(); g.fillRect(sx - 22, sy + 34, 44, 11); g.fillStyle = '#f3f0e8'; for (let i = 0; i < 6; i++) g.fillRect(sx - 20 + i * 7.4, sy + 35, 5.4, 9);
+  g.fillStyle = '#3aa8b0'; g.beginPath(); g.ellipse(sx, sy - 34, 52, 11, 0, 0, 7); g.fill(); g.fillRect(sx - 30, sy - 62, 60, 30);   // Hut
+  g.fillStyle = '#f6f0f0'; g.beginPath(); g.moveTo(sx - 24, sy - 60); g.lineTo(sx + 24, sy - 60); g.lineTo(sx + 14, sy - 92); g.lineTo(sx - 14, sy - 92); g.closePath(); g.fill(); g.fillStyle = '#d4506c'; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(sx - 24 + i * 12, sy - 60); g.lineTo(sx - 14 + i * 12, sy - 60); g.lineTo(sx - 8 + i * 10, sy - 92); g.lineTo(sx - 14 + i * 10, sy - 92); g.fill(); }
+  g.fillStyle = '#f7a3cc'; for (let i = 0; i < 5; i++) g.fillRect(sx - 40 + i * 17, sy + 38, 4, 14 + (i * 37 % 22));
+  g.fillStyle = '#d02a2a'; g.font = 'bold 9px Arial'; g.fillText('STRAWBERRY ICE', sx, sy + 76);
+  g.fillStyle = 'rgba(10,40,48,.55)'; g.fillRect(14, H * .7, W - 28, H * .27);
+  [[84, H * .745, '02', '#35d070'], [46, H * .8, '01', '#e04040'], [122, H * .8, '03', '#ffd62a']].forEach(([x, y, t, col]) => { g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283 + .52; i ? g.lineTo(x + Math.cos(a) * 15, y + Math.sin(a) * 15) : g.moveTo(x + Math.cos(a) * 15, y + Math.sin(a) * 15); } g.closePath(); g.stroke(); g.fillStyle = '#fff'; g.font = 'bold 12px Arial'; g.fillText(t, x, y + 4); });
+  g.fillStyle = '#bff6ff'; g.font = 'bold 26px "Courier New", monospace'; g.fillText('100%', 84, H * .93);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
 // Gegenstände in der Hand
 const torchM = new THREE.Group(), fuseM = new THREE.Group(), keyM = new THREE.Group(), cigM = new THREE.Group(), vapeM = new THREE.Group();
 let cigBody, cigEmber, cigTip, vapeLed;
@@ -4781,10 +4799,13 @@ let cigBody, cigEmber, cigTip, vapeLed;
     cMesh(new THREE.CylinderGeometry(.0047, .0047, .006, 8), 0x585650, 0, 0, -.087, cigBody, Math.PI / 2);
     cigEmber = new THREE.Mesh(new THREE.SphereGeometry(.0052, 8, 6), new THREE.MeshBasicMaterial({ color: 0x8a2a0a, depthTest: false, fog: false })); cigEmber.position.set(0, 0, -.09); cigEmber.renderOrder = camOrd++; cigBody.add(cigEmber);
     cigTip = new THREE.Object3D(); cigTip.position.set(0, 0, -.095); cigBody.add(cigTip); }
-  cBox(.03, .042, .1, 0x20242b, 0, 0, 0, 0, vapeM); cBox(.0305, .008, .1, 0x3a404a, 0, .02, 0, 0, vapeM); cMesh(new THREE.CylinderGeometry(.0135, .0135, .05, 12), 0xa9c4d2, 0, .004, -.073, vapeM, Math.PI / 2);
-  cMesh(new THREE.CylinderGeometry(.0085, .011, .02, 10), 0x0c0d10, 0, .004, .06, vapeM, Math.PI / 2); cMesh(new THREE.CylinderGeometry(.007, .0085, .012, 10), 0x15171a, 0, .004, .076, vapeM, Math.PI / 2);
-  vapeLed = new THREE.Mesh(new THREE.SphereGeometry(.0052, 8, 6), new THREE.MeshBasicMaterial({ color: 0x1a5a80, depthTest: false, fog: false })); vapeLed.position.set(0, .0225, -.03); vapeLed.renderOrder = camOrd++; vapeM.add(vapeLed);
-  vapeM.position.set(-.035, .0, -.0); vapeM.rotation.set(0, .32, 0); vapeM.scale.setScalar(2.1);
+  { const W = .042, Lh = .13, T = .022;
+    cBox(W, Lh, T, 0x48c6da, 0, 0, 0, 0, vapeM); cBox(W + .0008, .05, T + .0008, 0xf59ac0, 0, .04, 0, 0, vapeM);
+    const fm = new THREE.MeshBasicMaterial({ map: vapeTex(), depthTest: false, fog: false }); fm.userData.base = new THREE.Color(0xffffff); vmList.push(fm);
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(W * .94, Lh * .98), fm); face.position.set(0, 0, T / 2 + .0006); face.renderOrder = camOrd++; vapeM.add(face);
+    cBox(.022, .03, .016, 0xf59ac0, 0, .08, 0, 0, vapeM);
+    vapeLed = new THREE.Mesh(new THREE.PlaneGeometry(W * .8, .03), new THREE.MeshBasicMaterial({ color: 0x9ff4ff, transparent: true, opacity: .12, depthTest: false, fog: false })); vapeLed.position.set(0, -.04, T / 2 + .0012); vapeLed.renderOrder = camOrd++; vapeM.add(vapeLed); }
+  vapeM.position.set(-.03, .05, 0); vapeM.rotation.set(-.4, .22, 0); vapeM.scale.setScalar(2.0);
   cigM.position.set(-.04, .012, .0); cigM.rotation.set(0, .32, 0); cigM.scale.setScalar(2.0);
   torchM.position.set(0, .0, -.02); torchM.scale.setScalar(.85); fuseM.position.set(0, .0, -.08); fuseM.rotation.y = .6; fuseM.scale.setScalar(.62); keyM.position.set(0, .0, -.09); keyM.rotation.y = -.5; keyM.rotation.z = .3; [torchM, fuseM, keyM, cigM, vapeM].forEach(m => { m.visible = false; itemG.add(m); });
 }
@@ -5176,7 +5197,7 @@ function updateSmoke(dt) {
   if (SMK.puffQ > 0) { const n = Math.min(SMK.puffQ, 2); SMK.puffQ -= n; const fx = -Math.sin(P.vyaw), fz = -Math.cos(P.vyaw); mouthPos(_smv); if (!P.third) _smv.y = camera.position.y - .12; puffBurst(_smv.x + fx * .15, _smv.y, _smv.z + fz * .15, fx * .8, fz * .8, n, P.held === 'vape' ? 1.7 : 1); }
   // Glut an der Zigarette
   cigEmber.material.color.setRGB(SMK.lit ? .55 + SMK.drag * .45 : .12, SMK.lit ? .17 + SMK.drag * .3 : .1, SMK.lit ? .04 + SMK.drag * .06 : .1); cigEmber.visible = true;
-  vapeLed.material.color.setRGB(.1 + SMK.drag * .1, .35 + SMK.drag * .65, .5 + SMK.drag * .5);
+  vapeLed.material.opacity = .06 + SMK.drag * .28;
   cigBody.scale.z = Math.max(.15, (joint ? SMK.leftJ : SMK.left) * .95 + .05); if (joint) cigM.scale.set(2.8, 2.8, 2.3); else cigM.scale.set(2.0, 2.0, 2.0);
   // --- Mitspieler ---
   remotes.forEach(r => {
