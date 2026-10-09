@@ -85,6 +85,10 @@ Wer stirbt, ist **nicht mehr raus**: Nach der Todesszene wachst du am **Anfang d
 
 **Handy/Tablet** (Touch wird automatisch erkannt, am besten im Querformat – beim ersten Antippen geht das Spiel in den Vollbildmodus): Joystick unten links = laufen, Wischen auf der rechten Bildhälfte = umsehen, Tasten für AKTION (halten), E · BENUTZEN, LAMPE, VIDEO, FOTO, RING, QUALLE, ITEM ◄ ►, RENNEN und DUCKEN (an/aus), INVENTAR, PAUSE; die Hotbar unten ist antippbar. Auf dem Handy startet die Grafik automatisch in der mittleren Stufe (sinkt bei zu niedriger Bildrate selbst).
 
+## Offline spielen
+
+**Solo funktioniert komplett ohne Internet** – in der Android-App sowieso (das ganze Spiel steckt in der App), im Browser nach dem ersten Besuch (Service Worker, installierbar als App). Ist das Gerät offline, zeigt das Menü „OFFLINE“ an und sperrt Raum erstellen/Beitreten mit einem Hinweis – nur der Online-Co-op braucht eine Verbindung.
+
 ## Android-App (APK) & Google Play Store
 
 **Fertige Android-App:** `public/downloads/LetzteAufnahme.apk` (Capacitor-App im Querformat/Vollbild, Quellen in `android-app/`). Details in `ANDROID.md`.

@@ -256,6 +256,7 @@ body.touch .screen{-webkit-overflow-scrolling:touch}
     <div class="joinbox"><input id="codein" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false"><div class="go" id="joinbtn">[ BEITRETEN ]</div></div>
   </div>
   <label class="k" style="margin-top:1.2em"><input type="checkbox" id="micchk"> Proximity-Voice mit Mikrofon (Reden lockt das Wesen an)</label>
+  <p class="k" id="offbadge" style="display:none;color:#ffcf6a">● OFFLINE – Solo-Spiel funktioniert ohne Internet, Co-op braucht eine Verbindung.</p>
   <p class="k" id="netmsg"></p>
   <p class="k" id="apklink" style="display:none"><a href="/downloads/LetzteAufnahme.apk" style="color:#ff9b8c">▼ ANDROID-APP HERUNTERLADEN (APK)</a> · <a href="/privacy.html" style="color:#aaa">Datenschutz</a></p>
   <p class="k">Auch mit Controller (Stick = laufen/umsehen, A = benutzen, RT = Aktion) und am Handy (Touch-Steuerung). Dunkelheit, Schockmomente, Blut, flackernde Bilder. Kopfhörer empfohlen.</p>
@@ -5833,6 +5834,11 @@ function quitGame() {
 }
 $('quitbtn').addEventListener('click', e => { e.stopPropagation(); quitGame(); }); $('quitbtn2').addEventListener('click', quitGame);
 applySettings();
+
+/* ---------- Offline: Solo läuft ohne Internet, Co-op wird freundlich blockiert ---------- */
+function updateOnline() { const off = navigator.onLine === false; const b = $('offbadge'); if (b) b.style.display = off ? '' : 'none'; ['hostbtn', 'joinbtn'].forEach(id => $(id).classList.toggle('ro', off)); }
+['hostbtn', 'joinbtn'].forEach(id => $(id).addEventListener('click', e => { if (navigator.onLine === false) { e.stopImmediatePropagation(); const m = $('netmsg'); if (m) m.textContent = 'Du bist offline – Co-op braucht Internet. Solo geht auch ohne.'; } }, true));
+window.addEventListener('online', updateOnline); window.addEventListener('offline', updateOnline); updateOnline();
 
 /* ====================================================================
    BIER (Taste 9, unendlich) → betrunken: Schwanken, Doppelbilder, Unschärfe, Stolpern · SCHUBSEN (Taste H) im Co-op
