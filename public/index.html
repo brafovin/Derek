@@ -4605,7 +4605,7 @@ function respawnPlayer() {   // nach dem Tod: am Anfang der Etage wieder aufwach
   postMat.uniforms.fade.value = 0; fadeTo(1, 1.6); glitchKick = 1; deathShake = deathDy = deathPitch = deathRoll = 0; DC.pose = 0;
   if (net.mode === 'client') { if (net.hostConn) netSend(net.hostConn, { t: 'respawn' }); }
   else { respawnEntity(); E.grace = Math.max(E.grace, 14 * dcfg().grace); }
-  heartbeat(.7); say('Du wachst wieder auf – am Anfang der Etage. (Tode: ' + deathCount + ')', 5000);
+  heartbeat(.7); say('Du wachst wieder auf – am Anfang der Etage. Deine Sachen hast du noch. (Tode: ' + deathCount + ')', 5000);
 }
 function endDeathScene() {
   deathCreature.visible = false; entity.visible = true; deathShake = deathDy = deathPitch = deathRoll = 0; bleedK = 0; postMat.uniforms.bleed.value = 0; postMat.uniforms.fade.value = 1;

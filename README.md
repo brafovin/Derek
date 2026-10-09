@@ -77,7 +77,7 @@ Die Gegenstände in der Hand (Kamera, Lampe, Zigarette, Joint, Vape …) sitzen 
 
 ## Respawn
 
-Wer stirbt, ist **nicht mehr raus**: Nach der Todesszene wachst du am **Anfang der Etage** wieder auf (Akku mindestens 35 %, Wesen weit weg und kurz ruhig). Gefundene Gegenstände, eingesetzte Sicherungen und der Etagen-Fortschritt bleiben. Es zählt nur mit, wie oft du gestorben bist („Tode: n“). Im Co-op steht jeder einzeln wieder auf; es gibt kein Game Over und keinen Zuschauer-Modus mehr.
+Wer stirbt, ist **nicht mehr raus**: Nach der Todesszene wachst du am **Anfang der Etage** wieder auf (Akku mindestens 35 %, Wesen weit weg und kurz ruhig). **Nichts geht verloren:** Taschenlampe, Sicherungen, Schlüssel, Notizen, Spraydosen (samt Farbe), Fotos, Zigaretten/Joints/Bier und der gehaltene Gegenstand bleiben genau so, wie sie waren; auch eingesetzte Sicherungen und der Etagen-Fortschritt bleiben. Es zählt nur mit, wie oft du gestorben bist („Tode: n“). Im Co-op steht jeder einzeln wieder auf; es gibt kein Game Over und keinen Zuschauer-Modus mehr.
 
 ## Controller und Handy
 
